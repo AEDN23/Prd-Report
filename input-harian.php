@@ -36,7 +36,9 @@ $today = date('Y-m-d');
                             </label>
                             <input type="date" id="tanggal" name="tanggal" required
                                 value="<?= $today ?>"
-                                max="<?= $today ?>">
+                                max="<?= $today ?>"
+                                style="width: 100%; cursor: pointer;"
+                                onclick="this.showPicker && this.showPicker();">
                         </div>
 
                         <div class="form-group">
@@ -190,7 +192,7 @@ $today = date('Y-m-d');
                     <button type="submit" class="btn btn-primary btn-large">
                         💾 Simpan Data
                     </button>
-                    <a href="data-harian.php" class="btn btn-secondary">📋 Lihat Data</a>
+                    <!-- <a href="data-harian.php" class="btn btn-secondary">📋 Lihat Data</a> -->
                     <a href="index.php" class="btn btn-secondary">❌ Batal</a>
                 </div>
             </form>

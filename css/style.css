@@ -679,3 +679,20 @@ select:focus {
 .info-card li {
   margin-bottom: 0.3rem;
 }
+
+.table-container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+th,
+td {
+  text-align: center;
+  font-size: 14px;
+}
+th {
+  background-color: #cce5ff;
+}
+td:first-child {
+  font-weight: bold;
+  text-align: left;
+}

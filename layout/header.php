@@ -53,7 +53,7 @@ require_once 'backend/config.php';
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            <li <?php if ($page_title === "Dashboard") echo 'class="active nav-item"'; ?> class="nav-item">
+            <li <?php if ($page_title === "Halaman Utama") echo 'class="active nav-item"'; ?> class="nav-item">
                 <a class="nav-link" href="index.php">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
@@ -107,7 +107,7 @@ require_once 'backend/config.php';
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
-
             <!-- Main Content -->
             <div id="content">
+
                 <br>

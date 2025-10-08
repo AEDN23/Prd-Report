@@ -1,5 +1,5 @@
 <?php
-include 'layout/header.php';
+include '../layout/header.php';
 ?>
 <!-- End of Topbar -->
 
@@ -16,5 +16,5 @@ include 'layout/header.php';
 <!-- End of Main Content -->
 
 <?php
-include 'layout/footer.php';
+include '../layout/footer.php';
 ?>
