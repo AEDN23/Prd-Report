@@ -152,13 +152,12 @@ nav a.disabled:hover {
   font-size: 18px;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  color: white;
-  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
 }
 
-.btn-primary:hover {
+.btn-atas:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
 }
@@ -601,11 +600,6 @@ select:focus {
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
-}
-
-.btn-primary {
-  background-color: #007bff;
-  color: white;
 }
 
 .btn-secondary {

@@ -1,5 +1,5 @@
 <?php
-require_once 'backend/config.php';
+require_once '../backend/config.php';
 ?>
 
 <!DOCTYPE html>
@@ -12,12 +12,12 @@ require_once 'backend/config.php';
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link href="img/images.jpg" rel="icon">
+    <link href="../img/images.jpg" rel="icon">
 
     <title><?= $page_title; ?></title>
 
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
@@ -25,13 +25,13 @@ require_once 'backend/config.php';
 
 
     <!-- Custom fonts for this template-->
-    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
 
     <!-- Custom styles for this template-->
-    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="../css/sb-admin-2.min.css" rel="stylesheet">
 
 </head>
 
@@ -46,8 +46,30 @@ require_once 'backend/config.php';
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
 
+
                 <div class="sidebar-brand-text mx-3">EMIX PRODUKSI</div>
             </a>
+            <div style="text-align:center; font-size:14px; color:#fff; font-weight:bold;">
+                <?php
+                date_default_timezone_set('Asia/Jakarta');
+                echo '<b>' . date('d - M- Y') . '</b>';
+                ?>
+                <br>
+                <span id="jam" style="font-weight:bold;">
+                    <?php echo date('H:i:s'); ?>
+                </span>
+            </div>
+            <script>
+                function updateClock() {
+                    var now = new Date();
+                    var jam = now.getHours().toString().padStart(2, '0');
+                    var menit = now.getMinutes().toString().padStart(2, '0');
+                    var detik = now.getSeconds().toString().padStart(2, '0');
+                    document.getElementById('jam').textContent = jam + ':' + menit + ':' + detik;
+                }
+                setInterval(updateClock, 1000);
+            </script>
+            <br>
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
