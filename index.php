@@ -1,144 +1,158 @@
-<?php
-require_once 'backend/config.php';
-?>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const lineUtama = document.getElementById('lineUtama');
+            const bulanUtama = document.getElementById('bulanUtama');
+            const tahunUtama = document.getElementById('tahunUtama');
+            const tabelUtama = document.querySelector('.table-container');
 
-<!DOCTYPE html>
-<html lang="en">
+            function updateTabelUtama() {
+                const line = lineUtama.value;
+                const bulan = bulanUtama.value;
+                const tahun = tahunUtama.value;
 
-<head>
+                tabelUtama.innerHTML = '<div class="text-center py-3 text-muted">Loading data...</div>';
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link href="img/images.jpg" rel="icon">
+                fetch(`backend/inputharianajax.php?line=${line}&bulan=${bulan}&tahun=${tahun}`)
+                    .then(res => res.text())
+                    .then(html => tabelUtama.innerHTML = html)
+                    .catch(err => {
+                        tabelUtama.innerHTML = '<div class="text-danger text-center py-3">Gagal memuat data!</div>';
+                        console.error(err);
+                    });
+            }
 
-    <title>HALAMAN CHART</title>
+            // Auto update ketika filter berubah
+            [lineUtama, bulanUtama, tahunUtama].forEach(el => {
+                el.addEventListener('change', updateTabelUtama);
+            });
+
+            // Load pertama kali
+            updateTabelUtama();
+        });
+    </script>
+
+    <?php
+    require_once 'backend/config.php';
+    ?>
+
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link href="img/images.jpg" rel="icon">
+
+        <title>HALAMAN CHART</title>
 
 
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+        <link rel="stylesheet" href="css/style.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
 
 
-    <!-- Custom fonts for this template-->
-    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
+        <!-- Custom fonts for this template-->
+        <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+        <link
+            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
 
-    <!-- Custom styles for this template-->
-    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+        <!-- Custom styles for this template-->
+        <link href="css/sb-admin-2.min.css" rel="stylesheet">
 
-</head>
+    </head>
 
-<body id="page-top">
+    <body id="page-top">
 
 
-    <div class="container-fluid">
-        <br>
-        <br>
-        <br>
-        <div class="existing-targets">
-            <h3>📋 DATA PRODUKSI </h3>
-            <form method="GET" class="row g-2 mb-3">
-                <div class="col-md-3">
-                    <label class="form-label">Line Produksi</label>
-                    <select name="line" class="form-select">
-                        <?php foreach ($lines as $line): ?>
-                            <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($line['nama_line']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Bulan</label>
-                    <select name="bulan" class="form-select">
-                        <?php for ($m = 1; $m <= 12; $m++): ?>
-                            <option value="<?= $m ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
-                                <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
-                            </option>
-                        <?php endfor; ?>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Tahun</label>
-                    <input type="number" name="tahun" value="<?= $selectedYear ?>" class="form-control">
-                </div>
-                <div class="col-md-2 align-self-end">
-                    <button class="btn btn-primary w-100">Tampilkan</button>
-                </div>
-            </form>
+        <div class="container-fluid mt-4">
+            <div class="card shadow mb-4">
 
-            <div class="table-container">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Details</th>
-                            <th>Unit</th>
-                            <th>Target</th>
-                            <th>Average</th>
-                            <?php for ($d = 1; $d <= 31; $d++): ?>
-                                <th><?= $d ?></th>
-                            <?php endfor; ?>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <div class="card-header py-3 bg-primary text-white text-center">
+                    <div style="text-align:center; font-size:14px; color:#fff; font-weight:bold;">
                         <?php
-                        $details = [
-                            'batch_count' => ['Batch Count', 'per day'],
-                            'productivity' => ['Productivity', 'Ton/Shift'],
-                            'production_speed' => ['Production Speed', 'Kg/min'],
-                            'batch_weight' => ['Batch Weight', 'Kg/Batch'],
-                            'operation_factor' => ['Operation Factor', '%'],
-                            'cycle_time' => ['Cycle Time', 'min/Batch'],
-                            'grade_change_sequence' => ['Grade Change Sequence', 'frequenly'],
-                            'grade_change_time' => ['Grade Change Time', 'min/grade'],
-                            'feed_raw_material' => ['Feed Raw Material', 'Kg/Day']
-                        ];
-
-                        foreach ($details as $key => [$label, $unit]):
+                        date_default_timezone_set('Asia/Jakarta');
+                        echo '<h5> <b>' . date('d - M- Y') . '</b></h5>';
                         ?>
-                            <tr>
-                                <td><?= $label ?></td>
-                                <td><?= $unit ?></td>
-                                <td><?= $target['target_' . $key] ?? '-' ?></td>
-                                <td><?= $averages[$key] ?></td>
-                                <?php for ($d = 1; $d <= 31; $d++): ?>
-                                    <td>
-                                        <?= isset($perTanggal[$d][$key]) ? $perTanggal[$d][$key] : '-' ?>
-                                    </td>
+                    </div>
+                    <script>
+                        function updateClock() {
+                            var now = new Date();
+                            var jam = now.getHours().toString().padStart(2, '0');
+                            var menit = now.getMinutes().toString().padStart(2, '0');
+                            var detik = now.getSeconds().toString().padStart(2, '0');
+                            document.getElementById('jam').textContent = jam + ':' + menit + ':' + detik;
+                        }
+                        setInterval(updateClock, 1000);
+                    </script>
+                    <h5 class="m-0 font-weight-bold">📊 DASHBOARD DATA PRODUKSI</h5>
+                </div>
+
+                <!-- CHART PRODUKSI (BULANAN) -->
+                <div class="card-body">
+                    <div class="mb-5">
+                        <h6 class="fw-bold text-primary mb-3">📈 CHART PRODUKSI (BULANAN)</h6>
+                        <div class="chart-area border rounded p-3 bg-light">
+                            <canvas id="myChart"></canvas>
+                            <div id="chartLegend" class="mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- CHART PRODUKSI END -->
+
+                <div class="card-body">
+
+                    <!-- FILTER -->
+                    <form id="filterUtama" class="row g-2 mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label">Line Produksi</label>
+                            <select id="lineUtama" name="line" class="form-select">
+                                <?php foreach ($lines as $line): ?>
+                                    <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($line['nama_line']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Bulan</label>
+                            <select id="bulanUtama" name="bulan" class="form-select">
+                                <?php for ($m = 1; $m <= 12; $m++): ?>
+                                    <option value="<?= $m ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
+                                        <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
+                                    </option>
                                 <?php endfor; ?>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Tahun</label>
+                            <input id="tahunUtama" type="number" name="tahun" value="<?= $selectedYear ?>" class="form-control">
+                        </div>
+                    </form>
 
 
+                    <!-- DATA PRODUKSI (HARIAN) -->
+                    <div class="mb-5">
+                        <h6 class="fw-bold text-primary mb-3">📋 DATA PRODUKSI (HARIAN)</h6>
+                        <div class="table-container border rounded p-2">
+                            <div class="text-center py-3 text-muted">Memuat data...</div>
+                        </div>
+                    </div>
 
 
-            <br>
-            <div class="row">
-
-                <!-- CHART START -->
-                <!-- CHART END -->
-                <br>
-                <br>
-                <br>
-
-                <!-- FUNGSI UNTUK MENAMPILKAN DATA TARGET START -->
-                <div class="col-lg-12 mb-5">
-                    <br>
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                            <h6 class="m-0 font-weight-bold text-primary">DATA TARGET PRODUKSI (Rangkuman Tahunan)</h6>
+                    <!-- DATA TARGET PRODUKSI (TAHUNAN) -->
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-bold text-primary mb-0">📘 DATA TARGET PRODUKSI (Rangkuman Tahunan)</h6>
                             <div class="d-flex gap-2 align-items-center">
-                                <!-- Filter -->
                                 <form id="filterForm" class="d-flex gap-2 mb-0">
                                     <select id="lineSelect" name="line" class="form-control form-control-sm" style="width: 140px;">
                                         <?php foreach ($lines as $line): ?>
@@ -150,79 +164,92 @@ require_once 'backend/config.php';
                                     <input id="tahunInput" type="number" name="tahun" class="form-control form-control-sm"
                                         value="<?= $selectedYear ?>" style="width: 100px;">
                                 </form>
-                                <!-- Tombol Export -->
                                 <div class="btn-group">
-                                    <a id="btnPDF" href="export/exportpdf.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>" class="btn btn-danger btn-sm btn-atas">Export PDF</a>
-                                    <a id="btnExcel" href="export/export_excel.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>" class="btn btn-success btn-sm btn-atas ms-2">Export Excel</a>
+                                    <a id="btnPDF" href="export/exportpdf.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
+                                        class="btn btn-danger btn-sm">Export PDF</a>
+                                    <a id="btnExcel" href="export/export_excel.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
+                                        class="btn btn-success btn-sm">Export Excel</a>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive" id="tabelContainer">
-                                <table class="table table-bordered table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Details</th>
-                                            <th>Unit</th>
-                                            <th>Target</th>
-                                            <th>Average</th>
-                                            <?php
-                                            $namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                                            foreach ($namaBulan as $b): ?>
-                                                <th><?= $b ?></th>
-                                            <?php endforeach; ?>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($fields as $key => [$label, $unit]): ?>
-                                            <tr>
-                                                <td><?= $label ?></td>
-                                                <td><?= $unit ?></td>
-                                                <td><?= $target['target_' . $key] ?? '-' ?></td>
-                                                <td><?= $averages[$key] ?></td>
-                                                <?php for ($m = 1; $m <= 12; $m++): ?>
-                                                    <td>
-                                                        <?= isset($bulanData[$m]['avg_' . $key]) ? round($bulanData[$m]['avg_' . $key], 2) : '-' ?>
-                                                    </td>
-                                                <?php endfor; ?>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                                <div class="text-center py-4 text-muted">Silakan pilih line / tahun</div>
-                            </div>
+                        <div id="tabelContainer" class="table-responsive border rounded p-2">
+                            <div class="text-center py-3 text-muted">Silakan pilih line / tahun</div>
                         </div>
                     </div>
+
                 </div>
-                <!-- FUNGSI UNTUK MENAMPILKAN DATA TARGET START -->
-                <!-- /.container-fluid -->
+            </div>
+        </div>
+
+        <!-- FUNGSI UNTUK MENAMPILKAN DATA TARGET START -->
+        <!-- /.container-fluid -->
 
 
-                <br>
-                <br>
-                <!-- Scroll to Top Button-->
+        <br>
+        <br>
+        <!-- Scroll to Top Button-->
 
 
-                <!-- Bootstrap core JavaScript-->
-                <script src="vendor/jquery/jquery.min.js"></script>
-                <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <!-- Bootstrap core JavaScript-->
+        <script src="vendor/jquery/jquery.min.js"></script>
+        <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-                <!-- Core plugin JavaScript-->
-                <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+        <!-- Core plugin JavaScript-->
+        <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
-                <!-- Custom scripts for all pages-->
-                <script src="js/sb-admin-2.min.js"></script>
+        <!-- Custom scripts for all pages-->
+        <script src="js/sb-admin-2.min.js"></script>
 
-                <!-- Page level plugins -->
-                <script src="vendor/chart.js/Chart.min.js"></script>
+        <!-- Page level plugins -->
+        <script src="vendor/chart.js/Chart.min.js"></script>
 
-                <!-- Page level custom scripts -->
-                <script src="js/demo/chart-area-demo.js"></script>
-                <script src="js/demo/chart-pie-demo.js"></script>
-                <script src="js/demo/chart-bar-demo.js"></script>
-                <script src="js/chart-index.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</body>
+        <!-- Page level custom scripts -->
+        <script src="js/chart-index.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-</html>
-<!-- footer end -->
+
+    </body>
+
+    </html>
+    <!-- footer end -->
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const lineSelect = document.getElementById('lineSelect');
+            const tahunInput = document.getElementById('tahunInput');
+            const tabelContainer = document.getElementById('tabelContainer');
+            const btnPDF = document.getElementById('btnPDF');
+            const btnExcel = document.getElementById('btnExcel');
+
+            function updateTabel() {
+                const line = lineSelect.value;
+                const tahun = tahunInput.value;
+
+                // Update link export
+                btnPDF.href = `export/exportpdf.php?line=${line}&tahun=${tahun}`;
+                btnExcel.href = `export/export_excel.php?line=${line}&tahun=${tahun}`;
+
+                // Tampilkan loading
+                tabelContainer.innerHTML = '<div class="text-center py-3 text-muted">Loading data...</div>';
+
+                // Ambil data via AJAX
+                fetch(`backend/rangkuman_ajax.php?line=${line}&tahun=${tahun}`)
+                    .then(res => res.text())
+                    .then(html => {
+                        tabelContainer.innerHTML = html;
+                    })
+                    .catch(err => {
+                        tabelContainer.innerHTML = '<div class="text-danger text-center py-3">Gagal memuat data!</div>';
+                        console.error(err);
+                    });
+            }
+
+            // Trigger otomatis saat user ubah filter
+            lineSelect.addEventListener('change', updateTabel);
+            tahunInput.addEventListener('change', updateTabel);
+
+            // Load pertama kali
+            updateTabel();
+        });
+    </script>
