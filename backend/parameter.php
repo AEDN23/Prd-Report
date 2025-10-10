@@ -1,6 +1,7 @@
 <?php
 include 'config.php';
-
+// BACKLINK DARI ../produksi-report/INDEX.php
+// BAGIAN PARAMETER
 $line = $_GET['line'] ?? 1;
 $tahun = $_GET['tahun'] ?? date('Y');
 

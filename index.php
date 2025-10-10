@@ -98,6 +98,8 @@
                 <div class="card-body">
                     <div class="mb-5">
                         <h6 class="fw-bold text-primary mb-3">📈 CHART PRODUKSI (BULANAN)</h6>
+                        <button id="refreshChart" class="btn btn-sm btn-primary">FILTER BULAN CHARTNYA</button>
+                        <br>
                         <div class="chart-area border rounded p-3 bg-light">
                             <canvas id="myChart"></canvas>
                             <div id="chartLegend" class="mt-2"></div>
@@ -253,3 +255,129 @@
             updateTabel();
         });
     </script>
+
+
+
+    <!-- chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const bulan = document.getElementById('bulanUtama');
+            const tahun = document.getElementById('tahunUtama');
+
+            let currentDataset = 0; // indeks dataset aktif
+            const datasetKeys = ['batch_count', 'productivity', 'production_speed', 'feed_raw_material'];
+            const datasetLabels = ['Batch Count', 'Productivity', 'Production Speed', 'Feed Raw Material'];
+            let chartInstance;
+
+            const btnNext = document.createElement('button');
+            const btnPrev = document.createElement('button');
+            btnNext.className = 'btn btn-sm btn-primary ms-2';
+            btnPrev.className = 'btn btn-sm btn-secondary me-2';
+            btnPrev.textContent = '◀ Prev';
+            btnNext.textContent = 'Next ▶';
+            document.getElementById('chartLegend').append(btnPrev, btnNext);
+
+            function loadChart() {
+                const bulanVal = bulan.value;
+                const tahunVal = tahun.value;
+
+                fetch(`backend/chart-line.php?bulan=${bulanVal}&tahun=${tahunVal}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        renderChart(data);
+                    })
+                    .catch(err => console.error(err));
+            }
+
+            function renderChart(data) {
+                const key = datasetKeys[currentDataset];
+                const label = datasetLabels[currentDataset];
+
+                const labels = data.lineA.map(row => row.hari);
+                const dataA = data.lineA.map(row => parseFloat(row[key] || 0));
+                const dataB = data.lineB.map(row => parseFloat(row[key] || 0));
+
+                if (chartInstance) chartInstance.destroy();
+
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                                label: `Line A - ${label}`,
+                                data: dataA,
+                                borderColor: '#007bff',
+                                backgroundColor: 'rgba(0,123,255,0.1)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 3
+                            },
+                            {
+                                label: `Line B - ${label}`,
+                                data: dataB,
+                                borderColor: '#28a745',
+                                backgroundColor: 'rgba(40,167,69,0.1)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeInOutQuart'
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: `📊 Perbandingan ${label} (Line A vs Line B)`,
+                                font: {
+                                    size: 16
+                                }
+                            },
+                            legend: {
+                                position: 'bottom'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Hari'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Tombol navigasi chart
+            btnNext.addEventListener('click', () => {
+                currentDataset = (currentDataset + 1) % datasetKeys.length;
+                loadChart();
+            });
+
+            btnPrev.addEventListener('click', () => {
+                currentDataset = (currentDataset - 1 + datasetKeys.length) % datasetKeys.length;
+                loadChart();
+            });
+
+            // Auto ganti chart tiap 10 detik
+            setInterval(() => {
+                currentDataset = (currentDataset + 1) % datasetKeys.length;
+                loadChart();
+            }, 10000);
+
+            // Load pertama kali
+            loadChart();
+        });
+    </script>
+
+    <!-- chart end -->

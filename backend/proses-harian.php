@@ -1,6 +1,9 @@
 <?php
 include 'config.php';
 
+
+// BACK LINK DARI ../produksi-report/input-harian.php
+
 // Ambil data dari form
 $tanggal                = $_POST['tanggal'] ?? '';
 $line_id                = $_POST['line_id'] ?? '';
@@ -17,7 +20,7 @@ $feed_raw_material      = $_POST['feed_raw_material'] ?? null;
 try {
     // Validasi input wajib
     if (empty($tanggal) || empty($line_id) || empty($batch_count) || empty($productivity) || empty($operation_factor)) {
-        header("Location: ../input-harian.php?error=1");
+        header("Location: ../produksi-report/input-harian.php?error=1");
         exit;
     }
 
@@ -26,7 +29,7 @@ try {
     $cek->execute([$tanggal, $line_id]);
 
     if ($cek->fetch()) {
-        header("Location: ../input-harian.php?error=2"); // error duplikat
+        header("Location: ../produksi-report/input-harian.php?error=2"); // error duplikat
         exit;
     }
 
@@ -53,10 +56,10 @@ try {
     ]);
 
     // Redirect sukses
-    header("Location: ../input-harian.php?success=1");
+    header("Location: ../produksi-report/input-harian.php?success=1");
     exit;
 } catch (PDOException $e) {
     error_log("DB Error: " . $e->getMessage());
-    header("Location: ../input-harian.php?error=db");
+    header("Location: ../produksi-report/input-harian.php?error=db");
     exit;
 }

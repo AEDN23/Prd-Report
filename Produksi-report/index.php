@@ -116,78 +116,78 @@
                             <button class="btn btn-primary">filter bulan dan tahun</button>
                         </div>
                         <div class="chart-container"></div>
-                            <canvas id="myChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Color System -->
-                </div>
-
-
-
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">DATA TARGET PRODUKSI (Rangkuman Tahunan)</h6>
-
-                    <div class="d-flex gap-2 align-items-center">
-                        <!-- Filter -->
-                        <form id="filterForm" class="d-flex gap-2 mb-0">
-                            <select id="lineSelect" name="line" class="form-control form-control-sm" style="width: 140px;">
-                                <?php foreach ($lines as $line): ?>
-                                    <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($line['nama_line']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-
-                            <input id="tahunInput" type="number" name="tahun" class="form-control form-control-sm"
-                                value="<?= $selectedYear ?>" style="width: 100px;">
-                        </form>
-
-                        <!-- Tombol Export -->
-                        <div class="btn-group">
-                            <a id="btnPDF" href="../export/exportpdf.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>" class="btn btn-danger btn-sm btn-atas">Export PDF</a>
-                            <a id="btnExcel" href="../export/export_excel.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>" class="btn btn-success btn-sm btn-atas ms-2">Export Excel</a>
-                        </div>
+                        <canvas id="myChart"></canvas>
                     </div>
                 </div>
 
-                <div class="card-body">
-                    <div class="table-responsive" id="tabelContainer">
-                        <table class="table table-bordered table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Details</th>
-                                    <th>Unit</th>
-                                    <th>Target</th>
-                                    <th>Average</th>
-                                    <?php
-                                    $namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                                    foreach ($namaBulan as $b): ?>
-                                        <th><?= $b ?></th>
-                                    <?php endforeach; ?>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($fields as $key => [$label, $unit]): ?>
-                                    <tr>
-                                        <td><?= $label ?></td>
-                                        <td><?= $unit ?></td>
-                                        <td><?= $target['target_' . $key] ?? '-' ?></td>
-                                        <td><?= $averages[$key] ?></td>
-                                        <?php for ($m = 1; $m <= 12; $m++): ?>
-                                            <td>
-                                                <?= isset($bulanData[$m]['avg_' . $key]) ? round($bulanData[$m]['avg_' . $key], 2) : '-' ?>
-                                            </td>
-                                        <?php endfor; ?>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                        <div class="text-center py-4 text-muted">Silakan pilih line / tahun</div>
+                <!-- Color System -->
+            </div>
+
+
+
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">DATA TARGET PRODUKSI (Rangkuman Tahunan)</h6>
+
+                <div class="d-flex gap-2 align-items-center">
+                    <!-- Filter -->
+                    <form id="filterForm" class="d-flex gap-2 mb-0">
+                        <select id="lineSelect" name="line" class="form-control form-control-sm" style="width: 140px;">
+                            <?php foreach ($lines as $line): ?>
+                                <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($line['nama_line']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+
+                        <input id="tahunInput" type="number" name="tahun" class="form-control form-control-sm"
+                            value="<?= $selectedYear ?>" style="width: 100px;">
+                    </form>
+
+                    <!-- Tombol Export -->
+                    <div class="btn-group">
+                        <a id="btnPDF" href="../export/exportpdf.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>" class="btn btn-danger btn-sm btn-atas">Export PDF</a>
+                        <a id="btnExcel" href="../export/export_excel.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>" class="btn btn-success btn-sm btn-atas ms-2">Export Excel</a>
                     </div>
                 </div>
             </div>
+
+            <div class="card-body">
+                <div class="table-responsive" id="tabelContainer">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th>Details</th>
+                                <th>Unit</th>
+                                <th>Target</th>
+                                <th>Average</th>
+                                <?php
+                                $namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                foreach ($namaBulan as $b): ?>
+                                    <th><?= $b ?></th>
+                                <?php endforeach; ?>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($fields as $key => [$label, $unit]): ?>
+                                <tr>
+                                    <td><?= $label ?></td>
+                                    <td><?= $unit ?></td>
+                                    <td><?= $target['target_' . $key] ?? '-' ?></td>
+                                    <td><?= $averages[$key] ?></td>
+                                    <?php for ($m = 1; $m <= 12; $m++): ?>
+                                        <td>
+                                            <?= isset($bulanData[$m]['avg_' . $key]) ? round($bulanData[$m]['avg_' . $key], 2) : '-' ?>
+                                        </td>
+                                    <?php endfor; ?>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    <div class="text-center py-4 text-muted">Silakan pilih line / tahun</div>
+                </div>
+            </div>
         </div>
+    </div>
     </div>
     <!-- /.container-fluid -->
 
@@ -237,6 +237,9 @@
         });
     </script>
 
+
+
+    <!-- SCRIPT FUNGSI UNTUK PARAMETER LINE -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const lineB = document.getElementById('lineB');
