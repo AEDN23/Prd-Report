@@ -183,13 +183,10 @@
             </div>
         </div>
 
-        <!-- FUNGSI UNTUK MENAMPILKAN DATA TARGET START -->
-        <!-- /.container-fluid -->
 
 
         <br>
         <br>
-        <!-- Scroll to Top Button-->
 
 
         <!-- Bootstrap core JavaScript-->

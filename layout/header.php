@@ -41,14 +41,14 @@ require_once '../backend/config.php';
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled " id="accordionSidebar">
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index">
 
 
-                <div class="mx-3" style="text-align:center;  color:#fff; font-weight:bold;">EMIX PRODUKSI</div>
+                <div class="mx-3" style="text-align:center;  color:#fff; font-weight:bold;">Produksi Report</div>
             </a>
             <div style="text-align:center; font-size:14px; color:#fff; font-weight:bold;">
                 <?php
@@ -116,11 +116,6 @@ require_once '../backend/config.php';
                     <span>INPUT INFO</span></a>
             </li>
 
-            <li <?php if ($page_title === "Charts") echo 'class="active nav-item"'; ?> class="nav-item">
-                <a class="nav-link" href="charts">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Charts</span></a>
-            </li>
 
 
             <!-- Divider -->
