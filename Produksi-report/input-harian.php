@@ -12,17 +12,34 @@ $today = date('Y-m-d');
 <div class="container">
 
     <main>
-        <?php if (isset($_GET['success'])): ?>
+        <?php
+        if (isset($_GET['success']) && $_GET['success'] == 1): ?>
             <div class="alert alert-success">
                 ✅ Data berhasil disimpan!
             </div>
         <?php endif; ?>
 
-        <?php if (isset($_GET['error'])): ?>
+        <?php if (isset($_GET['error'])):
+            $errorMsg = '';
+            switch ($_GET['error']) {
+                case '1':
+                    $errorMsg = '⚠️ Semua field wajib diisi!';
+                    break;
+                case '2':
+                    $errorMsg = '⚠️ Data untuk tanggal dan line ini sudah ada. Silakan ubah tanggal atau line.';
+                    break;
+                case 'db':
+                    $errorMsg = '❌ Terjadi kesalahan pada database. Silakan coba lagi.';
+                    break;
+                default:
+                    $errorMsg = '❌ Gagal menyimpan data. Pastikan data valid.';
+            }
+        ?>
             <div class="alert alert-error">
-                ❌ Gagal menyimpan data. Pastikan data valid.
+                <?= $errorMsg ?>
             </div>
         <?php endif; ?>
+
 
         <div class="form-container">
             <form action="../backend/proses-harian.php" method="POST" id="formHarian">
@@ -103,6 +120,7 @@ $today = date('Y-m-d');
                             <input type="number" id="production_speed" name="production_speed"
                                 step="0.01" min="0"
                                 value=""
+                                required
                                 placeholder="Contoh: 32.5">
                             <small class="form-help">Kg per menit</small>
                         </div>
@@ -113,6 +131,7 @@ $today = date('Y-m-d');
                             </label>
                             <input type="number" id="batch_weight" name="batch_weight"
                                 step="0.01" min="0"
+                                required
                                 value=""
                                 placeholder="Contoh: 138">
                             <small class="form-help">Kg per batch</small>
@@ -132,6 +151,7 @@ $today = date('Y-m-d');
                             <input type="number" id="operation_factor" name="operation_factor"
                                 step="0.01" min="0" max="100" required
                                 value=""
+
                                 placeholder="Contoh: 82.0">
                             <small class="form-help">Dalam persentase (0-100%)</small>
                         </div>
@@ -141,7 +161,7 @@ $today = date('Y-m-d');
                                 Cycle Time
                             </label>
                             <input type="number" id="cycle_time" name="cycle_time"
-                                step="0.01" min="0"
+                                step="0.01" min="0" required
                                 value=""
                                 placeholder="Contoh: 4.30">
                             <small class="form-help">Menit per batch</small>
@@ -154,7 +174,7 @@ $today = date('Y-m-d');
                                 Grade Change Sequence
                             </label>
                             <input type="number" id="grade_change_sequence" name="grade_change_sequence"
-                                step="0.01" min="0"
+                                step="0.01" min="0" required
                                 value=""
                                 placeholder="Contoh: 3">
                             <small class="form-help">Frekuensi perubahan grade</small>
@@ -165,7 +185,7 @@ $today = date('Y-m-d');
                                 Grade Change Time
                             </label>
                             <input type="number" id="grade_change_time" name="grade_change_time"
-                                step="0.01" min="0"
+                                step="0.01" min="0" required
                                 value=""
                                 placeholder="Contoh: 3.2">
                             <small class="form-help">Menit per grade change</small>
@@ -181,7 +201,7 @@ $today = date('Y-m-d');
                             Feed Raw Material
                         </label>
                         <input type="number" id="feed_raw_material" name="feed_raw_material"
-                            step="0.01" min="0"
+                            step="0.01" min="0" required
                             value=""
                             placeholder="Contoh: 4800">
                         <small class="form-help">Kg material yang dipakai hari ini</small>

@@ -76,7 +76,6 @@ include '../layout/header.php';
         </div>
 </div>
 </main>
-</div>
 
 <?php
 include '../layout/footer.php';

@@ -16,7 +16,7 @@ require_once '../backend/config.php';
 
     <title><?= $page_title; ?></title>
 
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -41,13 +41,14 @@ require_once '../backend/config.php';
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled " id="accordionSidebar">
+
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index">
 
 
-                <div class="sidebar-brand-text mx-3">EMIX PRODUKSI</div>
+                <div class="mx-3" style="text-align:center;  color:#fff; font-weight:bold;">EMIX PRODUKSI</div>
             </a>
             <div style="text-align:center; font-size:14px; color:#fff; font-weight:bold;">
                 <?php
@@ -72,47 +73,55 @@ require_once '../backend/config.php';
             <br>
 
             <!-- Divider -->
+            <div class="sidebar-heading">
+                Master Data
+            </div>
+            <li <?php if ($page_title === "Halaman Utama") echo 'class="active nav-item"'; ?> class="nav-item">
+                <a class="nav-link" href="index">
+                    <i class="bi bi-clipboard2-data"></i>
+                    <span>Dashboard</span></a>
+            </li>
+            <li <?php if ($page_title === "INFORMASI") echo 'class="active nav-item"'; ?> class="nav-item">
+                <a class="nav-link" href="informasi">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <span>Informasi</span></a>
+            </li>
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            <li <?php if ($page_title === "Halaman Utama") echo 'class="active nav-item"'; ?> class="nav-item">
-                <a class="nav-link" href="index.php">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span></a>
-            </li>
 
             <!-- Divider -->
             <hr class="sidebar-divider">
 
             <!-- Heading -->
             <div class="sidebar-heading">
-                Addons
+                INPUT
             </div>
 
+
             <li <?php if ($page_title === "Input Target Produksi") echo 'class="active nav-item"'; ?> class="nav-item">
-                <a class="nav-link" href="input-target.php">
-                    <i class="fas fa-fw fa-chart-area" class="active"></i>
+                <a class="nav-link" href="input-target">
+                    <i class="bi bi-clipboard"></i></i>
                     <span>INPUT TARGET</span></a>
             </li>
 
             <li <?php if ($page_title === "Input Harian") echo 'class="active nav-item"'; ?> class="nav-item">
-                <a class="nav-link" href="input-harian.php">
-                    <i class="fas fa-fw fa-chart-area" class="active"></i>
+                <a class="nav-link" href="input-harian">
+                    <i class="bi bi-calendar"></i>
                     <span>INPUT HARIAN</span></a>
             </li>
-            <!-- Nav Item - Charts -->
+            <li <?php if ($page_title === "Input Info") echo 'class="active nav-item"'; ?> class="nav-item">
+                <a class="nav-link" href="input-info">
+                    <i class="bi bi-info"></i>
+                    <span>INPUT INFO</span></a>
+            </li>
+
             <li <?php if ($page_title === "Charts") echo 'class="active nav-item"'; ?> class="nav-item">
-                <a class="nav-link" href="charts.php">
+                <a class="nav-link" href="charts">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Charts</span></a>
             </li>
 
-            <!-- Nav Item - Tables -->
-            <li <?php if ($page_title === "Tables") echo 'class="active nav-item"'; ?> class="nav-item">
-                <a class="nav-link" href="tables.php">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Tables</span></a>
-            </li>
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">

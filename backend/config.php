@@ -69,7 +69,7 @@ function showError($message)
 {
     echo "<script>
         alert('Gagal menambahkan: ' + " . json_encode($message) . ");
-        window.location.href = '../input-target.php';
+        window.location.href = '../produksi-report/input-target';
     </script>";
     exit();
 }
@@ -77,7 +77,7 @@ function showSuccess($message)
 {
     echo "<script>
         alert('Berhasil menambahkan: ' + " . json_encode($message) . ");
-        window.location.href = '../index.php';
+        window.location.href = '../index';
     </script>";
     exit();
 }
