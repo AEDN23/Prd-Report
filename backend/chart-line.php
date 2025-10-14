@@ -1,32 +1,33 @@
 <?php
-include 'config.php';
+require_once 'config.php';
 
-$tahun = $_GET['tahun'] ?? date('Y');
 $bulan = $_GET['bulan'] ?? date('n');
+$tahun = $_GET['tahun'] ?? date('Y');
 
-// Ambil data untuk Line A (id=1) & Line B (id=2)
-function ambilDataLine($pdo, $line, $bulan, $tahun)
-{
+$data = ['lines' => []];
+
+// Ambil semua line produksi dari DB
+$lines = $pdo->query("SELECT id, nama_line FROM line_produksi ORDER BY id")->fetchAll(PDO::FETCH_ASSOC);
+
+foreach ($lines as $line) {
+    $lineId = $line['id'];
+    $namaLine = $line['nama_line'];
+
+    // Ambil data produksi per hari untuk tiap line
     $stmt = $pdo->prepare("
         SELECT 
             DAY(tanggal) AS hari,
-            AVG(batch_count) AS batch_count,
-            AVG(productivity) AS productivity,
-            AVG(production_speed) AS production_speed,
-            AVG(feed_raw_material) AS feed_raw_material
+            batch_count,
+            productivity,
+            production_speed,
+            feed_raw_material
         FROM input_harian
         WHERE line_id = ? AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?
-        GROUP BY DAY(tanggal)
         ORDER BY hari
     ");
-    $stmt->execute([$line, $bulan, $tahun]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->execute([$lineId, $bulan, $tahun]);
+    $data['lines'][$namaLine] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-$dataA = ambilDataLine($pdo, 1, $bulan, $tahun);
-$dataB = ambilDataLine($pdo, 2, $bulan, $tahun);
-
-echo json_encode([
-    'lineA' => $dataA,
-    'lineB' => $dataB
-]);
+header('Content-Type: application/json');
+echo json_encode($data);

@@ -50,7 +50,7 @@ try {
     ");
     $stmt->execute([$judul, $deskripsi, $isi_informasi, $namaFile]);
 
-    echo "<script>alert('✅ Data berhasil disimpan!'); window.location.href='../produksi-report/informasi';</script>";
+    echo "<script>alert('✅ Data berhasil disimpan!'); window.location.href='../dashboard/informasi';</script>";
     exit;
 } catch (Exception $e) {
     echo "<script>alert('❌ Terjadi kesalahan: " . addslashes($e->getMessage()) . "'); window.history.back();</script>";
