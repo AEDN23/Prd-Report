@@ -227,10 +227,10 @@ document.addEventListener("DOMContentLoaded", () => {
   [bulan, tahun].forEach((el) => el.addEventListener("change", loadChart));
 
   // Auto refresh setiap 10 detik (optional)
-  // setInterval(() => {
-  //   currentDataset = (currentDataset + 1) % datasetKeys.length;
-  //   loadChart();
-  // }, 10000);
+  setInterval(() => {
+    currentDataset = (currentDataset + 1) % datasetKeys.length;
+    loadChart();
+  }, 10000);
 
   loadChart(); // load awal
 });
@@ -353,7 +353,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       pdf.addImage(canvasImage, "PNG", 20, 60, pdfWidth - 40, pdfHeight - 100);
 
-      pdf.save("barchart-produksi.pdf");
+      pdf.save(`barchart-produksi bulan ${bulanNama} - ${tahunVal}.pdf`);
     } catch (err) {
       console.error("Gagal export PDF:", err);
       alert("Gagal membuat PDF!");
@@ -482,7 +482,6 @@ document.addEventListener("DOMContentLoaded", () => {
               usePointStyle: true,
               pointStyle: "rectRounded",
             },
-            // 🔥 legend bisa diklik untuk sembunyiin bar tertentu
             onClick: (e, legendItem, legend) => {
               const index = legendItem.datasetIndex;
               const ci = legend.chart;
@@ -524,6 +523,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Filter bulan/tahun
   [bulan, tahun].forEach((el) => el.addEventListener("change", loadBarChart));
+
+  // Auto refresh setiap 10 detik untuk barchart
+  setInterval(() => {
+    currentDataset = (currentDataset + 1) % datasetKeys.length;
+    loadBarChart();
+  }, 10000);
 
   loadBarChart(); // Load awal
 });
@@ -640,4 +645,178 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   loadChartTahunan(); // load awal
+});
+
+// ===============================
+// 📊 CHART TAHUNAN DENGAN FILTER LINE, TAHUN, DAN NAVIGASI METRIK
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+  const ctx = document.getElementById("BarCharttahunan").getContext("2d");
+  const lineSelect = document.getElementById("lineSelect");
+  const tahunInput = document.getElementById("tahunInput");
+  const legendContainer = document.getElementById("barcharttahunan");
+
+  let chart;
+  let currentMetric = 0;
+
+  // Daftar metrik (kolom di DB) dan labelnya
+  const metrics = [
+    { key: "productivity", label: "Productivity (Ton/Shift)" },
+    { key: "batch_count", label: "Batch Count (Per Day)" },
+    { key: "production_speed", label: "Production Speed (Kg/Min)" },
+    { key: "feed_raw_material", label: "Feed Raw Material (Kg/Day)" },
+    { key: "operation_factor", label: "Operation Factor (%)" },
+  ];
+
+  // Buat tombol navigasi
+  const btnPrev = document.createElement("button");
+  const btnNext = document.createElement("button");
+  btnPrev.textContent = "◀ Prev";
+  btnNext.textContent = "Next ▶";
+  btnPrev.className = "btn btn-sm btn-secondary me-2";
+  btnNext.className = "btn btn-sm btn-primary ms-2";
+  legendContainer.append(btnPrev, btnNext);
+
+  const bulanLabels = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+
+  // Ambil data dari backend
+  function loadChart() {
+    const lineId = lineSelect.value || 1;
+    const tahun = tahunInput.value || new Date().getFullYear();
+    fetch(
+      `backend/get_chart_tahunan.php?line=${encodeURIComponent(
+        lineId
+      )}&tahun=${encodeURIComponent(tahun)}`
+    )
+      .then((res) => res.json())
+      .then((data) => renderChart(data))
+      .catch((err) => {
+        console.error("Gagal ambil data chart tahunan:", err);
+        // jika error, tetap hapus chart lama agar UI konsisten
+        if (chart) {
+          chart.destroy();
+          chart = null;
+        }
+      });
+  }
+
+  // Render chart dari data (menggunakan currentMetric)
+  function renderChart(data) {
+    const metricKey = metrics[currentMetric].key;
+    const metricLabel = metrics[currentMetric].label;
+    const dataBulan = data.bulanData || {};
+    const targetData = data.target || {};
+    const tahun = data.tahun || tahunInput.value;
+
+    // buat array produksi berdasarkan avg_<metricKey>
+    const produksiData = bulanLabels.map((_, i) => {
+      const bulan = i + 1;
+      const avgKey = `avg_${metricKey}`;
+      return dataBulan[bulan] && dataBulan[bulan][avgKey] !== undefined
+        ? parseFloat(dataBulan[bulan][avgKey])
+        : 0;
+    });
+
+    // ambil target dari kolom target_<metricKey> di tabel target
+    const targetKey = `target_${metricKey}`;
+    const targetValue =
+      targetData &&
+      targetData[targetKey] !== null &&
+      targetData[targetKey] !== undefined
+        ? parseFloat(targetData[targetKey])
+        : 0;
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: bulanLabels,
+        datasets: [
+          {
+            label: `Rata-rata ${metricLabel}`,
+            data: produksiData,
+            backgroundColor: "rgba(0, 123, 255, 0.6)",
+            borderColor: "#007bff",
+            borderWidth: 1.5,
+            borderRadius: 4,
+          },
+          {
+            label: `🎯 Target ${metricLabel}`,
+            data: Array(12).fill(targetValue),
+            type: "line",
+            borderColor: "#ff0000",
+            borderWidth: 2,
+            borderDash: [6, 4],
+            pointRadius: 0,
+            fill: false,
+            yAxisID: "y",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: `📘 Grafik ${metricLabel} vs Target (${tahun})`,
+            font: { size: 16 },
+          },
+          legend: {
+            position: "bottom",
+            labels: {
+              usePointStyle: true,
+              pointStyle: "rectRounded",
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: metricLabel },
+          },
+          x: {
+            title: { display: true, text: "Bulan" },
+          },
+        },
+      },
+    });
+  }
+
+  // Tombol navigasi
+  btnNext.addEventListener("click", () => {
+    currentMetric = (currentMetric + 1) % metrics.length;
+    loadChart();
+  });
+  btnPrev.addEventListener("click", () => {
+    currentMetric = (currentMetric - 1 + metrics.length) % metrics.length;
+    loadChart();
+  });
+
+  // event filter
+  [lineSelect, tahunInput].forEach((el) =>
+    el.addEventListener("change", loadChart)
+  );
+
+  // auto refresh 10s
+  setInterval(() => {
+    loadChart();
+  }, 10);
+
+  // load awal
+  loadChart();
 });

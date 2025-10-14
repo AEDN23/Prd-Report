@@ -34,43 +34,81 @@
                     <h5 class="m-0 font-weight-bold">📊 DASHBOARD DATA PRODUKSI</h5>
                 </div>
                 <!-- CHART PRODUKSI (BULANAN) -->
-                <div class="card-body">
-                    <div class="mb-5">
-                        <h6 class="fw-bold text-primary mb-3">📈 CHART PRODUKSI (BULANAN)</h6>
-                        <!-- FILTER -->
-                        <form id="filterchart" class="row g-2 mb-4">
-                            <div class="col-md-2">
-                                <label class="form-label">Bulan</label>
-                                <select id="bulanUtama" name="bulan" class="form-select">
-                                    <?php for ($m = 1; $m <= 12; $m++): ?>
-                                        <option value="<?= $m ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
-                                            <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
-                                        </option>
-                                    <?php endfor; ?>
-                                </select>
+
+                <section id="1">
+                    <div class="card-body">
+                        <div class="mb-5">
+                            <h6 class="fw-bold text-primary mb-3">📈 CHART PRODUKSI (BULANAN)</h6>
+                            <!-- FILTER -->
+                            <form id="filterchart" class="row g-2 mb-4">
+                                <div class="col-md-2">
+                                    <label class="form-label">Bulan</label>
+                                    <select id="bulanUtama" name="bulan" class="form-select">
+                                        <?php for ($m = 1; $m <= 12; $m++): ?>
+                                            <option value="<?= $m ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
+                                                <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
+                                            </option>
+                                        <?php endfor; ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Tahun</label>
+                                    <input id="tahunUtama" type="number" name="tahun" value="<?= $selectedYear ?>" class="form-control">
+                                </div>
+                            </form>
+                            <div id="chartLegend" class="mt-3 text-center"> </div>
+                            <br>
+                            <div><button id="exportPDF" class="btn btn-primary">Export PDF</button></div>
+                            <div class="chart-area border rounded p-3 bg-light"
+                                style="width:100%; overflow-x:auto; overflow-y:hidden; height:auto; max-height:500PX">
+                                <canvas id="myChart" style="width:100%; height:400px; display:block;"> </canvas>
                             </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Tahun</label>
-                                <input id="tahunUtama" type="number" name="tahun" value="<?= $selectedYear ?>" class="form-control">
+                            <div id="barchart" class="mt-3 text-center"></div>
+                            <div><button id="exportPDFbarchart" class="btn btn-primary">Export PDF</button></div>
+                            <div class="chart-area border rounded p-3 bg-light"
+                                style="width:100%; overflow-x:auto; overflow-y:hidden; height:auto; max-height:500PX">
+                                <canvas id="BarChart" style="width:100%; height:400px; display:block;"></canvas>
                             </div>
+                            <br>
+                        </div>
+                </section>
+
+
+                <section id="2">
+                    <div class="d-flex gap-2 align-items-center mb-3">
+                        <form id="filterTahunan" class="d-flex gap-2 mb-0">
+                            <select id="lineSelect" name="line" class="form-control form-control-sm" style="width: 160px;">
+                                <?php foreach ($lines as $line): ?>
+                                    <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($line['nama_line']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <input id="tahunInput" type="number" name="tahun" class="form-control form-control-sm"
+                                value="<?= $selectedYear ?>" style="width: 110px;">
                         </form>
-                        <div id="chartLegend" class="mt-3 text-center"> </div>
-                        <br>
-                        <div><button id="exportPDF" class="btn btn-primary">Export PDF</button></div>
+
+                        <button id="exportPDFbarcharttahunan" class="btn btn-primary btn-sm ms-2" style="min-width: 120px;">
+                            Export PDF
+                        </button>
+                    </div>
+
+                    <div class="card-body">
                         <div class="chart-area border rounded p-3 bg-light"
-                            style="width:100%; overflow-x:auto; overflow-y:hidden; height:auto; max-height:500PX">
-                            <canvas id="myChart" style="width:100%; height:400px; display:block;"> </canvas>
+                            style="width:100%; overflow-x:auto; overflow-y:hidden; height:auto; max-height:500px;">
+                            <div id="barcharttahunan" class="mt-3 text-center"></div>
+                            <canvas id="BarCharttahunan" style="width:100%; height:400px; display:block;"></canvas>
                         </div>
-                        <div id="barchart" class="mt-3 text-center"></div>
-                        <div><button id="exportPDFbarchart" class="btn btn-primary">Export PDF</button></div>
-                        <div class="chart-area border rounded p-3 bg-light"
-                            style="width:100%; overflow-x:auto; overflow-y:hidden; height:auto; max-height:500PX">
-                            <canvas id="BarChart" style="width:100%; height:400px; display:block;"></canvas>
-                        </div>
-                        <br>
-                        <div class="d-flex align-items-end mb-3" style="gap: 1px;">
-                            <div style="flex: 1;">
-                                <select id="lineUtama" name="line" class="form-select" style="min-width: 180px;">
+                    </div>
+                </section>
+
+
+                <section id="3">
+                    <div class="card-body">
+                        <form id="filterUtama" class="row g-2 mb-4">
+                            <div class="col-md-3">
+                                <label class="form-label">Line Produksi</label>
+                                <select id="lineUtama" name="line" class="form-select">
                                     <?php foreach ($lines as $line): ?>
                                         <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
                                             <?= htmlspecialchars($line['nama_line']) ?>
@@ -78,42 +116,18 @@
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <div>
-                                <button id="exportPDFbarcharttahunan" class="btn btn-primary" style="min-width: 140px;">Export PDF</button>
+                        </form>
+                        <!-- DATA PRODUKSI (HARIAN) -->
+                        <div class="mb-5">
+                            <h6 class="fw-bold text-primary mb-3">📋 DATA PRODUKSI (HARIAN)</h6>
+                            <div class="table-container border rounded p-2">
+                                <div class="text-center py-3 text-muted">Memuat data...</div>
                             </div>
                         </div>
-                        <div id="barcharttahunan" class="mt-3 text-center"></div>
-                        <div class="chart-area border rounded p-3 bg-light"
-                            style="width:100%; overflow-x:auto; overflow-y:hidden; height:auto; max-height:500PX">
-                            <canvas id="BarCharttahunan" style="width:100%; height:400px; display:block;"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CHART PRODUKSI END -->
-                <div class="card-body">
-                    <!-- FILTER -->
-                    <form id="filterUtama" class="row g-2 mb-4">
-                        <div class="col-md-3">
-                            <label class="form-label">Line Produksi</label>
-                            <select id="lineUtama" name="line" class="form-select">
-                                <?php foreach ($lines as $line): ?>
-                                    <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($line['nama_line']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </form>
-                    <!-- DATA PRODUKSI (HARIAN) -->
-                    <div class="mb-5">
-                        <h6 class="fw-bold text-primary mb-3">📋 DATA PRODUKSI (HARIAN)</h6>
-                        <div class="table-container border rounded p-2">
-                            <div class="text-center py-3 text-muted">Memuat data...</div>
-                        </div>
-                    </div>
-                    <!-- DATA TARGET PRODUKSI (TAHUNAN) -->
-                    <div>
+                </section>
+                <!-- DATA TARGET PRODUKSI (TAHUNAN) -->
+                <section id="tabel">
+                    <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h6 class="fw-bold text-primary mb-0">📘 DATA TARGET PRODUKSI (Rangkuman Tahunan)</h6>
                             <div class="d-flex gap-2 align-items-center">
@@ -140,97 +154,10 @@
                             <div class="text-center py-3 text-muted">Silakan pilih line / tahun</div>
                         </div>
                     </div>
-                </div>
+                </section>
             </div>
+        </div>
         </div>
     </body>
 
     </html>
-
-    <script>
-        // ===============================
-        // 📘 CHART TAHUNAN (PAKAI DATA PHP LANGSUNG)
-        // ===============================
-        document.addEventListener("DOMContentLoaded", () => {
-            const ctx = document.getElementById("BarCharttahunan").getContext("2d");
-
-            // Ambil data PHP -> ubah ke JS
-            const dataBulan = <?= json_encode($dataBulan); ?>;
-            const targetData = <?= json_encode($target); ?>;
-
-            const bulanLabels = [
-                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-            ];
-
-            // ambil nilai rata-rata productivity (misalnya)
-            const produksiData = bulanLabels.map((_, i) => {
-                const bulan = i + 1;
-                return dataBulan[bulan]?.avg_productivity ? parseFloat(dataBulan[bulan].avg_productivity) : 0;
-            });
-
-            const targetValue = targetData?.productivity || 0;
-
-            const chart = new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels: bulanLabels,
-                    datasets: [{
-                            label: "Rata-rata Productivity",
-                            data: produksiData,
-                            backgroundColor: "rgba(0, 123, 255, 0.6)",
-                            borderColor: "#007bff",
-                            borderWidth: 1.5,
-                            borderRadius: 4,
-                        },
-                        {
-                            label: "🎯 Target Productivity",
-                            data: Array(12).fill(targetValue),
-                            type: "line",
-                            borderColor: "#ff0000",
-                            borderWidth: 2,
-                            borderDash: [6, 4],
-                            pointRadius: 0,
-                            fill: false,
-                            yAxisID: "y",
-                        },
-                    ],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: "📘 Grafik Productivity vs Target (" + <?= json_encode($selectedYear) ?> + ")",
-                            font: {
-                                size: 16
-                            },
-                        },
-                        legend: {
-                            position: "bottom",
-                            labels: {
-                                usePointStyle: true,
-                                pointStyle: "rectRounded",
-                            },
-                        },
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: "Nilai Productivity"
-                            },
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: "Bulan"
-                            },
-                        },
-                    },
-                },
-            });
-        });
-    </script>
