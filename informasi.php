@@ -62,30 +62,9 @@
                             <canvas id="myChart" style="width:100%; height:400px; display:block;"> </canvas>
                         </div>
                         <div id="barchart" class="mt-3 text-center"></div>
-                        <div><button id="exportPDFbarchart" class="btn btn-primary">Export PDF</button></div>
                         <div class="chart-area border rounded p-3 bg-light"
                             style="width:100%; overflow-x:auto; overflow-y:hidden; height:auto; max-height:500PX">
                             <canvas id="BarChart" style="width:100%; height:400px; display:block;"></canvas>
-                        </div>
-                        <br>
-                        <div class="d-flex align-items-end mb-3" style="gap: 1px;">
-                            <div style="flex: 1;">
-                                <select id="lineUtama" name="line" class="form-select" style="min-width: 180px;">
-                                    <?php foreach ($lines as $line): ?>
-                                        <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
-                                            <?= htmlspecialchars($line['nama_line']) ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div>
-                                <button id="exportPDFbarcharttahunan" class="btn btn-primary" style="min-width: 140px;">Export PDF</button>
-                            </div>
-                        </div>
-                        <div id="barcharttahunan" class="mt-3 text-center"></div>
-                        <div class="chart-area border rounded p-3 bg-light"
-                            style="width:100%; overflow-x:auto; overflow-y:hidden; height:auto; max-height:500PX">
-                            <canvas id="BarCharttahunan" style="width:100%; height:400px; display:block;"></canvas>
                         </div>
                     </div>
                 </div>
@@ -146,91 +125,3 @@
     </body>
 
     </html>
-
-    <script>
-        // ===============================
-        // 📘 CHART TAHUNAN (PAKAI DATA PHP LANGSUNG)
-        // ===============================
-        document.addEventListener("DOMContentLoaded", () => {
-            const ctx = document.getElementById("BarCharttahunan").getContext("2d");
-
-            // Ambil data PHP -> ubah ke JS
-            const dataBulan = <?= json_encode($dataBulan); ?>;
-            const targetData = <?= json_encode($target); ?>;
-
-            const bulanLabels = [
-                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-            ];
-
-            // ambil nilai rata-rata productivity (misalnya)
-            const produksiData = bulanLabels.map((_, i) => {
-                const bulan = i + 1;
-                return dataBulan[bulan]?.avg_productivity ? parseFloat(dataBulan[bulan].avg_productivity) : 0;
-            });
-
-            const targetValue = targetData?.productivity || 0;
-
-            const chart = new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels: bulanLabels,
-                    datasets: [{
-                            label: "Rata-rata Productivity",
-                            data: produksiData,
-                            backgroundColor: "rgba(0, 123, 255, 0.6)",
-                            borderColor: "#007bff",
-                            borderWidth: 1.5,
-                            borderRadius: 4,
-                        },
-                        {
-                            label: "🎯 Target Productivity",
-                            data: Array(12).fill(targetValue),
-                            type: "line",
-                            borderColor: "#ff0000",
-                            borderWidth: 2,
-                            borderDash: [6, 4],
-                            pointRadius: 0,
-                            fill: false,
-                            yAxisID: "y",
-                        },
-                    ],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: "📘 Grafik Productivity vs Target (" + <?= json_encode($selectedYear) ?> + ")",
-                            font: {
-                                size: 16
-                            },
-                        },
-                        legend: {
-                            position: "bottom",
-                            labels: {
-                                usePointStyle: true,
-                                pointStyle: "rectRounded",
-                            },
-                        },
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: "Nilai Productivity"
-                            },
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: "Bulan"
-                            },
-                        },
-                    },
-                },
-            });
-        });
-    </script>

@@ -232,44 +232,412 @@ document.addEventListener("DOMContentLoaded", () => {
   //   loadChart();
   // }, 10000);
 
-  // Load pertama kali
-  loadChart();
+  loadChart(); // load awal
 });
 
 // ==============================
 // 📊 SCRIPT UNTUK EXPOR PDF
 // ==============================
 document.addEventListener("DOMContentLoaded", () => {
-  const exportBtn = document.querySelector("#exportPDF");
+  const exportBtn = document.getElementById("exportPDF"); // pastikan tombol punya id="exportPDF"
   const chartCanvas = document.getElementById("myChart");
 
   exportBtn.addEventListener("click", async () => {
     try {
-      // Ambil image dari chart (canvas)
-      const canvasImage = chartCanvas.toDataURL("image/png", 1.0);
-
-      // Buat dokumen PDF baru
+      const canvasImage = chartCanvas.toDataURL("image/png", 2.0);
       const { jsPDF } = window.jspdf;
+
+      // FUNGSI untuk mendapatkan ukuran canvas (biar rasio sama kayak di layar)
+      const canvasWidth = chartCanvas.width;
+      const canvasHeight = chartCanvas.height;
+
+      // Fungsi mengubah ke skala pixel PDF (agar proporsional)
+      const pdfWidth = 1000;
+      const ratio = pdfWidth / canvasWidth;
+      const pdfHeight = canvasHeight * ratio + 100; // +100 untuk ruang judul
+
+      // Buat dokumen PDF dengan ukuran dinamis
       const pdf = new jsPDF({
-        orientation: "landscape", // biar lebar muat chart
+        orientation: "landscape",
         unit: "px",
-        format: [800, 500],
+        format: [pdfWidth, pdfHeight],
       });
 
-      // Tambahkan judul di atas chart
-      pdf.setFontSize(14);
-      pdf.text("📊 Laporan Chart Produksi", 20, 30);
+      // Judul di atas chart
+      pdf.setFontSize(18);
+      const bulanVal = document.getElementById("bulanUtama").value;
+      const tahunVal = document.getElementById("tahunUtama").value;
+      const namaBulan = [
+        "Januari",
+        "Februari",
+        "Maret",
+        "April",
+        "Mei",
+        "Juni",
+        "Juli",
+        "Agustus",
+        "September",
+        "Oktober",
+        "November",
+        "Desember",
+      ];
+      const bulanNama = namaBulan[parseInt(bulanVal, 10) - 1] || bulanVal;
 
-      // Masukkan gambar chart ke PDF
-      pdf.addImage(canvasImage, "PNG", 20, 50, 760, 400);
+      pdf.text(
+        `Laporan Chart Produksi Bulan ${bulanNama} - ${tahunVal}`,
+        30,
+        40
+      );
 
-      // Simpan file PDF
+      // Tambahkan gambar chart
+      pdf.addImage(canvasImage, "PNG", 20, 60, pdfWidth - 40, pdfHeight - 100);
+
+      // fungsi Simpan PDF
       pdf.save("chart-produksi.pdf");
-
-      console.log("PDF berhasil dibuat!");
-    } catch (error) {
-      console.error("Gagal export PDF:", error);
-      alert("Gagal membuat PDF, coba lagi!");
+    } catch (err) {
+      console.error("Gagal export PDF:", err);
+      alert("Gagal membuat PDF!");
     }
   });
+});
+
+// ==============================
+// 📊 SCRIPT UNTUK EXPOR PDF BARCHART
+// ==============================
+document.addEventListener("DOMContentLoaded", () => {
+  const exportBtn = document.getElementById("exportPDFbarchart");
+  const chartCanvas = document.getElementById("BarChart");
+
+  exportBtn.addEventListener("click", async () => {
+    try {
+      const canvasImage = chartCanvas.toDataURL("image/png", 2.0);
+      const { jsPDF } = window.jspdf;
+
+      const canvasWidth = chartCanvas.width;
+      const canvasHeight = chartCanvas.height;
+
+      const pdfWidth = 1000;
+      const ratio = pdfWidth / canvasWidth;
+      const pdfHeight = canvasHeight * ratio + 100;
+
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "px",
+        format: [pdfWidth, pdfHeight],
+      });
+
+      pdf.setFontSize(18);
+      const bulanVal = document.getElementById("bulanUtama").value;
+      const tahunVal = document.getElementById("tahunUtama").value;
+      const namaBulan = [
+        "Januari",
+        "Februari",
+        "Maret",
+        "April",
+        "Mei",
+        "Juni",
+        "Juli",
+        "Agustus",
+        "September",
+        "Oktober",
+        "November",
+        "Desember",
+      ];
+      const bulanNama = namaBulan[parseInt(bulanVal, 10) - 1] || bulanVal;
+
+      pdf.text(
+        `Laporan Bar Chart Produksi Bulan ${bulanNama} - ${tahunVal}`,
+        30,
+        40
+      );
+
+      pdf.addImage(canvasImage, "PNG", 20, 60, pdfWidth - 40, pdfHeight - 100);
+
+      pdf.save("barchart-produksi.pdf");
+    } catch (err) {
+      console.error("Gagal export PDF:", err);
+      alert("Gagal membuat PDF!");
+    }
+  });
+});
+
+// ===============================
+// 📊 SCRIPT UNTUK BAR CHART (MIRIP LINE CHART)
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+  const ctxBar = document.getElementById("BarChart").getContext("2d");
+  const bulan = document.getElementById("bulanUtama");
+  const tahun = document.getElementById("tahunUtama");
+  const barChartLegend = document.getElementById("barchart");
+
+  let currentDataset = 0;
+  const datasetKeys = [
+    "batch_count",
+    "productivity",
+    "production_speed",
+    "feed_raw_material",
+  ];
+  const datasetLabels = [
+    "Batch Count",
+    "Productivity",
+    "Production Speed",
+    "Feed Raw Material",
+  ];
+  let barChartInstance;
+
+  // Tombol navigasi antar dataset
+  const btnPrevBar = document.createElement("button");
+  const btnNextBar = document.createElement("button");
+  btnPrevBar.textContent = "◀ Prev";
+  btnNextBar.textContent = "Next ▶";
+  btnPrevBar.className = "btn btn-sm btn-secondary me-2";
+  btnNextBar.className = "btn btn-sm btn-primary ms-2";
+  barChartLegend.append(btnPrevBar, btnNextBar);
+
+  // Ambil data dari backend
+  function loadBarChart() {
+    const bulanVal = bulan.value;
+    const tahunVal = tahun.value;
+
+    fetch(`backend/chart-line.php?bulan=${bulanVal}&tahun=${tahunVal}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.lines) renderBarChart(data.lines);
+        else console.error("Data bar chart tidak sesuai format:", data);
+      })
+      .catch((err) => console.error("Gagal load bar chart:", err));
+  }
+
+  // Render chart
+  function renderBarChart(lines) {
+    const key = datasetKeys[currentDataset];
+    const label = datasetLabels[currentDataset];
+    const labels = Array.from({ length: 31 }, (_, i) => i + 1);
+
+    // Warna bar-nya beda untuk setiap line
+    const warna = [
+      "#0046FF",
+      "#F9E400",
+      "#FF90BB",
+      "#450693",
+      "#6f42c1",
+      "#E9FF97",
+      "#fd7e14",
+      "#6610f2",
+      "#17a2b8",
+      "#adb5bd",
+    ];
+
+    const datasets = Object.entries(lines).map(([lineName, dataLine], i) => {
+      const dataMap = {};
+      dataLine.forEach((row) => {
+        const hari = parseInt(row.hari);
+        dataMap[hari] = parseFloat(row[key]) || 0;
+      });
+      return {
+        label: `${lineName} - ${label}`,
+        data: labels.map((hari) => dataMap[hari] || 0),
+        backgroundColor: warna[i % warna.length] + "88",
+        borderColor: warna[i % warna.length],
+        borderWidth: 1.5,
+      };
+    });
+
+    if (barChartInstance) barChartInstance.destroy();
+
+    // Nama bulan Indonesia
+    const namaBulan = [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember",
+    ];
+    const bulanIndex = parseInt(bulan.value, 10) - 1;
+    const bulanNama = namaBulan[bulanIndex] || bulan.value;
+
+    barChartInstance = new Chart(ctxBar, {
+      type: "bar",
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { intersect: false, mode: "index" },
+        plugins: {
+          title: {
+            display: true,
+            text: `📊 ${label} Antar Line Produksi Bulan ${bulanNama} - ${tahun.value}`,
+            font: { size: 16 },
+          },
+          legend: {
+            position: "bottom",
+            labels: {
+              usePointStyle: true,
+              pointStyle: "rectRounded",
+            },
+            // 🔥 legend bisa diklik untuk sembunyiin bar tertentu
+            onClick: (e, legendItem, legend) => {
+              const index = legendItem.datasetIndex;
+              const ci = legend.chart;
+              const meta = ci.getDatasetMeta(index);
+              meta.hidden =
+                meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+              ci.update();
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: "Nilai Parameter" },
+          },
+          x: {
+            title: { display: true, text: "Hari (1–31)" },
+            ticks: { stepSize: 1 },
+            stacked: false,
+          },
+        },
+        elements: {
+          bar: { borderRadius: 5 },
+        },
+      },
+    });
+  }
+
+  // Tombol navigasi antar dataset
+  btnNextBar.addEventListener("click", () => {
+    currentDataset = (currentDataset + 1) % datasetKeys.length;
+    loadBarChart();
+  });
+  btnPrevBar.addEventListener("click", () => {
+    currentDataset =
+      (currentDataset - 1 + datasetKeys.length) % datasetKeys.length;
+    loadBarChart();
+  });
+
+  // Filter bulan/tahun
+  [bulan, tahun].forEach((el) => el.addEventListener("change", loadBarChart));
+
+  loadBarChart(); // Load awal
+});
+
+// ===============================
+// 📘 CHART TAHUNAN (DENGAN GARIS TARGET)
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+  const ctxTahunan = document
+    .getElementById("BarCharttahunan")
+    .getContext("2d");
+  const lineSelect = document.getElementById("lineSelect");
+  const tahunInput = document.getElementById("tahunInput");
+  const legendTahunan = document.getElementById("barcharttahunan");
+
+  let chartTahunan;
+
+  function loadChartTahunan() {
+    const lineVal = lineSelect.value;
+    const tahunVal = tahunInput.value;
+
+    fetch(`backend/chart-tahunan.php?line=${lineVal}&tahun=${tahunVal}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.data) renderChartTahunan(data);
+        else console.error("Format data tahunan tidak sesuai:", data);
+      })
+      .catch((err) => console.error("Gagal load chart tahunan:", err));
+  }
+
+  function renderChartTahunan(data) {
+    const bulanLabels = [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember",
+    ];
+
+    const produksiData = bulanLabels.map((bulan) => data.data[bulan] || 0);
+    const targetValue = data.target || 0;
+
+    // dataset utama (produksi)
+    const produksiDataset = {
+      label: "Total Produksi",
+      data: produksiData,
+      backgroundColor: "#007bff88",
+      borderColor: "#007bff",
+      borderWidth: 1.5,
+      borderRadius: 4,
+    };
+
+    // dataset garis target (horizontal)
+    const targetDataset = {
+      label: "🎯 Target Produksi",
+      data: Array(12).fill(targetValue),
+      type: "line",
+      borderColor: "#FF0000",
+      borderWidth: 2,
+      borderDash: [8, 4],
+      pointRadius: 0,
+      fill: false,
+      yAxisID: "y",
+    };
+
+    if (chartTahunan) chartTahunan.destroy();
+
+    chartTahunan = new Chart(ctxTahunan, {
+      type: "bar",
+      data: {
+        labels: bulanLabels,
+        datasets: [produksiDataset, targetDataset],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: `📘 Data Produksi vs Target (${tahunInput.value})`,
+            font: { size: 16 },
+          },
+          legend: {
+            position: "bottom",
+            labels: {
+              usePointStyle: true,
+              pointStyle: "rectRounded",
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: "Jumlah Produksi" },
+          },
+          x: {
+            title: { display: true, text: "Bulan" },
+          },
+        },
+      },
+    });
+  }
+
+  // event listener
+  [lineSelect, tahunInput].forEach((el) =>
+    el.addEventListener("change", loadChartTahunan)
+  );
+
+  loadChartTahunan(); // load awal
 });
