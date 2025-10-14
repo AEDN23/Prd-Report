@@ -237,5 +237,39 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ==============================
-// 📊 SCRIPT UNTUK DASHBOARD BAR CHART
+// 📊 SCRIPT UNTUK EXPOR PDF
 // ==============================
+document.addEventListener("DOMContentLoaded", () => {
+  const exportBtn = document.querySelector("#exportPDF");
+  const chartCanvas = document.getElementById("myChart");
+
+  exportBtn.addEventListener("click", async () => {
+    try {
+      // Ambil image dari chart (canvas)
+      const canvasImage = chartCanvas.toDataURL("image/png", 1.0);
+
+      // Buat dokumen PDF baru
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: "landscape", // biar lebar muat chart
+        unit: "px",
+        format: [800, 500],
+      });
+
+      // Tambahkan judul di atas chart
+      pdf.setFontSize(14);
+      pdf.text("📊 Laporan Chart Produksi", 20, 30);
+
+      // Masukkan gambar chart ke PDF
+      pdf.addImage(canvasImage, "PNG", 20, 50, 760, 400);
+
+      // Simpan file PDF
+      pdf.save("chart-produksi.pdf");
+
+      console.log("PDF berhasil dibuat!");
+    } catch (error) {
+      console.error("Gagal export PDF:", error);
+      alert("Gagal membuat PDF, coba lagi!");
+    }
+  });
+});

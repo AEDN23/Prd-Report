@@ -53,7 +53,7 @@
                         </form>
                         <div id="chartLegend" class="mt-3 text-center"> </div>
                         <br>
-                        <div><button class="btn btn-primary">Export PDF</button></div>
+                        <div><button id="exportPDF" class="btn btn-primary">Export PDF</button></div>
                         <div class="chart-area border rounded p-3 bg-light"
                             style="width:100%; overflow-x:auto; overflow-y:hidden; height:auto; max-height:500PX">
                             <canvas id="myChart" style="width:100%; height:400px; display:block;"> </canvas>
@@ -124,48 +124,12 @@
     </html>
     <script src="js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 
 
     <!-- chart end -->
     <!-- Library jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const exportBtn = document.querySelector(".btn.btn-primary"); // Tombol Export PDF
-            const chartCanvas = document.getElementById("myChart");
-
-            exportBtn.addEventListener("click", async () => {
-                try {
-                    // Ambil image dari chart (canvas)
-                    const canvasImage = chartCanvas.toDataURL("image/png", 1.0);
-
-                    // Buat dokumen PDF baru
-                    const {
-                        jsPDF
-                    } = window.jspdf;
-                    const pdf = new jsPDF({
-                        orientation: "landscape", // biar lebar muat chart
-                        unit: "px",
-                        format: [800, 500],
-                    });
-
-                    // Tambahkan judul di atas chart
-                    pdf.setFontSize(14);
-                    pdf.text("📊 Laporan Chart Produksi", 20, 30);
-
-                    // Masukkan gambar chart ke PDF
-                    pdf.addImage(canvasImage, "PNG", 20, 50, 760, 400);
-
-                    // Simpan file PDF
-                    pdf.save("chart-produksi.pdf");
-
-                    console.log("PDF berhasil dibuat!");
-                } catch (error) {
-                    console.error("Gagal export PDF:", error);
-                    alert("Gagal membuat PDF, coba lagi!");
-                }
-            });
-        });
+     
     </script>
