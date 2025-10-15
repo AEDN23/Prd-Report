@@ -48,6 +48,7 @@ date_default_timezone_set('Asia/Jakarta');
 
 
     <!-- SCRIPTS -->
+    <script src="js/autoScroll.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="js/script.js"></script>
@@ -57,9 +58,9 @@ date_default_timezone_set('Asia/Jakarta');
 
 <body id="page-top">
 
-    <!-- =============================== -->
+    <!-- =========================================================================================================================================-->
     <!-- 🌐 HEADER BAR / NAVBAR -->
-    <!-- =============================== -->
+    <!-- =========================================================================================================================================-->
     <nav class="navbar navbar-expand-lg shadow-sm">
         <div class="container-fluid">
             <a class="navbar-brand text-white fw-bold" href="#">📊 Dashboard Produksi</a>
@@ -83,16 +84,16 @@ date_default_timezone_set('Asia/Jakarta');
         </div>
     </nav>
 
-    <!-- =============================== -->
+    <!-- =========================================================================================================================================-->
     <!-- 📊 ISI HALAMAN -->
-    <!-- =============================== -->
+    <!-- =========================================================================================================================================-->
     <div class="container-fluid">
         <div class="card shadow mb-4">
             <div class="card-body">
 
-                <!-- =============================== -->
+                <!-- =========================================================================================================================================-->
                 <!-- 📈 CHART PRODUKSI (BULANAN) -->
-                <!-- =============================== -->
+                <!-- =========================================================================================================================================-->
                 <section id="chart-bulanan" class="mb-5">
                     <h6 class="fw-bold text-primary mb-3">📈 CHART PRODUKSI (BULANAN)</h6>
 
@@ -124,13 +125,13 @@ date_default_timezone_set('Asia/Jakarta');
                 </section>
 
 
-                <hr>
 
-                <!-- =============================== -->
+                <!-- =========================================================================================================================================-->
                 <!-- 📊 CHART BAR (BULANAN) -->
-                <!-- =============================== -->
+                <!-- =========================================================================================================================================-->
 
                 <section id="chart-bar-bulanan" class="mb-5">
+                    <hr>
                     <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI</h6>
                     <div class="chart-container">
                         <div class="chart-toolbar">
@@ -144,9 +145,9 @@ date_default_timezone_set('Asia/Jakarta');
 
                 <hr>
 
-                <!-- =============================== -->
+                <!-- =========================================================================================================================================-->
                 <!-- 📅 CHART TAHUNAN PER LINE -->
-                <!-- =============================== -->
+                <!-- =========================================================================================================================================-->
                 <section id="chart-tahunan">
                     <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI (TAHUNAN)</h6>
                     <div class="d-flex align-items-center mb-3 gap-2">
@@ -172,10 +173,10 @@ date_default_timezone_set('Asia/Jakarta');
                         <canvas id="BarCharttahunan" style="width:100%; height:400px;"></canvas>
                     </div>
                 </section>
-                <hr>
+                <section id="informasi">
+                    <hr>
 
-
-
+                </section>
             </div> <!-- end card-body -->
         </div> <!-- end card -->
     </div> <!-- end container -->
