@@ -2,7 +2,7 @@
 // 📊 SCRIPT UNTUK EXPOR PDF
 // ==============================
 document.addEventListener("DOMContentLoaded", () => {
-  const exportBtn = document.getElementById("exportPDF"); // pastikan tombol punya id="exportPDF"
+  const exportBtn = document.getElementById("exportPDF"); 
   const chartCanvas = document.getElementById("myChart");
 
   exportBtn.addEventListener("click", async () => {
