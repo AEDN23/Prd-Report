@@ -69,15 +69,24 @@ function showError($message)
 {
     echo "<script>
         alert('Gagal menambahkan: ' + " . json_encode($message) . ");
-        window.location.href = '../produksi-report/input-target';
+        window.location.href = '../dashboard/input-target';
     </script>";
     exit();
 }
+
 function showSuccess($message)
 {
     echo "<script>
         alert('Berhasil menambahkan: ' + " . json_encode($message) . ");
         window.location.href = '../index';
+    </script>";
+    exit();
+}
+function showSuccessTarget($message)
+{
+    echo "<script>
+        alert('Berhasil menambahkan: ' + " . json_encode($message) . ");
+        window.location.href = '../dashboard/input-target';
     </script>";
     exit();
 }

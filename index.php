@@ -48,7 +48,7 @@ date_default_timezone_set('Asia/Jakarta');
 
 
     <!-- SCRIPTS -->
-    <script src="js/autoScroll.js"></script>
+    <script src="js/autoscroll.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="js/script.js"></script>
@@ -143,12 +143,12 @@ date_default_timezone_set('Asia/Jakarta');
                     </div>
                 </section>
 
-                <hr>
 
                 <!-- =========================================================================================================================================-->
                 <!-- 📅 CHART TAHUNAN PER LINE -->
                 <!-- =========================================================================================================================================-->
                 <section id="chart-tahunan">
+                    <hr>
                     <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI (TAHUNAN)</h6>
                     <div class="d-flex align-items-center mb-3 gap-2">
                         <form id="filterTahunan" class="d-flex mb-0 gap-2">
@@ -173,9 +173,39 @@ date_default_timezone_set('Asia/Jakarta');
                         <canvas id="BarCharttahunan" style="width:100%; height:400px;"></canvas>
                     </div>
                 </section>
+                
                 <section id="informasi">
                     <hr>
+                    <h2>Daftar Informasi</h2>
+                    <div class="card-body">
 
+                        <?php
+
+                        try {
+                            $stmt = $pdo->query("SELECT * FROM info ORDER BY created_at DESC");
+                            $infos = $stmt->fetchAll();
+
+                            if ($infos) {
+                                foreach ($infos as $info) {
+                                    echo "<h1 class='text-center' style='word-break:break-word; white-space:normal;'>" . htmlspecialchars($info['judul']) . "</h1><div>" . htmlspecialchars(date('d-m-Y', strtotime($info['created_at']))) . "</div>";
+                                    echo "<div class='text-center'>"  . '|  ' . htmlspecialchars($info['deskripsi']) . ' |</div>  <br>';
+                                    echo "<p class='text-justify' style='word-break:break-word; white-space:normal;'>" . nl2br(htmlspecialchars($info['isi'])) . "</p>";
+                                    if (!empty($info['file'])) {
+                                        echo "<a href='../uploads/info/" . htmlspecialchars($info['file']) . "' target='_blank'>Lihat File</a><br>";
+                                    }
+                                    echo "<hr>";
+                                }
+                            } else {
+                                echo "<p><a href='input-info.php'>Tidak ada informasi tersedia. klik untuk tambah informasi<a></p>";
+                            }
+                        } catch (Exception $e) {
+                            echo "<p>Error: " . htmlspecialchars($e->getMessage()) . "</p>";
+                        }
+                        ?>
+                        <b>
+                            <hr>
+                        </b>
+                    </div>
                 </section>
             </div> <!-- end card-body -->
         </div> <!-- end card -->

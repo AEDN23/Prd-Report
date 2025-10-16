@@ -44,35 +44,9 @@ document.addEventListener("DOMContentLoaded", () => {
 // =========================================================================================================================================================
 // SCRIPT UNTUK PARAMETER LINE
 // =========================================================================================================================================================
-document.addEventListener("DOMContentLoaded", () => {
-  const lineB = document.getElementById("lineB");
-  const tahunB = document.getElementById("tahunB");
-  const containerB = document.getElementById("parameterB");
 
-  function updateParameterB() {
-    const line = lineB.value;
-    const tahun = tahunB.value;
-    containerB.innerHTML =
-      '<div class="text-center py-3 text-muted">Loading...</div>';
 
-    fetch(`../backend/parameter.php?line=${line}&tahun=${tahun}`)
-      .then((res) => res.text())
-      .then((html) => (containerB.innerHTML = html))
-      .catch((err) => {
-        containerB.innerHTML =
-          '<div class="text-danger">Gagal memuat data.</div>';
-        console.error(err);
-      });
-  }
 
-  // auto update saat filter berubah
-  [lineB, tahunB].forEach((el) =>
-    el.addEventListener("change", updateParameterB)
-  );
-
-  // load pertama
-  updateParameterB();
-});
 
 // =========================================================================================================================================================
 // SCRIPT UNTUK TABEL PRODUKSI HARIAN

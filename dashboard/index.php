@@ -55,29 +55,6 @@ include '../layout/header.php';
             <!-- ============================== -->
             <!-- ⿢ PARAMETER LINE -->
             <!-- ============================== -->
-            <section id="parameter-section" class="mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold text-primary mb-0">📈 PARAMETER LINE</h6>
-                    <div class="d-flex gap-2 align-items-center">
-                        <select id="lineSelectParam" name="line" class="form-control form-control-sm" style="width: 160px;">
-                            <?php foreach ($lines as $line): ?>
-                                <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($line['nama_line']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <input id="tahunParam" type="number" class="form-control form-control-sm" value="<?= date('Y') ?>" style="width: 100px;">
-                        <!-- <div class="btn-group">
-                            <a id="btnPDF" href="../export/exportpdf.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>" class="btn btn-danger btn-sm">Export PDF</a>
-                            <a id="btnExcel" href="../export/export_excel.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>" class="btn btn-success btn-sm">Export Excel</a>
-                        </div> -->
-                    </div>
-                </div>
-
-                <div id="parameterB" class="border rounded p-3 bg-light text-center text-muted">
-                    Memuat data...
-                </div>
-            </section>
 
             <hr>
 

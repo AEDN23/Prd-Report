@@ -53,7 +53,7 @@ try {
         $target_feed_raw_material
     ]);
 
-    showSuccess("Target produksi berhasil disimpan!");
+    showSuccessTarget("Target produksi berhasil disimpan!");
 } catch (PDOException $e) {
     showError("Terjadi error: " . $e->getMessage());
 }
