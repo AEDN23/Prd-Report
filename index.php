@@ -118,7 +118,7 @@ date_default_timezone_set('Asia/Jakarta');
                         <div class="chart-toolbar">
                             <button id="prevLine" class="btn btn-sm btn-secondary">◀ Prev</button>
                             <button id="nextLine" class="btn btn-sm btn-primary">Next ▶</button>
-                            <button id="exportPDF" class="btn btn-sm btn-danger">Export PDF</button>
+                            <!-- <button id="exportPDF" class="btn btn-sm btn-danger">Export PDF</button> -->
                         </div>
                         <canvas id="myChart" style="width:100%; height:400px;"></canvas>
                     </div>
@@ -129,7 +129,6 @@ date_default_timezone_set('Asia/Jakarta');
                 <!-- =========================================================================================================================================-->
                 <!-- 📊 CHART BAR (BULANAN) -->
                 <!-- =========================================================================================================================================-->
-
                 <section id="chart-bar-bulanan" class="mb-5">
                     <hr>
                     <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI</h6>
@@ -137,7 +136,7 @@ date_default_timezone_set('Asia/Jakarta');
                         <div class="chart-toolbar">
                             <button id="prevBar" class="btn btn-sm btn-secondary">◀ Prev</button>
                             <button id="nextBar" class="btn btn-sm btn-primary">Next ▶</button>
-                            <button id="exportPDFbarchart" class="btn btn-sm btn-danger">Export PDF</button>
+                            <!-- <button id="exportPDFbarchart" class="btn btn-sm btn-danger">Export PDF</button> -->
                         </div>
                         <canvas id="BarChart" style="width:100%; height:400px;"></canvas>
                     </div>
@@ -163,17 +162,47 @@ date_default_timezone_set('Asia/Jakarta');
                                 value="<?= $selectedYear ?>" style="width: 110px;">
                         </form>
                     </div>
-
                     <div class="chart-container">
                         <div class="chart-toolbar">
                             <button id="prevTahunan" class="btn btn-sm btn-secondary">◀ Prev</button>
                             <button id="nextTahunan" class="btn btn-sm btn-primary">Next ▶</button>
-                            <button id="exportPDFbarcharttahunan" class="btn btn-sm btn-danger">Export PDF</button>
+                            <!-- <button id="exportPDFbarcharttahunan" class="btn btn-sm btn-danger">Export PDF</button> -->
                         </div>
                         <canvas id="BarCharttahunan" style="width:100%; height:400px;"></canvas>
                     </div>
                 </section>
-                
+
+
+
+                <!-- =========================================================================================================================================-->
+                <!-- 📅 TABEL HARIAN PRODUKSI -->
+                <!-- =========================================================================================================================================-->
+                <section id="filter-section" class="mb-4">
+                    <b>
+                        <h2 class="fw-bold text-dark mb-3">📋 DATA PRODUKSI</h2>
+                    </b>
+                    <form id="filterUtama" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Line Produksi</label>
+                            <select id="lineUtama" name="line" class="form-select">
+                                <?php foreach ($lines as $line): ?>
+                                    <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($line['nama_line']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </form>
+
+                    <div class="table-container mt-3">
+                        <div class="text-center py-3 text-muted">Memuat data...</div>
+                    </div>
+                </section>
+
+
+                <!-- =========================================================================================================================================-->
+                <!-- 📅 INFORMASI -->
+                <!-- =========================================================================================================================================-->
                 <section id="informasi">
                     <hr>
                     <h2>Daftar Informasi</h2>
@@ -214,3 +243,45 @@ date_default_timezone_set('Asia/Jakarta');
 </body>
 
 </html>
+
+
+
+<!-- // =========================================================================================================================================================
+// SCRIPT UNTUK TABEL PRODUKSI HARIAN
+// ========================================================================================================================================================= -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const lineUtama = document.getElementById("lineUtama");
+        const bulanUtama = document.getElementById("bulanUtama");
+        const tahunUtama = document.getElementById("tahunUtama");
+        const tabelUtama = document.querySelector(".table-container");
+
+        function updateTabelUtama() {
+            const line = lineUtama.value;
+            const bulan = bulanUtama.value;
+            const tahun = tahunUtama.value;
+
+            tabelUtama.innerHTML =
+                '<div class="text-center py-3 text-muted">Loading data...</div>';
+
+            fetch(
+                    `backend/inputharianajax.php?line=${line}&bulan=${bulan}&tahun=${tahun}`
+                )
+                .then((res) => res.text())
+                .then((html) => (tabelUtama.innerHTML = html))
+                .catch((err) => {
+                    tabelUtama.innerHTML =
+                        '<div class="text-danger text-center py-3">Gagal memuat data!</div>';
+                    console.error(err);
+                });
+        }
+
+        // Auto update ketika filter berubah
+        [lineUtama, bulanUtama, tahunUtama].forEach((el) => {
+            el.addEventListener("change", updateTabelUtama);
+        });
+
+        // Load pertama kali
+        updateTabelUtama();
+    });
+</script>

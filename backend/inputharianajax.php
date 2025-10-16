@@ -74,15 +74,36 @@ foreach ($fields as $key => $v) {
             <?php endfor; ?>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="text-center align-middle">
         <?php foreach ($fields as $key => [$label, $unit]): ?>
+            <?php $targetVal = isset($target['target_' . $key]) ? floatval($target['target_' . $key]) : 0; ?>
             <tr>
                 <td><?= htmlspecialchars($label) ?></td>
                 <td><?= htmlspecialchars($unit) ?></td>
-                <td><?= $target['target_' . $key] ?? '-' ?></td>
-                <td><?= $averages[$key] ?></td>
+                <td style="color: black; font-weight:bold;"><?= $targetVal ?: '-' ?></td>
+                <?php
+                $targetVal = isset($target['target_' . $key]) ? floatval($target['target_' . $key]) : 0;
+                $avgVal = $averages[$key];
+                $color = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
+                ?>
+                <td style="color: <?= $color ?>; font-weight:bold;"><?= $avgVal ?></td>
+
+
                 <?php for ($d = 1; $d <= 31; $d++): ?>
-                    <td><?= isset($data[$d][$key]) ? $data[$d][$key] : '-' ?></td>
+                    <?php
+                    $val = $data[$d][$key] ?? null;
+                    $style = '';
+
+                    // kalau ada nilai dan target > 0
+                    if ($val !== null && $targetVal > 0) {
+                        if ($val < $targetVal) {
+                            $style = 'style="color:red;font-weight:bold"';
+                        } else {
+                            $style = 'style="color:black;"';
+                        }
+                    }
+                    ?>
+                    <td <?= $style ?>><?= $val ?? '-' ?></td>
                 <?php endfor; ?>
             </tr>
         <?php endforeach; ?>

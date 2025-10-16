@@ -1,3 +1,18 @@
+// SCRIPT DI DASHBOARD/CHART.PHP FUNGSI NYA UNTUK MENAMPILKAN CHART DI DASHBOARD/INDEX.
+
+// ============================================================================
+// 📈 LINE CHART BULANAN
+// ============================================================================
+// ============================================================================
+// 📊 BAR CHART BULANAN
+// ============================================================================
+// ============================================================================
+// 📅 BAR CHART TAHUNAN
+// ============================================================================
+// ============================================================================
+// 🧾 Fungsi Export PDF (dipakai semua chart)
+// ============================================================================
+
 // ============================================================================
 // 📈 LINE CHART BULANAN
 // ============================================================================
@@ -8,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const btnPrev = document.getElementById("prevLine");
   const btnNext = document.getElementById("nextLine");
-  // const btnExport = document.getElementById("exportPDF");
+  const btnExport = document.getElementById("exportPDF");
 
   let currentDataset = 0;
   const datasetKeys = [
@@ -29,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const bulanVal = bulan.value;
     const tahunVal = tahun.value;
 
-    fetch(`backend/chart-line.php?bulan=${bulanVal}&tahun=${tahunVal}`)
+    fetch(`../backend/chart-line.php?bulan=${bulanVal}&tahun=${tahunVal}`)
       .then((res) => res.json())
       .then((data) => {
         if (data && data.lines) renderChart(data.lines);
@@ -124,9 +139,9 @@ document.addEventListener("DOMContentLoaded", () => {
       (currentDataset - 1 + datasetKeys.length) % datasetKeys.length;
     loadChart();
   });
-  // btnExport.addEventListener("click", () =>
-  //   exportChartPDF("myChart", "Chart_Produksi_Bulanan")
-  // );
+  btnExport.addEventListener("click", () =>
+    exportChartPDF("myChart", "Chart_Produksi_Bulanan")
+  );
 
   [bulan, tahun].forEach((el) => el.addEventListener("change", loadChart));
   loadChart();
@@ -142,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const btnPrev = document.getElementById("prevBar");
   const btnNext = document.getElementById("nextBar");
-  // const btnExport = document.getElementById("exportPDFbarchart");
+  const btnExport = document.getElementById("exportPDFbarchart");
 
   let currentDataset = 0;
   const datasetKeys = [
@@ -160,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let chartInstance;
 
   function loadChart() {
-    fetch(`backend/chart-line.php?bulan=${bulan.value}&tahun=${tahun.value}`)
+    fetch(`../backend/chart-line.php?bulan=${bulan.value}&tahun=${tahun.value}`)
       .then((res) => res.json())
       .then((data) => renderChart(data.lines))
       .catch((err) => console.error("Gagal load bar chart:", err));
@@ -245,9 +260,9 @@ document.addEventListener("DOMContentLoaded", () => {
       (currentDataset - 1 + datasetKeys.length) % datasetKeys.length;
     loadChart();
   });
-  // btnExport.addEventListener("click", () =>
-  //   exportChartPDF("BarChart", "Chart_Bar_Bulanan")
-  // );
+  btnExport.addEventListener("click", () =>
+    exportChartPDF("BarChart", "Chart_Bar_Bulanan")
+  );
 
   [bulan, tahun].forEach((el) => el.addEventListener("change", loadChart));
   loadChart();
@@ -263,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const btnPrev = document.getElementById("prevTahunan");
   const btnNext = document.getElementById("nextTahunan");
-  // const btnExport = document.getElementById("exportPDFbarcharttahunan");
+  const btnExport = document.getElementById("exportPDFbarcharttahunan");
 
   let currentMetric = 0;
   let chart;
@@ -293,7 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function loadChartyears() {
     fetch(
-      `backend/get_chart_tahunan.php?line=${lineSelect.value}&tahun=${tahunInput.value}`
+      `../backend/get_chart_tahunan.php?line=${lineSelect.value}&tahun=${tahunInput.value}`
     )
       .then((res) => res.json())
       .then((data) => renderChart(data))
@@ -373,9 +388,9 @@ document.addEventListener("DOMContentLoaded", () => {
     currentMetric = (currentMetric - 1 + metrics.length) % metrics.length;
     loadChartyears();
   });
-  // btnExport.addEventListener("click", () =>
-  //   exportChartPDF("BarCharttahunan", "Chart_Tahunan")
-  // );
+  btnExport.addEventListener("click", () =>
+    exportChartPDF("BarCharttahunan", "Chart_Tahunan")
+  );
 
   [lineSelect, tahunInput].forEach((el) =>
     el.addEventListener("change", loadChartyears)
@@ -386,12 +401,12 @@ document.addEventListener("DOMContentLoaded", () => {
 // ============================================================================
 // 🧾 Fungsi Export PDF (dipakai semua chart)
 // ============================================================================
-// function exportChartPDF(canvasId, title) {
-//   const { jsPDF } = window.jspdf;
-//   const pdf = new jsPDF();
-//   const canvas = document.getElementById(canvasId);
-//   const imgData = canvas.toDataURL("image/png");
-//   pdf.text(title, 15, 15);
-//   pdf.addImage(imgData, "PNG", 10, 25, 190, 100);
-//   pdf.save(`${title}.pdf`);
-// }
+function exportChartPDF(canvasId, title) {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  const canvas = document.getElementById(canvasId);
+  const imgData = canvas.toDataURL("image/png");
+  pdf.text(title, 15, 15);
+  pdf.addImage(imgData, "PNG", 10, 25, 190, 100);
+  pdf.save(`${title}.pdf`);
+}

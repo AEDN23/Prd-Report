@@ -3,10 +3,13 @@ $page_title = "CHART";
 include '../layout/header.php';
 ?>
 
-<script src="../js/script.js"></script>
+<!-- Tambahkan ini sebelum chartdashboard.js -->
+<script src="../js/chart.4.4.1.min.js"></script>
+
+<script src="../js/jspdf.umd.min.js"></script>
 <script src="../js/export.js"></script>
-<script src="../js/chart.js"></script>
-<script src="../../js/chart.js"></script>
+<script src="../js/chartdashboard.js"></script>
+
 <link href="../css/ind.css" rel="stylesheet">
 <style>
     /* ===== Sticky Navbar ===== */
@@ -80,7 +83,6 @@ include '../layout/header.php';
             <!-- =========================================================================================================================================-->
             <!-- 📊 CHART BAR (BULANAN) -->
             <!-- =========================================================================================================================================-->
-
             <section id="chart-bar-bulanan" class="mb-5">
                 <hr>
                 <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI</h6>
@@ -125,39 +127,6 @@ include '../layout/header.php';
                 </div>
             </section>
 
-            <section id="informasi">
-                <hr>
-                <h2>Daftar Informasi</h2>
-                <div class="card-body">
-
-                    <?php
-
-                    try {
-                        $stmt = $pdo->query("SELECT * FROM info ORDER BY created_at DESC");
-                        $infos = $stmt->fetchAll();
-
-                        if ($infos) {
-                            foreach ($infos as $info) {
-                                echo "<h1 class='text-center' style='word-break:break-word; white-space:normal;'>" . htmlspecialchars($info['judul']) . "</h1><div>" . htmlspecialchars(date('d-m-Y', strtotime($info['created_at']))) . "</div>";
-                                echo "<div class='text-center'>"  . '|  ' . htmlspecialchars($info['deskripsi']) . ' |</div>  <br>';
-                                echo "<p class='text-justify' style='word-break:break-word; white-space:normal;'>" . nl2br(htmlspecialchars($info['isi'])) . "</p>";
-                                if (!empty($info['file'])) {
-                                    echo "<a href='../uploads/info/" . htmlspecialchars($info['file']) . "' target='_blank'>Lihat File</a><br>";
-                                }
-                                echo "<hr>";
-                            }
-                        } else {
-                            echo "<p><a href='input-info.php'>Tidak ada informasi tersedia. klik untuk tambah informasi<a></p>";
-                        }
-                    } catch (Exception $e) {
-                        echo "<p>Error: " . htmlspecialchars($e->getMessage()) . "</p>";
-                    }
-                    ?>
-                    <b>
-                        <hr>
-                    </b>
-                </div>
-            </section>
         </div> <!-- end card-body -->
     </div> <!-- end card -->
 </div> <!-- end container -->
