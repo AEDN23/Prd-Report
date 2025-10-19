@@ -44,7 +44,7 @@
 
 <!-- Page level plugins -->
 <script src="../vendor/chart.js/Chart.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
 
 
 </body>
@@ -92,9 +92,9 @@
         updateTabel();
     });
 </script>
-// <!-- ===========================================================================================================-->
-// <!-- // 📘 SCRIPT UNTUK TABEL PARAMETER-->
-// <!-- =========================================================================================================== -->
+<!-- ===========================================================================================================-->
+<!-- // 📘 SCRIPT UNTUK TABEL PARAMETER-->
+<!-- =========================================================================================================== -->
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const lineB = document.getElementById("lineSelectParam");

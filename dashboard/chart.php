@@ -1,15 +1,12 @@
 <?php
-$page_title = "CHART";
+$page_title = "Chart";
 include '../layout/header.php';
 ?>
 
-<!-- Tambahkan ini sebelum chartdashboard.js -->
-<script src="../js/chart.4.4.1.min.js"></script>
 
 <script src="../js/jspdf.umd.min.js"></script>
-<script src="../js/export.js"></script>
+<!-- <script src="../js/export.js"></script> -->
 <script src="../js/chartdashboard.js"></script>
-
 <link href="../css/ind.css" rel="stylesheet">
 <style>
     /* ===== Sticky Navbar ===== */
@@ -83,6 +80,7 @@ include '../layout/header.php';
             <!-- =========================================================================================================================================-->
             <!-- 📊 CHART BAR (BULANAN) -->
             <!-- =========================================================================================================================================-->
+
             <section id="chart-bar-bulanan" class="mb-5">
                 <hr>
                 <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI</h6>
@@ -99,7 +97,6 @@ include '../layout/header.php';
 
             <!-- =========================================================================================================================================-->
             <!-- 📅 CHART TAHUNAN PER LINE -->
-            <!-- =========================================================================================================================================-->
             <section id="chart-tahunan">
                 <hr>
                 <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI (TAHUNAN)</h6>
@@ -116,12 +113,11 @@ include '../layout/header.php';
                             value="<?= $selectedYear ?>" style="width: 110px;">
                     </form>
                 </div>
-
                 <div class="chart-container">
                     <div class="chart-toolbar">
                         <button id="prevTahunan" class="btn btn-sm btn-secondary">◀ Prev</button>
                         <button id="nextTahunan" class="btn btn-sm btn-primary">Next ▶</button>
-                        <button id="exportPDFbarcharttahunan" class="btn btn-sm btn-danger">Export PDF</button>
+                        <!-- <button id="exportPDFbarcharttahunan" class="btn btn-sm btn-danger">Export PDF</button> -->
                     </div>
                     <canvas id="BarCharttahunan" style="width:100%; height:400px;"></canvas>
                 </div>

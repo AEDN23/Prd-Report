@@ -86,7 +86,7 @@ foreach ($fields as $key => $v) {
                 $avgVal = $averages[$key];
                 $color = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
                 ?>
-                <td style="color: <?= $color ?>; font-weight:bold;"><?= $avgVal ?></td>
+                <td style="color: <?= $color ?>; font-weight:;"><?= $avgVal ?></td>
 
 
                 <?php for ($d = 1; $d <= 31; $d++): ?>

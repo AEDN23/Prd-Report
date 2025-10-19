@@ -17,7 +17,7 @@ require_once '../backend/config.php';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
@@ -70,6 +70,11 @@ require_once '../backend/config.php';
                 <a class="nav-link" href="informasi">
                     <i class="bi bi-info-circle-fill"></i>
                     <span>Informasi</span></a>
+            </li>
+            <li <?php if ($page_title === "Chart") echo 'class="active nav-item"'; ?> class="nav-item">
+                <a class="nav-link" href="chart">
+                    <i class="bi bi-bar-chart-fill"></i>
+                    <span>Chart</span></a>
             </li>
             <hr class="sidebar-divider my-0">
 

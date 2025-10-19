@@ -377,6 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
           x: { title: { display: true, text: "Bulan" } },
         },
       },
+      plugins: [ChartDataLabels], // <-- tambahkan ini
     });
   }
 
@@ -388,25 +389,27 @@ document.addEventListener("DOMContentLoaded", () => {
     currentMetric = (currentMetric - 1 + metrics.length) % metrics.length;
     loadChartyears();
   });
-  btnExport.addEventListener("click", () =>
-    exportChartPDF("BarCharttahunan", "Chart_Tahunan")
-  );
+  plugins: [ChartDataLabels], // <-- tambahkan ini
+    // ============================================================================= TOMBOL EXPORT PDF ===========================================================================================
+    // btnExport.addEventListener("click", () =>
+    //   exportChartPDF("BarCharttahunan", "Chart_Tahunan")
+    // );
 
-  [lineSelect, tahunInput].forEach((el) =>
-    el.addEventListener("change", loadChartyears)
-  );
+    [lineSelect, tahunInput].forEach((el) =>
+      el.addEventListener("change", loadChartyears)
+    );
   loadChartyears();
 });
 
 // ============================================================================
 // 🧾 Fungsi Export PDF (dipakai semua chart)
 // ============================================================================
-function exportChartPDF(canvasId, title) {
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF();
-  const canvas = document.getElementById(canvasId);
-  const imgData = canvas.toDataURL("image/png");
-  pdf.text(title, 15, 15);
-  pdf.addImage(imgData, "PNG", 10, 25, 190, 100);
-  pdf.save(`${title}.pdf`);
-}
+// function exportChartPDF(canvasId, title) {
+//   const { jsPDF } = window.jspdf;
+//   const pdf = new jsPDF();
+//   const canvas = document.getElementById(canvasId);
+//   const imgData = canvas.toDataURL("image/png");
+//   pdf.text(title, 15, 15);
+//   pdf.addImage(imgData, "PNG", 10, 25, 190, 100);
+//   pdf.save(`${title}.pdf`);
+// }

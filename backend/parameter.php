@@ -35,7 +35,7 @@ $fields = [
 
 // --- Generate Table Rows ---
 ?>
-<table class="table table-bordered table-striped table-sm">
+<table class="table table-bordered  table-sm">
     <thead class="table-primary text-center">
         <tr>
             <th>Parameter Check</th>
