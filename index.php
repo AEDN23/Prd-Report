@@ -1,9 +1,13 @@
 <?php
 require_once 'backend/config.php';
 date_default_timezone_set('Asia/Jakarta');
-$tahunSekarang = date('Y');
 
-// Fields yang akan ditampilkan (sama seperti di config.php)
+$tahunSekarang  = date('Y');
+$bulanSekarang  = date('n');
+
+// =====================================================================
+// 💡 FIELD DATA PRODUKSI
+// =====================================================================
 $fields = [
     'batch_count' => ['Batch Count', 'Per Day'],
     'productivity' => ['Productivity', 'Ton/Shift'],
@@ -11,20 +15,24 @@ $fields = [
     'batch_weight' => ['Batch Weight', 'Kg/Batch'],
     'operation_factor' => ['Operation Factor', '%'],
     'cycle_time' => ['Cycle Time', 'Min/Batch'],
-    'grade_change_sequence' => ['Grade Change Sequence', 'Frequently'],
+    'grade_change_sequence' => ['Grade Change Sequence', 'Freq'],
     'grade_change_time' => ['Grade Change Time', 'Min/Grade'],
     'feed_raw_material' => ['Feed Raw Material', 'Kg/Day']
 ];
 
-// Helper: ambil data rangkuman untuk satu line
+// =====================================================================
+// 🧮 FUNGSI AMBIL DATA TAHUNAN
+// =====================================================================
 function getAnnualSummary(PDO $pdo, int $lineId, int $tahun)
 {
-    // ambil target
+    global $fields;
+
+    // Ambil target line
     $stmt = $pdo->prepare("SELECT * FROM target WHERE line_id = ? AND tahun_target = ? LIMIT 1");
     $stmt->execute([$lineId, $tahun]);
     $target = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-    // ambil rata-rata per bulan untuk setiap metric
+    // Ambil rata-rata bulanan
     $stmt = $pdo->prepare("
         SELECT 
             MONTH(tanggal) AS bulan,
@@ -50,14 +58,14 @@ function getAnnualSummary(PDO $pdo, int $lineId, int $tahun)
         $bulanData[(int)$r['bulan']] = $r;
     }
 
-    // hitung average tahunan per field (rata-rata dari bulan-bulan yang ada)
+    // Hitung rata-rata tahunan
     $averages = [];
-    foreach (array_keys($GLOBALS['fields']) as $key) {
+    foreach (array_keys($fields) as $key) {
         $sum = 0;
         $cnt = 0;
         for ($m = 1; $m <= 12; $m++) {
             $avgKey = 'avg_' . $key;
-            if (isset($bulanData[$m][$avgKey]) && $bulanData[$m][$avgKey] !== null) {
+            if (!empty($bulanData[$m][$avgKey])) {
                 $sum += $bulanData[$m][$avgKey];
                 $cnt++;
             }
@@ -72,30 +80,9 @@ function getAnnualSummary(PDO $pdo, int $lineId, int $tahun)
     ];
 }
 
-$lineA_id = 1;
-$lineB_id = 2;
-
-// ambil summary
-$summaryA = getAnnualSummary($pdo, $lineA_id, (int)$tahunSekarang);
-$summaryB = getAnnualSummary($pdo, $lineB_id, (int)$tahunSekarang);
-
-// nama bulan singkat
-$namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-// ================================================================================================ BACKEND DATA HARIAN
-
-// Ambil line ID untuk Line A
-// ================================================================================================ BACKEND DATA HARIAN
-
-// Ambil line ID untuk Line A dan Line B 
-$lineA_id = 1;
-$lineB_id = 2;
-
-// Ambil bulan dan tahun sekarang
-$bulanSekarang = date('n');
-$tahunSekarang = date('Y');
-
-// Ambil nama bulan untuk judul
+// =====================================================================
+// 🧾 VARIABEL DASAR
+// =====================================================================
 $namaBulan = [
     1 => 'Januari',
     2 => 'Februari',
@@ -111,114 +98,64 @@ $namaBulan = [
     12 => 'Desember'
 ];
 
-// Daftar kolom
-$fields = [
-    'batch_count' => ['Batch Count', 'Per Day'],
-    'productivity' => ['Productivity', 'Ton/Shift'],
-    'production_speed' => ['Production Speed', 'Kg/Min'],
-    'batch_weight' => ['Batch Weight', 'Kg/Batch'],
-    'operation_factor' => ['Operation Factor', '%'],
-    'cycle_time' => ['Cycle Time', 'Min/Batch'],
-    'grade_change_sequence' => ['Grade Change Sequence', 'Freq'],
-    'grade_change_time' => ['Grade Change Time', 'Min/Grade'],
-    'feed_raw_material' => ['Feed Raw Material', 'Kg/Day']
-];
+$lineA_id = 1;
+$lineB_id = 2;
 
-// ================================================= LINE A =================================================
+// =====================================================================
+// 📊 DATA TAHUNAN (LINE A & B)
+// =====================================================================
+$summaryA = getAnnualSummary($pdo, $lineA_id, $tahunSekarang);
+$summaryB = getAnnualSummary($pdo, $lineB_id, $tahunSekarang);
 
-// Ambil data target line A
-$stmt = $pdo->prepare("SELECT * FROM target WHERE line_id = ? AND tahun_target = ?");
-$stmt->execute([$lineA_id, $tahunSekarang]);
-$targetA = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+// =====================================================================
+// 📅 DATA HARIAN (LINE A & B)
+// =====================================================================
+function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
+{
+    // Ambil target
+    $stmt = $pdo->prepare("SELECT * FROM target WHERE line_id = ? AND tahun_target = ?");
+    $stmt->execute([$lineId, $tahun]);
+    $target = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-// Ambil data harian line A
-$stmt = $pdo->prepare("
-    SELECT 
-        DAY(tanggal) AS hari,
-        batch_count,
-        productivity,
-        production_speed,
-        batch_weight,
-        operation_factor,
-        cycle_time,
-        grade_change_sequence,
-        grade_change_time,
-        feed_raw_material
-    FROM input_harian
-    WHERE line_id = ? AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?
-    ORDER BY tanggal
-");
-$stmt->execute([$lineA_id, $bulanSekarang, $tahunSekarang]);
-$dataHarianA = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Ambil data harian
+    $stmt = $pdo->prepare("
+        SELECT 
+            DAY(tanggal) AS hari,
+            batch_count, productivity, production_speed, batch_weight,
+            operation_factor, cycle_time, grade_change_sequence,
+            grade_change_time, feed_raw_material
+        FROM input_harian
+        WHERE line_id = ? AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?
+        ORDER BY tanggal
+    ");
+    $stmt->execute([$lineId, $bulan, $tahun]);
+    $dataHarian = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Susun data per tanggal
-$perHariA = [];
-foreach ($dataHarianA as $row) {
-    $perHariA[(int)$row['hari']] = $row;
-}
-
-// Hitung average
-$averagesA = [];
-foreach (array_keys($fields) as $key) {
-    $sum = 0;
-    $count = 0;
-    foreach ($dataHarianA as $row) {
-        if (!empty($row[$key])) {
-            $sum += $row[$key];
-            $count++;
-        }
+    // Susun data per tanggal
+    $perHari = [];
+    foreach ($dataHarian as $row) {
+        $perHari[(int)$row['hari']] = $row;
     }
-    $averagesA[$key] = $count ? round($sum / $count, 2) : '-';
-}
 
-// ================================================= LINE B =================================================
-
-// Ambil data target line B
-$stmt = $pdo->prepare("SELECT * FROM target WHERE line_id = ? AND tahun_target = ?");
-$stmt->execute([$lineB_id, $tahunSekarang]);
-$targetB = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-
-// Ambil data harian line B
-$stmt = $pdo->prepare("
-    SELECT 
-        DAY(tanggal) AS hari,
-        batch_count,
-        productivity,
-        production_speed,
-        batch_weight,
-        operation_factor,
-        cycle_time,
-        grade_change_sequence,
-        grade_change_time,
-        feed_raw_material
-    FROM input_harian
-    WHERE line_id = ? AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?
-    ORDER BY tanggal
-");
-$stmt->execute([$lineB_id, $bulanSekarang, $tahunSekarang]);
-$dataHarianB = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Susun data per tanggal
-$perHariB = [];
-foreach ($dataHarianB as $row) {
-    $perHariB[(int)$row['hari']] = $row;
-}
-
-// Hitung average
-$averagesB = [];
-foreach (array_keys($fields) as $key) {
-    $sum = 0;
-    $count = 0;
-    foreach ($dataHarianB as $row) {
-        if (!empty($row[$key])) {
-            $sum += $row[$key];
-            $count++;
+    // Hitung average
+    $averages = [];
+    foreach (array_keys($fields) as $key) {
+        $sum = 0;
+        $count = 0;
+        foreach ($dataHarian as $row) {
+            if (!empty($row[$key])) {
+                $sum += $row[$key];
+                $count++;
+            }
         }
+        $averages[$key] = $count ? round($sum / $count, 2) : '-';
     }
-    $averagesB[$key] = $count ? round($sum / $count, 2) : '-';
+
+    return [$target, $perHari, $averages];
 }
 
-
+[$targetA, $perHariA, $averagesA] = getDailyData($pdo, $lineA_id, $bulanSekarang, $tahunSekarang, $fields);
+[$targetB, $perHariB, $averagesB] = getDailyData($pdo, $lineB_id, $bulanSekarang, $tahunSekarang, $fields);
 
 ?>
 
@@ -330,54 +267,27 @@ foreach (array_keys($fields) as $key) {
                 <!-- =========================================================================================================================================-->
                 <!-- 📊 CHART BAR (BULANAN) -->
                 <!-- =========================================================================================================================================-->
+                <!-- ========================== LINE A =========================== -->
                 <section id="chart-bar-bulanan-LINEA" class="mb-5">
-                    <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI</h6>
-                    <form id="filterchart" class="row g-3 mb-3">
-                        <div class="col-md-2">
-                            <select id="bulanUtama" name="bulan" class="form-select" hidden>
-                                <?php for ($m = 1; $m <= 12; $m++): ?>
-                                    <option value="<?= $m ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
-                                        <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
-                                    </option>
-                                <?php endfor; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <input id="tahunUtama" type="number" name="tahun" value="<?= $selectedYear ?>" class="form-control" hidden>
-                        </div>
-                    </form>
+                    <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE A</h6>
                     <div class="chart-container">
-                        <div class="chart-toolbar">
-                            <button id="prevBar" class="btn btn-sm btn-secondary">◀ Prev</button>
-                            <button id="nextBar" class="btn btn-sm btn-primary">Next ▶</button>
-                            <!-- <button id="exportPDFbarchart" class="btn btn-sm btn-danger">Export PDF</button> -->
+                        <div class="chart-toolbar mb-2">
+                            <button id="prevBarA" class="btn btn-sm btn-secondary">◀ Prev</button>
+                            <button id="nextBarA" class="btn btn-sm btn-primary">Next ▶</button>
                         </div>
-                        <!-- <canvas id="BarChart" style="width:100%; height:400px;"></canvas> -->
+                        <canvas id="BarChartA" style="width:100%; height:400px;"></canvas>
                     </div>
                 </section>
-                <section id="chart-bar-bulanan-LINEA" class="mb-5">
-                    <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI</h6>
-                    <form id="filterchart" class="row g-3 mb-3">
-                        <div class="col-md-2">
-                            <select id="bulanUtama" name="bulan" class="form-select" hidden>
-                                <?php for ($m = 1; $m <= 12; $m++): ?>
-                                    <option value="<?= $m ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
-                                        <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
-                                    </option>
-                                <?php endfor; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <input id="tahunUtama" type="number" name="tahun" value="<?= $selectedYear ?>" class="form-control" hidden>
-                        </div>
-                    </form>
+
+                <!-- ========================== LINE B =========================== -->
+                <section id="chart-bar-bulanan-LINEB" class="mb-5">
+                    <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE B</h6>
                     <div class="chart-container">
-                        <div class="chart-toolbar">
-                            <button id="prevBar" class="btn btn-sm btn-secondary">◀ Prev</button>
-                            <button id="nextBar" class="btn btn-sm btn-primary">Next ▶</button>
-                            <!-- <button id="exportPDFbarchart" class="btn btn-sm btn-danger">Export PDF</button> -->
+                        <div class="chart-toolbar mb-2">
+                            <button id="prevBarB" class="btn btn-sm btn-secondary">◀ Prev</button>
+                            <button id="nextBarB" class="btn btn-sm btn-primary">Next ▶</button>
                         </div>
-                        <canvas id="BarChart" style="width:100%; height:400px;"></canvas>
+                        <canvas id="BarChartB" style="width:100%; height:400px;"></canvas>
                     </div>
                 </section>
 
@@ -409,7 +319,6 @@ foreach (array_keys($fields) as $key) {
                         <canvas id="BarCharttahunan" style="width:100%; height:400px;"></canvas>
                     </div>
                 </section>
-
                 <section id="chart-tahunan-LINEB">
                     <hr>
                     <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI LINE-B (TAHUNAN)</h6>
@@ -432,13 +341,13 @@ foreach (array_keys($fields) as $key) {
                             <button id="nextTahunan" class="btn btn-sm btn-primary">Next ▶</button>
                             <!-- <button id="exportPDFbarcharttahunan" class="btn btn-sm btn-danger">Export PDF</button> -->
                         </div>
-                        <!-- <canvas id="BarCharttahunanLINEB" style="width:100%; height:400px;"></canvas> -->
+                        <canvas id="BarCharttahunanLINEB" style="width:100%; height:400px;"></canvas>
                     </div>
                 </section>
 
-                <!-- =========================================================================================================================================-->
-                <!-- 📅 TABEL DATA PRODUKSI TAHUNAN DAN HARIAN LINE A -->
-                <!-- =========================================================================================================================================-->
+                <!-- ===================================================================== -->
+                <!-- 📋 TABEL DATA PRODUKSI HARIAN LINE A -->
+                <!-- ===================================================================== -->
                 <section id="DATA-HARIAN-LINEA" class="mb-4">
                     <h2>📋 DATA PRODUKSI HARIAN LINE A (<?= $namaBulan[$bulanSekarang] . " " . $tahunSekarang ?>)</h2>
                     <div class="table-responsive border rounded p-2">
@@ -449,27 +358,25 @@ foreach (array_keys($fields) as $key) {
                                     <th>Unit</th>
                                     <th>Target</th>
                                     <th>Average</th>
-                                    <?php for ($i = 1; $i <= 31; $i++): ?>
-                                        <th><?= $i ?></th>
-                                    <?php endfor; ?>
+                                    <?php for ($i = 1; $i <= 31; $i++): ?><th><?= $i ?></th><?php endfor; ?>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($fields as $key => [$label, $unit]):
-                                    $targetVal = isset($targetA['target_' . $key]) ? floatval($targetA['target_' . $key]) : 0;
+                                    $targetVal = $targetA['target_' . $key] ?? 0;
                                     $avgVal = $averagesA[$key];
                                     $avgColor = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
                                 ?>
                                     <tr>
                                         <td class="text-start"><?= htmlspecialchars($label) ?></td>
                                         <td><?= htmlspecialchars($unit) ?></td>
-                                        <td style=";"><?= $targetVal ?: '-' ?></td>
-                                        <td style="color:<?= $avgColor ?>; ;"><?= $avgVal ?></td>
+                                        <td><?= $targetVal ?: '-' ?></td>
+                                        <td style="color:<?= $avgColor ?>"><?= $avgVal ?></td>
                                         <?php for ($i = 1; $i <= 31; $i++):
-                                            $val = isset($perHariA[$i][$key]) ? round($perHariA[$i][$key], 2) : '-';
+                                            $val = $perHariA[$i][$key] ?? '-';
                                             $color = ($val !== '-' && $targetVal > 0 && $val < $targetVal) ? 'red' : 'black';
                                         ?>
-                                            <td style="color:<?= $color ?>; "><?= $val ?></td>
+                                            <td style="color:<?= $color ?>"><?= is_numeric($val) ? round($val, 2) : '-' ?></td>
                                         <?php endfor; ?>
                                     </tr>
                                 <?php endforeach; ?>
@@ -478,11 +385,14 @@ foreach (array_keys($fields) as $key) {
                     </div>
                 </section>
 
+                <!-- ===================================================================== -->
+                <!-- 📘 TABEL DATA TAHUNAN LINE A -->
+                <!-- ===================================================================== -->
                 <section id="tabel-tahunan-LINEA" class="mb-4">
                     <h2 class="fw-bold">📋 DATA PRODUKSI LINE A TAHUN <?= $tahunSekarang ?></h2>
                     <div class="table-responsive border rounded p-2">
-                        <table class="table table-bordered table-sm mb-0">
-                            <thead class="table-light text-center">
+                        <table class="table table-bordered table-sm mb-0 text-center">
+                            <thead class="table-light">
                                 <tr>
                                     <th>Details</th>
                                     <th>Unit</th>
@@ -493,21 +403,21 @@ foreach (array_keys($fields) as $key) {
                             </thead>
                             <tbody>
                                 <?php foreach ($fields as $key => [$label, $unit]):
-                                    $targetVal = isset($summaryA['target']['target_' . $key]) ? floatval($summaryA['target']['target_' . $key]) : 0;
+                                    $targetVal = $summaryA['target']['target_' . $key] ?? 0;
                                     $avgVal = $summaryA['averages'][$key];
                                     $avgColor = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
                                 ?>
                                     <tr>
                                         <td><?= htmlspecialchars($label) ?></td>
                                         <td><?= htmlspecialchars($unit) ?></td>
-                                        <td style=";"><?= $targetVal ?: '-' ?></td>
-                                        <td style="color:<?= $avgColor ?>; ;"><?= $avgVal ?></td>
+                                        <td><?= $targetVal ?: '-' ?></td>
+                                        <td style="color:<?= $avgColor ?>"><?= $avgVal ?></td>
                                         <?php for ($m = 1; $m <= 12; $m++):
                                             $avgKey = 'avg_' . $key;
-                                            $val = isset($summaryA['bulanData'][$m][$avgKey]) ? round($summaryA['bulanData'][$m][$avgKey], 2) : '-';
+                                            $val = $summaryA['bulanData'][$m][$avgKey] ?? '-';
                                             $color = ($val !== '-' && $targetVal > 0 && $val < $targetVal) ? 'red' : 'black';
                                         ?>
-                                            <td style="color:<?= $color ?>; ;"><?= $val ?></td>
+                                            <td style="color:<?= $color ?>"><?= is_numeric($val) ? round($val, 2) : '-' ?></td>
                                         <?php endfor; ?>
                                     </tr>
                                 <?php endforeach; ?>
@@ -516,9 +426,9 @@ foreach (array_keys($fields) as $key) {
                     </div>
                 </section>
 
-                <!-- =========================================================================================================================================-->
-                <!-- 📅 TABEL DATA PRODUKSI TAHUNAN DAN HARIAN LINE B -->
-                <!-- =========================================================================================================================================-->
+                <!-- ===================================================================== -->
+                <!-- 📋 DATA PRODUKSI LINE B -->
+                <!-- ===================================================================== -->
                 <section id="DATA-HARIAN-LINEB" class="mb-4">
                     <h2>📋 DATA PRODUKSI HARIAN LINE B (<?= $namaBulan[$bulanSekarang] . " " . $tahunSekarang ?>)</h2>
                     <div class="table-responsive border rounded p-2">
@@ -534,20 +444,20 @@ foreach (array_keys($fields) as $key) {
                             </thead>
                             <tbody>
                                 <?php foreach ($fields as $key => [$label, $unit]):
-                                    $targetVal = isset($targetB['target_' . $key]) ? floatval($targetB['target_' . $key]) : 0;
+                                    $targetVal = $targetB['target_' . $key] ?? 0;
                                     $avgVal = $averagesB[$key];
                                     $avgColor = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
                                 ?>
                                     <tr>
                                         <td class="text-start"><?= htmlspecialchars($label) ?></td>
                                         <td><?= htmlspecialchars($unit) ?></td>
-                                        <td style=";"><?= $targetVal ?: '-' ?></td>
-                                        <td style="color:<?= $avgColor ?>; ;"><?= $avgVal ?></td>
+                                        <td><?= $targetVal ?: '-' ?></td>
+                                        <td style="color:<?= $avgColor ?>"><?= $avgVal ?></td>
                                         <?php for ($i = 1; $i <= 31; $i++):
-                                            $val = isset($perHariB[$i][$key]) ? round($perHariB[$i][$key], 2) : '-';
+                                            $val = $perHariB[$i][$key] ?? '-';
                                             $color = ($val !== '-' && $targetVal > 0 && $val < $targetVal) ? 'red' : 'black';
                                         ?>
-                                            <td style="color:<?= $color ?>; ;"><?= $val ?></td>
+                                            <td style="color:<?= $color ?>"><?= is_numeric($val) ? round($val, 2) : '-' ?></td>
                                         <?php endfor; ?>
                                     </tr>
                                 <?php endforeach; ?>
@@ -557,10 +467,10 @@ foreach (array_keys($fields) as $key) {
                 </section>
 
                 <section id="tabel-tahunan-LINEB" class="mb-4">
-                    <h2>📋 DATA PRODUKSI LINE B TAHUN <?= $tahunSekarang ?></h2>
+                    <h2 class="fw-bold">📋 DATA PRODUKSI LINE B TAHUN <?= $tahunSekarang ?></h2>
                     <div class="table-responsive border rounded p-2">
-                        <table class="table table-bordered table-sm mb-0">
-                            <thead class="table-light text-center">
+                        <table class="table table-bordered table-sm mb-0 text-center">
+                            <thead class="table-light">
                                 <tr>
                                     <th>Details</th>
                                     <th>Unit</th>
@@ -571,21 +481,21 @@ foreach (array_keys($fields) as $key) {
                             </thead>
                             <tbody>
                                 <?php foreach ($fields as $key => [$label, $unit]):
-                                    $targetVal = isset($summaryB['target']['target_' . $key]) ? floatval($summaryB['target']['target_' . $key]) : 0;
+                                    $targetVal = $summaryB['target']['target_' . $key] ?? 0;
                                     $avgVal = $summaryB['averages'][$key];
                                     $avgColor = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
                                 ?>
                                     <tr>
                                         <td><?= htmlspecialchars($label) ?></td>
                                         <td><?= htmlspecialchars($unit) ?></td>
-                                        <td style=";"><?= $targetVal ?: '-' ?></td>
-                                        <td style="color:<?= $avgColor ?>; ;"><?= $avgVal ?></td>
+                                        <td><?= $targetVal ?: '-' ?></td>
+                                        <td style="color:<?= $avgColor ?>"><?= $avgVal ?></td>
                                         <?php for ($m = 1; $m <= 12; $m++):
                                             $avgKey = 'avg_' . $key;
-                                            $val = isset($summaryB['bulanData'][$m][$avgKey]) ? round($summaryB['bulanData'][$m][$avgKey], 2) : '-';
+                                            $val = $summaryB['bulanData'][$m][$avgKey] ?? '-';
                                             $color = ($val !== '-' && $targetVal > 0 && $val < $targetVal) ? 'red' : 'black';
                                         ?>
-                                            <td style="color:<?= $color ?>; ;"><?= $val ?></td>
+                                            <td style="color:<?= $color ?>"><?= is_numeric($val) ? round($val, 2) : '-' ?></td>
                                         <?php endfor; ?>
                                     </tr>
                                 <?php endforeach; ?>
