@@ -72,8 +72,6 @@ function getAnnualSummary(PDO $pdo, int $lineId, int $tahun)
     ];
 }
 
-// Contoh: tentukan ID line untuk Line A & Line B.
-// Jika kamu punya ID spesifik, ganti 1 dan 2 -> sesuai data table `line_produksi`.
 $lineA_id = 1;
 $lineB_id = 2;
 
@@ -86,12 +84,12 @@ $namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oc
 
 // ================================================================================================ BACKEND DATA HARIAN
 
-// Ambil line ID untuk Line A (ganti sesuai ID line_produksi kamu)
+// Ambil line ID untuk Line A
 // ================================================================================================ BACKEND DATA HARIAN
 
-// Ambil line ID untuk Line A dan Line B (ganti sesuai ID line_produksi kamu)
+// Ambil line ID untuk Line A dan Line B 
 $lineA_id = 1;
-$lineB_id = 2; // ✅ diperbaiki: sebelumnya salah pakai $line_id
+$lineB_id = 2;
 
 // Ambil bulan dan tahun sekarang
 $bulanSekarang = date('n');
@@ -197,7 +195,7 @@ $stmt = $pdo->prepare("
     WHERE line_id = ? AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?
     ORDER BY tanggal
 ");
-$stmt->execute([$lineB_id, $bulanSekarang, $tahunSekarang]); // ✅ pakai line B
+$stmt->execute([$lineB_id, $bulanSekarang, $tahunSekarang]);
 $dataHarianB = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Susun data per tanggal
@@ -271,7 +269,7 @@ foreach (array_keys($fields) as $key) {
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="js/autoscroll.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>                SCRIPT UNTUK IMPORT PDF-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> <!--SCRIPT UNTUK IMPORT PDF-->
     <script src="js/script.js"></script>
     <script src="js/export.js"></script>
     <script src="js/chart.js"></script>
@@ -365,15 +363,15 @@ foreach (array_keys($fields) as $key) {
                     <hr>
                     <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI (TAHUNAN)</h6>
                     <div class="d-flex align-items-center mb-3 gap-2">
-                        <form id="filterTahunan" class="d-flex mb-0 gap-2">
-                            <select id="lineSelect" name="line" class="form-control form-control-sm" style="width: 160px;" hidden>
+                        <form id="filterTahunan" class="d-flex mb-0 gap-2" hidden>
+                            <select id="lineSelect" name="line" hidden class="form-control form-control-sm" style="width: 160px;">
                                 <?php foreach ($lines as $line): ?>
                                     <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($line['nama_line']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <input hidden id="tahunInput" type="number" name="tahun" class="form-control form-control-sm"
+                            <input id="tahunInput" type="number" hidden name="tahun" class="form-control form-control-sm"
                                 value="<?= $selectedYear ?>" style="width: 110px;">
                         </form>
                     </div>

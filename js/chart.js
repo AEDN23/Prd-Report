@@ -273,11 +273,15 @@ document.addEventListener("DOMContentLoaded", () => {
 // ============================================================================
 document.addEventListener("DOMContentLoaded", () => {
   const ctx = document.getElementById("BarCharttahunan").getContext("2d");
+  const lineSelect = document.getElementById("lineSelect");
   const tahunInput = document.getElementById("tahunInput");
+
   const btnPrev = document.getElementById("prevTahunan");
   const btnNext = document.getElementById("nextTahunan");
-  let chart;
+  // const btnExport = document.getElementById("exportPDFbarcharttahunan");
+
   let currentMetric = 0;
+  let chart;
 
   const metrics = [
     { key: "productivity", label: "Productivity (Ton/Shift)" },
@@ -303,7 +307,9 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   function loadChartyears() {
-    fetch(`backend/get_chart_tahunan.php?tahun=${tahunInput.value}`)
+    fetch(
+      `backend/get_chart_tahunan.php?line=${lineSelect.value}&tahun=${tahunInput.value}`
+    )
       .then((res) => res.json())
       .then((data) => renderChart(data))
       .catch((err) => console.error("Gagal ambil data chart tahunan:", err));
@@ -311,39 +317,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderChart(data) {
     const metric = metrics[currentMetric];
+    const dataBulan = data.bulanData || {};
+    const targetData = data.target || {};
     const tahun = data.tahun || tahunInput.value;
-    const warna = [
-      "#0046FF",
-      "#F9E400",
-      "#FF90BB",
-      "#450693",
-      "#6f42c1",
-      "#E9FF97",
-      "#fd7e14",
-      "#6610f2",
-      "#17a2b8",
-      "#adb5bd",
-    ];
 
-    // Dataset per line
-    const datasets = Object.entries(data.lines || {}).map(
-      ([lineName, dataLine], i) => {
-        const dataMap = {};
-        dataLine.forEach((row) => {
-          const bulan = parseInt(row.bulan);
-          const avgKey = `avg_${metric.key}`;
-          dataMap[bulan] = parseFloat(row[avgKey]) || 0;
-        });
-        return {
-          label: lineName,
-          data: bulanLabels.map((_, idx) => dataMap[idx + 1] || 0),
-          backgroundColor: warna[i % warna.length] + "99",
-          borderColor: warna[i % warna.length],
-          borderWidth: 1.5,
-          borderRadius: 4,
-        };
-      }
-    );
+    const produksiData = bulanLabels.map((_, i) => {
+      const bulan = i + 1;
+      const avgKey = `avg_${metric.key}`;
+      return dataBulan[bulan] && dataBulan[bulan][avgKey] !== undefined
+        ? parseFloat(dataBulan[bulan][avgKey])
+        : 0;
+    });
+
+    const targetKey = `target_${metric.key}`;
+    const targetValue =
+      targetData && targetData[targetKey] !== undefined
+        ? parseFloat(targetData[targetKey])
+        : 0;
 
     if (chart) chart.destroy();
 
@@ -351,7 +341,26 @@ document.addEventListener("DOMContentLoaded", () => {
       type: "bar",
       data: {
         labels: bulanLabels,
-        datasets: datasets,
+        datasets: [
+          {
+            label: `Rata-rata ${metric.label}`,
+            data: produksiData,
+            backgroundColor: "rgba(0,123,255,0.6)",
+            borderColor: "#007bff",
+            borderWidth: 1.5,
+            borderRadius: 4,
+          },
+          {
+            label: `🎯 Target ${metric.label}`,
+            data: Array(12).fill(targetValue),
+            type: "line",
+            borderColor: "#ff0000",
+            borderWidth: 2,
+            borderDash: [6, 4],
+            pointRadius: 0,
+            fill: false,
+          },
+        ],
       },
       options: {
         responsive: true,
@@ -359,19 +368,8 @@ document.addEventListener("DOMContentLoaded", () => {
         plugins: {
           title: {
             display: true,
-            text: `📘 ${metric.label} per Line (${tahun})`,
+            text: `📘 Grafik ${metric.label} vs Target (${tahun})`,
             font: { size: 16 },
-          },
-          legend: {
-            position: "bottom",
-            labels: { usePointStyle: true },
-          },
-          datalabels: {
-            color: "#000",
-            anchor: "end",
-            align: "top",
-            font: { weight: "bold", size: 10 },
-            formatter: (v) => (v !== 0 ? v.toFixed(1) : ""),
           },
         },
         scales: {
@@ -379,7 +377,6 @@ document.addEventListener("DOMContentLoaded", () => {
           x: { title: { display: true, text: "Bulan" } },
         },
       },
-      plugins: [ChartDataLabels],
     });
   }
 
@@ -391,12 +388,13 @@ document.addEventListener("DOMContentLoaded", () => {
     currentMetric = (currentMetric - 1 + metrics.length) % metrics.length;
     loadChartyears();
   });
+  // btnExport.addEventListener("click", () =>
+  //   exportChartPDF("BarCharttahunan", "Chart_Tahunan")
+  // );
 
-  setInterval(() => {
-    currentMetric = (currentMetric + 1) % metrics.length;
-    loadChartyears();
-  }, 5000);
-
+  [lineSelect, tahunInput].forEach((el) =>
+    el.addEventListener("change", loadChartyears)
+  );
   loadChartyears();
 });
 
