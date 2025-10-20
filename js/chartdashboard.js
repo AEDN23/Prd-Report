@@ -143,6 +143,11 @@ document.addEventListener("DOMContentLoaded", () => {
     exportChartPDF("myChart", "Chart_Produksi_Bulanan")
   );
 
+  // setInterval(() => {
+  //   currentDataset = (currentDataset + 1) % datasetKeys.length;
+  //   loadChart();
+  // }, 50000); //UBAH ANGKA NYAA
+
   [bulan, tahun].forEach((el) => el.addEventListener("change", loadChart));
   loadChart();
 });
@@ -278,7 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const btnPrev = document.getElementById("prevTahunan");
   const btnNext = document.getElementById("nextTahunan");
-  const btnExport = document.getElementById("exportPDFbarcharttahunan");
+  // const btnExport = document.getElementById("exportPDFbarcharttahunan");
 
   let currentMetric = 0;
   let chart;
@@ -377,7 +382,6 @@ document.addEventListener("DOMContentLoaded", () => {
           x: { title: { display: true, text: "Bulan" } },
         },
       },
-      plugins: [ChartDataLabels], // <-- tambahkan ini
     });
   }
 
@@ -389,15 +393,13 @@ document.addEventListener("DOMContentLoaded", () => {
     currentMetric = (currentMetric - 1 + metrics.length) % metrics.length;
     loadChartyears();
   });
-  plugins: [ChartDataLabels], // <-- tambahkan ini
-    // ============================================================================= TOMBOL EXPORT PDF ===========================================================================================
-    // btnExport.addEventListener("click", () =>
-    //   exportChartPDF("BarCharttahunan", "Chart_Tahunan")
-    // );
+  // btnExport.addEventListener("click", () =>
+  //   exportChartPDF("BarCharttahunan", "Chart_Tahunan")
+  // );
 
-    [lineSelect, tahunInput].forEach((el) =>
-      el.addEventListener("change", loadChartyears)
-    );
+  [lineSelect, tahunInput].forEach((el) =>
+    el.addEventListener("change", loadChartyears)
+  );
   loadChartyears();
 });
 

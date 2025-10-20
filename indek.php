@@ -311,7 +311,7 @@ foreach (array_keys($fields) as $key) {
             <div class="card-body">
 
                 <!-- =========================================================================================================================================-->
-                <!-- 📈 CHART PRODUKSI (BULANAN)    BUKA KOMEN JIKA INGIN MENAMPIKAN LINE CHART-->
+                <!-- 📈 CHART PRODUKSI (BULANAN)    BUKAN KOMEN JIKA INGIN MENAMPIKAN LINE CHART-->
                 <!-- =========================================================================================================================================-->
                 <!-- <section id="chart-bulanan" class="mb-5">
                     <h6 class="fw-bold text-primary mb-3">📈 CHART PRODUKSI (BULANAN)</h6>
@@ -330,32 +330,7 @@ foreach (array_keys($fields) as $key) {
                 <!-- =========================================================================================================================================-->
                 <!-- 📊 CHART BAR (BULANAN) -->
                 <!-- =========================================================================================================================================-->
-                <section id="chart-bar-bulanan-LINEA" class="mb-5">
-                    <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI</h6>
-                    <form id="filterchart" class="row g-3 mb-3">
-                        <div class="col-md-2">
-                            <select id="bulanUtama" name="bulan" class="form-select" hidden>
-                                <?php for ($m = 1; $m <= 12; $m++): ?>
-                                    <option value="<?= $m ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
-                                        <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
-                                    </option>
-                                <?php endfor; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <input id="tahunUtama" type="number" name="tahun" value="<?= $selectedYear ?>" class="form-control" hidden>
-                        </div>
-                    </form>
-                    <div class="chart-container">
-                        <div class="chart-toolbar">
-                            <button id="prevBar" class="btn btn-sm btn-secondary">◀ Prev</button>
-                            <button id="nextBar" class="btn btn-sm btn-primary">Next ▶</button>
-                            <!-- <button id="exportPDFbarchart" class="btn btn-sm btn-danger">Export PDF</button> -->
-                        </div>
-                        <!-- <canvas id="BarChart" style="width:100%; height:400px;"></canvas> -->
-                    </div>
-                </section>
-                <section id="chart-bar-bulanan-LINEA" class="mb-5">
+                <section id="chart-bar-bulanan" class="mb-5">
                     <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI</h6>
                     <form id="filterchart" class="row g-3 mb-3">
                         <div class="col-md-2">
@@ -382,11 +357,11 @@ foreach (array_keys($fields) as $key) {
                 </section>
 
                 <!-- =========================================================================================================================================-->
-                <!-- 📅 CHART TAHUNAN PER LINE A  DAN B-->
+                <!-- 📅 CHART TAHUNAN PER LINE -->
                 <!-- =========================================================================================================================================-->
-                <section id="chart-tahunan-LINEA">
+                <section id="chart-tahunan">
                     <hr>
-                    <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI LINE-A (TAHUNAN)</h6>
+                    <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI (TAHUNAN)</h6>
                     <div class="d-flex align-items-center mb-3 gap-2">
                         <form id="filterTahunan" class="d-flex mb-0 gap-2" hidden>
                             <select id="lineSelect" name="line" hidden class="form-control form-control-sm" style="width: 160px;">
@@ -407,32 +382,6 @@ foreach (array_keys($fields) as $key) {
                             <!-- <button id="exportPDFbarcharttahunan" class="btn btn-sm btn-danger">Export PDF</button> -->
                         </div>
                         <canvas id="BarCharttahunan" style="width:100%; height:400px;"></canvas>
-                    </div>
-                </section>
-
-                <section id="chart-tahunan-LINEB">
-                    <hr>
-                    <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI LINE-B (TAHUNAN)</h6>
-                    <div class="d-flex align-items-center mb-3 gap-2">
-                        <form id="filterTahunan" class="d-flex mb-0 gap-2" hidden>
-                            <select id="lineSelect" name="line" hidden class="form-control form-control-sm" style="width: 160px;">
-                                <?php foreach ($lines as $line): ?>
-                                    <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($line['nama_line']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <input id="tahunInput" type="number" name="tahun" class="form-control form-control-sm"
-                                value="<?= $selectedYear ?>" style="width: 110px;">
-                        </form>
-                    </div>
-                    <div class="chart-container">
-                        <div class="chart-toolbar">
-                            <button id="prevTahunan" class="btn btn-sm btn-secondary">◀ Prev</button>
-                            <button id="nextTahunan" class="btn btn-sm btn-primary">Next ▶</button>
-                            <!-- <button id="exportPDFbarcharttahunan" class="btn btn-sm btn-danger">Export PDF</button> -->
-                        </div>
-                        <!-- <canvas id="BarCharttahunanLINEB" style="width:100%; height:400px;"></canvas> -->
                     </div>
                 </section>
 
@@ -593,6 +542,7 @@ foreach (array_keys($fields) as $key) {
                         </table>
                     </div>
                 </section>
+
 
 
                 <!-- =========================================================================================================================================-->
