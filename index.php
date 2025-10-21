@@ -312,14 +312,14 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                 <!-- 📊 CHART BAR (BULANAN) -->
                 <!-- =========================================================================================================================================-->
                 <!-- ========================== LINE A =========================== -->
-                <section id="chart-bar-bulanan-LINEA" class="mb-5" style="height: 100vh">
+                <section id="chart-bar-bulanan-LINEA" class="mb-5">
                     <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE A</h6>
-                    <div class="chart-container">
+                    <div class="chart-container" style="height: 85vh">
                         <div class="chart-toolbar mb-2">
                             <button id="prevBarA" class="btn btn-sm btn-secondary">◀ Prev</button>
                             <button id="nextBarA" class="btn btn-sm btn-primary">Next ▶</button>
                         </div>
-                        <canvas id="BarChartA" style="width:100%; height:85vh;"></canvas>
+                        <canvas id="BarChartA" style="width:100%;"></canvas>
                     </div>
                 </section>
 

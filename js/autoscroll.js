@@ -35,10 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Optional: pause kalau user hover halaman (biar ga ganggu)
   // ============================================================================== komentar fungsi di bawah ini untuk refresh terus menerus
-  document.body.addEventListener("mouseenter", () => clearInterval(timer));
-  document.body.addEventListener("mouseleave", () => {
-    clearInterval(timer);
-    timer = setInterval(scrollToNext, intervalMs);
-  });
+  // document.body.addEventListener("mouseenter", () => clearInterval(timer));
+  // document.body.addEventListener("mouseleave", () => {
+  //   clearInterval(timer);
+  //   timer = setInterval(scrollToNext, intervalMs);
+  // });
   // // ============================================================================== Komen sampe sini ( block dulu yg atas lalu pencet ctrl + /)
 });
