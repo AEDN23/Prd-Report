@@ -1,10 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Ambil semua section utama
   const mainSections = [
-    document.getElementById("chart-bulanan"),
-    document.getElementById("chart-bar-bulanan"),
-    document.getElementById("chart-tahunan"),
-    document.getElementById("filter-section"),
+    document.getElementById("chart-bar-bulanan-LINEA"),
+    document.getElementById("chart-bar-bulanan-LINEB"),
+    document.getElementById("chart-tahunan-LINEA"),
+    document.getElementById("chart-tahunan-LINEB"),
+    document.getElementById("DATA-HARIAN-LINEA"),
+    document.getElementById("tabel-tahunan-LINEA"),
   ].filter(Boolean);
 
   const infoTitles = Array.from(document.querySelectorAll("#informasi h1"));
@@ -18,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===============================================================================================================================
   // FUNGSI UNTUK SCROLL 1000 = 1 DETIK
   // ===============================================================================================================================
-  const intervalMs = 30000;
+  const intervalMs = 2000;
 
   function scrollToNext() {
     const target = scrollTargets[currentIndex];
@@ -38,5 +40,5 @@ document.addEventListener("DOMContentLoaded", () => {
     clearInterval(timer);
     timer = setInterval(scrollToNext, intervalMs);
   });
-  // ============================================================================== Komen sampe sini ( block dulu yg atas lalu pencet ctrl + /)
+  // // ============================================================================== Komen sampe sini ( block dulu yg atas lalu pencet ctrl + /)
 });

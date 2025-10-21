@@ -134,6 +134,11 @@ document.addEventListener("DOMContentLoaded", () => {
       loadChart();
     });
 
+    setInterval(() => {
+      currentDataset = (currentDataset + 1) % datasetKeys.length;
+      loadChart();
+    }, 50000); //UBAH ANGKA NYAA
+
     loadChart();
   }
 });

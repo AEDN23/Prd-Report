@@ -171,8 +171,11 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
     <!-- STYLES -->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <link href="css/ind.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         /* ===== Sticky Navbar ===== */
+
+
         html {
             scroll-behavior: smooth;
         }
@@ -217,28 +220,70 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
     <!-- =========================================================================================================================================-->
     <!-- 🌐 HEADER BAR / NAVBAR -->
     <!-- =========================================================================================================================================-->
-    <nav class="navbar navbar-expand-lg shadow-sm">
+    <nav class="navbar navbar-expand-lg shadow-sm" style="background-color: #0d6efd;">
         <div class="container-fluid">
+            <!-- Brand -->
             <a class="navbar-brand text-white fw-bold" href="#">📊 Dashboard Produksi</a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarContent" aria-controls="navbarContent"
-                aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon text-white"></span>
-            </button>
 
+            <!-- Navbar Content -->
             <div class="collapse navbar-collapse justify-content-between" id="navbarContent">
+                <!-- Left Side (Dropdowns) -->
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="#chart-bulanan">📈 Bulanan</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#chart-bar-bulanan">📊 Bar Bulanan</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#chart-tahunan">📅 Tahunan</a></li>
+
+                    <!-- Dropdown 1: Chart Produksi -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white fw-semibold" href="#" id="dropdownChart"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            📈 Chart Produksi
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownChart">
+                            <li><a class="dropdown-item" href="#cchart-bar-bulanan-LINEA">Line A Harian</a></li>
+                            <li><a class="dropdown-item" href="#chart-bar-bulanan-LINEB">Line B Harian</a></li>
+                            <li><a class="dropdown-item" href="#chart-tahunan-LINEA">Chart tahunan LINE-A</a></li>
+                            <li><a class="dropdown-item" href="#chart-tahunan-LINEB">Chart tahunan LINE-B</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Dropdown 2: Laporan -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white fw-semibold" href="#" id="dropdownReport"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            📅 Laporan
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownReport">
+                            <li><a class="dropdown-item" href="#tabel-tahunan-LINEA">Tabel Harian Line A</a></li>
+                            <li><a class="dropdown-item" href="#tabel-tahunan-LINEB">Tabel Harian Line B</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Dropdown 3: Informasi -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white fw-semibold" href="#" id="dropdownInfo"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            ℹ️ Informasi
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownInfo">
+                            <li><a class="dropdown-item" href="#informasi">Lihat Informasi</a></li>
+                            <li><a class="dropdown-item" href="input-info.php">Tambah Informasi</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">Contoh Menu Tambahan</a></li>
+                        </ul>
+                    </li>
+
                 </ul>
-                <div class="nav-date">
+
+                <!-- Right Side (Tanggal) -->
+                <div class="text-white fw-semibold">
                     <?= date('d - M - Y'); ?>
                 </div>
             </div>
         </div>
     </nav>
+
+
 
     <!-- =========================================================================================================================================-->
     <!-- 📊 ISI HALAMAN -->
@@ -246,7 +291,6 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
     <div class="container-fluid">
         <div class="card shadow mb-4">
             <div class="card-body">
-
                 <!-- =========================================================================================================================================-->
                 <!-- 📈 CHART PRODUKSI (BULANAN)    BUKA KOMEN JIKA INGIN MENAMPIKAN LINE CHART-->
                 <!-- =========================================================================================================================================-->
@@ -268,32 +312,35 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                 <!-- 📊 CHART BAR (BULANAN) -->
                 <!-- =========================================================================================================================================-->
                 <!-- ========================== LINE A =========================== -->
-                <section id="chart-bar-bulanan-LINEA" class="mb-5">
+                <section id="chart-bar-bulanan-LINEA" class="mb-5" style="height: 100vh">
                     <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE A</h6>
                     <div class="chart-container">
                         <div class="chart-toolbar mb-2">
                             <button id="prevBarA" class="btn btn-sm btn-secondary">◀ Prev</button>
                             <button id="nextBarA" class="btn btn-sm btn-primary">Next ▶</button>
                         </div>
-                        <canvas id="BarChartA" style="width:100%; height:400px;"></canvas>
+                        <canvas id="BarChartA" style="width:100%; height:85vh;"></canvas>
                     </div>
                 </section>
 
                 <!-- ========================== LINE B =========================== -->
-                <section id="chart-bar-bulanan-LINEB" class="mb-5">
+                <section id="chart-bar-bulanan-LINEB" class="mb-5" style="height: 100vh">
                     <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE B</h6>
                     <div class="chart-container">
                         <div class="chart-toolbar mb-2">
                             <button id="prevBarB" class="btn btn-sm btn-secondary">◀ Prev</button>
                             <button id="nextBarB" class="btn btn-sm btn-primary">Next ▶</button>
                         </div>
-                        <canvas id="BarChartB" style="width:100%; height:400px;"></canvas>
+                        <canvas id="BarChartB" style="width:100%; height:85vh;"></canvas>
                     </div>
                 </section>
 
                 <!-- =========================================================================================================================================-->
                 <!-- 📅 CHART TAHUNAN PER LINE A  DAN B-->
                 <!-- =========================================================================================================================================-->
+
+                <!-- ========================== LINE A TAHUNAN =========================== -->
+
                 <section id="chart-tahunan-LINEA">
                     <hr>
                     <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI LINE-A (TAHUNAN)</h6>
@@ -316,9 +363,11 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                             <button id="nextTahunan" class="btn btn-sm btn-primary">Next ▶</button>
                             <!-- <button id="exportPDFbarcharttahunan" class="btn btn-sm btn-danger">Export PDF</button> -->
                         </div>
-                        <canvas id="BarCharttahunan" style="width:100%; height:400px;"></canvas>
+                        <canvas id="BarCharttahunan" style="width:100%; height:700px;"></canvas>
                     </div>
                 </section>
+
+                <!-- ========================== LINE B TAHUNAN =========================== -->
                 <section id="chart-tahunan-LINEB">
                     <hr>
                     <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI LINE-B (TAHUNAN)</h6>
@@ -341,17 +390,17 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                             <button id="nextTahunan" class="btn btn-sm btn-primary">Next ▶</button>
                             <!-- <button id="exportPDFbarcharttahunan" class="btn btn-sm btn-danger">Export PDF</button> -->
                         </div>
-                        <canvas id="BarCharttahunanLINEB" style="width:100%; height:400px;"></canvas>
+                        <canvas id="BarCharttahunanLINEB" style="width:100%; height:700px;"></canvas>
                     </div>
                 </section>
 
                 <!-- ===================================================================== -->
                 <!-- 📋 TABEL DATA PRODUKSI HARIAN LINE A -->
                 <!-- ===================================================================== -->
-                <section id="DATA-HARIAN-LINEA" class="mb-4">
+                <section id="DATA-HARIAN-LINEA" class="mb-4" style="height: 100vh;">
                     <h2>📋 DATA PRODUKSI HARIAN LINE A (<?= $namaBulan[$bulanSekarang] . " " . $tahunSekarang ?>)</h2>
                     <div class="table-responsive border rounded p-2">
-                        <table class="table table-bordered table-sm mb-0 align-middle text-center">
+                        <table style="height: 80vh;" class="table table-bordered table-sm mb-0 align-middle text-center">
                             <thead class="table-light">
                                 <tr>
                                     <th>Details</th>
@@ -388,10 +437,10 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                 <!-- ===================================================================== -->
                 <!-- 📘 TABEL DATA TAHUNAN LINE A -->
                 <!-- ===================================================================== -->
-                <section id="tabel-tahunan-LINEA" class="mb-4">
+                <section id="tabel-tahunan-LINEA" style="height: 100vh;" class="mb-4">
                     <h2 class="fw-bold">📋 DATA PRODUKSI LINE A TAHUN <?= $tahunSekarang ?></h2>
                     <div class="table-responsive border rounded p-2">
-                        <table class="table table-bordered table-sm mb-0 text-center">
+                        <table class="table table-bordered table-sm mb-0 text-center" style="height:85vh">
                             <thead class="table-light">
                                 <tr>
                                     <th>Details</th>
@@ -429,10 +478,10 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                 <!-- ===================================================================== -->
                 <!-- 📋 DATA PRODUKSI LINE B -->
                 <!-- ===================================================================== -->
-                <section id="DATA-HARIAN-LINEB" class="mb-4">
+                <section id="DATA-HARIAN-LINEB" style="height: 100vh;" class="mb-4">
                     <h2>📋 DATA PRODUKSI HARIAN LINE B (<?= $namaBulan[$bulanSekarang] . " " . $tahunSekarang ?>)</h2>
                     <div class="table-responsive border rounded p-2">
-                        <table class="table table-bordered table-sm mb-0 align-middle text-center">
+                        <table class="table table-bordered table-sm mb-0 align-middle text-center" style="height: 85vh;">
                             <thead class="table-light">
                                 <tr>
                                     <th>Details</th>
@@ -466,10 +515,10 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                     </div>
                 </section>
 
-                <section id="tabel-tahunan-LINEB" class="mb-4">
+                <section id="tabel-tahunan-LINEB" style="height: 100vh;" class="mb-4">
                     <h2 class="fw-bold">📋 DATA PRODUKSI LINE B TAHUN <?= $tahunSekarang ?></h2>
                     <div class="table-responsive border rounded p-2">
-                        <table class="table table-bordered table-sm mb-0 text-center">
+                        <table style="height: 85vh;" class="table table-bordered table-sm mb-0 text-center">
                             <thead class="table-light">
                                 <tr>
                                     <th>Details</th>
