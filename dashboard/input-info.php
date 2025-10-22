@@ -5,7 +5,6 @@ include '../layout/header.php';
 
 <div class="form-container">
     <form action="../backend/proses-informasi.php" method="POST" enctype="multipart/form-data" id="formHarian">
-
         <div class="form-section">
             <h2><i class="bi bi-info"></i>INFORMASI</h2>
             <div class="form-row">
@@ -31,11 +30,11 @@ include '../layout/header.php';
                     <textarea id="isi_informasi" name="isi_informasi" required
                         style="width: 100%; cursor: text;"><?= htmlspecialchars($data['isi_informasi'] ?? '') ?></textarea>
 
-                    <label for="file">
+                    <!-- <label for="file">
                         Upload File (jika ada)
-                    </label>
+                    </label> -->
 
-                    <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png" style="width: 100%; cursor: text;" onclick="">
+                    <!-- <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png" style="width: 100%; cursor: text;" onclick=""> -->
 
                 </div>
 

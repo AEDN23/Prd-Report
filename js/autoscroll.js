@@ -5,8 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("chart-bar-bulanan-LINEB"),
     document.getElementById("chart-tahunan-LINEA"),
     document.getElementById("chart-tahunan-LINEB"),
-    document.getElementById("DATA-HARIAN-LINEA"),
-    document.getElementById("tabel-tahunan-LINEA"),
+    document.getElementById("DATA-PRODUKSI-LINEA"),
+    document.getElementById("DATA-PRODUKSI-LINEB"),
   ].filter(Boolean);
 
   const infoTitles = Array.from(document.querySelectorAll("#informasi h1"));
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===============================================================================================================================
   // FUNGSI UNTUK SCROLL 1000 = 1 DETIK
   // ===============================================================================================================================
-  const intervalMs = 2000;
+  const intervalMs = 5000;
 
   function scrollToNext() {
     const target = scrollTargets[currentIndex];

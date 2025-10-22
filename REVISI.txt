@@ -1,4 +1,12 @@
 REVISI WEB PRODUKSI REPORT
 
-(17/10/2025)
+|17/10/2025|
 - Bar chart pisah antar line a dan b
+
+|22-OKTOBER-2025|
+- Memisahkan bar chart tahunan dan harian  ✅  
+- Menambahkan garis target di chart harian ✅
+- Buat halaman tabel, chart semuanya jadi 1 slide ✅
+- Chart refresh 5 detik, scroll 20 detik ✅ 
+
+

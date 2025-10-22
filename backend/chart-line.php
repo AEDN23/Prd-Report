@@ -5,10 +5,12 @@ $bulan = $_GET['bulan'] ?? date('n');
 $tahun = $_GET['tahun'] ?? date('Y');
 $lineId = $_GET['line'] ?? null;
 
-$data = ['lines' => []];
+$data = ['lines' => [], 'target' => []];
 
 if ($lineId) {
-    // Jika spesifik line diminta
+    // =============================
+    // 🔹 Ambil data harian per line
+    // =============================
     $stmt = $pdo->prepare("
         SELECT 
             DAY(tanggal) AS hari,
@@ -22,8 +24,26 @@ if ($lineId) {
     ");
     $stmt->execute([$lineId, $bulan, $tahun]);
     $data['lines'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // =============================
+    // 🎯 Ambil data target per line
+    // =============================
+    $stmtTarget = $pdo->prepare("
+        SELECT 
+            target_batch_count,
+            target_productivity,
+            target_production_speed,
+            target_feed_raw_material
+        FROM target
+        WHERE line_id = ? AND tahun_target = ?
+        LIMIT 1
+    ");
+    $stmtTarget->execute([$lineId, $tahun]);
+    $data['target'] = $stmtTarget->fetch(PDO::FETCH_ASSOC) ?: [];
 } else {
-    // Default: ambil semua line
+    // =============================
+    // 🔹 Ambil semua line (optional)
+    // =============================
     $lines = $pdo->query("SELECT id, nama_line FROM line_produksi ORDER BY id")->fetchAll(PDO::FETCH_ASSOC);
     foreach ($lines as $line) {
         $stmt = $pdo->prepare("
@@ -39,6 +59,19 @@ if ($lineId) {
         ");
         $stmt->execute([$line['id'], $bulan, $tahun]);
         $data['lines'][$line['nama_line']] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmtTarget = $pdo->prepare("
+            SELECT 
+                target_batch_count,
+                target_productivity,
+                target_production_speed,
+                target_feed_raw_material
+            FROM target
+            WHERE line_id = ? AND tahun_target = ?
+            LIMIT 1
+        ");
+        $stmtTarget->execute([$line['id'], $tahun]);
+        $data['target'][$line['nama_line']] = $stmtTarget->fetch(PDO::FETCH_ASSOC) ?: [];
     }
 }
 
