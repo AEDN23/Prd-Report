@@ -215,14 +215,14 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                         </div>
                         <canvas id="myChart" style="width:100%; height:400px;"></canvas>
                     </div>
-                </section> <br> <br> -->
+                </section> -->
 
 
 
                 <!-- =========================================================================================================================================-->
                 <!-- 📊 CHART BAR (BULANAN) -->
                 <!-- =========================================================================================================================================-->
-                <!-- ========================== LINE A =========================== -->
+                <!-- ========================== LINE A BULANAN =========================== -->
                 <section id="chart-bar-bulanan-LINEA" style="height: 100vh;" class="mb-5">
                     <br>
                     <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE A</h6>
@@ -233,9 +233,9 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                         </div>
                         <canvas id="BarChartA" style="width:100%; height: 85vh"></canvas>
                     </div>
-                </section> <br> <br>
+                </section>
 
-                <!-- ========================== LINE B =========================== -->
+                <!-- ========================== LINE B BULANAN =========================== -->
                 <section id="chart-bar-bulanan-LINEB" class="mb-5" style="height: 100vh">
                     <br>
                     <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE B</h6>
@@ -246,74 +246,47 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                         </div>
                         <canvas id="BarChartB" style="width:100%; height:85vh;"></canvas>
                     </div>
-                </section> <br> <br>
+                </section>
 
                 <!-- =========================================================================================================================================-->
                 <!-- 📅 CHART TAHUNAN PER LINE A  DAN B-->
                 <!-- =========================================================================================================================================-->
 
                 <!-- ========================== LINE A TAHUNAN =========================== -->
-
+                <!-- ========================== LINE A TAHUNAN =========================== -->
                 <section id="chart-tahunan-LINEA" style="height: 100vh;">
+                    <br>
                     <hr>
                     <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI LINE-A (TAHUNAN)</h6>
-                    <div class="d-flex align-items-center mb-3 gap-2">
-                        <form id="filterTahunan" class="d-flex mb-0 gap-2" hidden>
-                            <select id="lineSelect" name="line" hidden class="form-control form-control-sm" style="width: 160px;">
-                                <?php foreach ($lines as $line): ?>
-                                    <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($line['nama_line']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <input id="tahunInput" type="number" name="tahun" class="form-control form-control-sm"
-                                value="<?= $selectedYear ?>" style="width: 110px;">
-                        </form>
-                    </div>
                     <div class="chart-container">
                         <div class="chart-toolbar">
                             <button id="prevTahunan" class="btn btn-sm btn-secondary">◀ Prev</button>
                             <button id="nextTahunan" class="btn btn-sm btn-primary">Next ▶</button>
-                            <!-- <button id="exportPDFbarcharttahunan" class="btn btn-sm btn-danger">Export PDF</button> -->
                         </div>
                         <canvas id="BarCharttahunan" style="width:100%; height:85vh;"></canvas>
                     </div>
-                </section> <br> <br>
+                </section>
 
                 <!-- ========================== LINE B TAHUNAN =========================== -->
                 <section id="chart-tahunan-LINEB" style="height: 100vh;">
                     <hr>
                     <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI LINE-B (TAHUNAN)</h6>
-                    <div class="d-flex align-items-center mb-3 gap-2">
-                        <form id="filterTahunan" class="d-flex mb-0 gap-2" hidden>
-                            <select id="lineSelect" name="line" hidden class="form-control form-control-sm" style="width: 160px;">
-                                <?php foreach ($lines as $line): ?>
-                                    <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($line['nama_line']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <input id="tahunInput" type="number" name="tahun" class="form-control form-control-sm"
-                                value="<?= $selectedYear ?>" style="width: 110px;">
-                        </form>
-                    </div>
                     <div class="chart-container">
                         <div class="chart-toolbar">
-                            <button id="prevTahunan" class="btn btn-sm btn-secondary">◀ Prev</button>
-                            <button id="nextTahunan" class="btn btn-sm btn-primary">Next ▶</button>
-                            <!-- <button id="exportPDFbarcharttahunan" class="btn btn-sm btn-danger">Export PDF</button> -->
+                            <button id="prevTahunanB" class="btn btn-sm btn-secondary">◀ Prev</button>
+                            <button id="nextTahunanB" class="btn btn-sm btn-primary">Next ▶</button>
                         </div>
                         <canvas id="BarCharttahunanLINEB" style="width:100%; height:85vh;"></canvas>
                     </div>
-                </section> <br> <br>
-                <br>
+                </section>
+
                 <!-- ===================================================================== -->
                 <!-- 📋 TABEL DATA PRODUKSI LINE A -->
                 <!-- ===================================================================== -->
                 <section id="DATA-PRODUKSI-LINEA" class="mb-4" style="height: 100vh;">
                     <h2>📋 DATA PRODUKSI HARIAN LINE A (<?= $namaBulan[$bulanSekarang] . " " . $tahunSekarang ?>)</h2>
                     <div class="table-responsive border rounded p-2">
-                        <table style="height: 350px; font-size:x-large" class="table table-bordered table-sm mb-0 align-middle text-center">
+                        <table class="table table-bordered table-sm mb-0 align-middle text-center">
                             <thead class="table-light">
                                 <tr>
                                     <th>Details</th>
@@ -349,7 +322,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                     <br>
                     <h2 class="fw-bold">📋 DATA PRODUKSI LINE A TAHUN <?= $tahunSekarang ?></h2>
                     <div class="table-responsive border rounded p-2">
-                        <table style="height: 350px;" class="table table-bordered table-sm mb-0 text-center">
+                        <table class="table table-bordered table-sm mb-0 text-center">
                             <thead class="table-light">
                                 <tr>
                                     <th>Details</th>
@@ -382,7 +355,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                             </tbody>
                         </table>
                     </div>
-                </section> <br> <br>
+                </section>
 
 
                 <!-- ===================================================================== -->
@@ -391,7 +364,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                 <section id="DATA-PRODUKSI-LINEB" style="height: 100vh;" class="mb-4">
                     <h2>📋 DATA PRODUKSI HARIAN LINE B (<?= $namaBulan[$bulanSekarang] . " " . $tahunSekarang ?>)</h2>
                     <div class="table-responsive border rounded p-2">
-                        <table class="table table-bordered table-sm mb-0 align-middle text-center" style="height: 350px">
+                        <table class="table table-bordered table-sm mb-0 align-middle text-center">
                             <thead class="table-light">
                                 <tr>
                                     <th>Details</th>
@@ -423,10 +396,9 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                             </tbody>
                         </table>
                     </div>
-                    <br>
                     <h2 class="fw-bold">📋 DATA PRODUKSI LINE B TAHUN <?= $tahunSekarang ?></h2>
                     <div class="table-responsive border rounded p-2">
-                        <table style="height: 350px" class="table table-bordered table-sm mb-0 text-center">
+                        <table class="table table-bordered table-sm mb-0 text-center">
                             <thead class="table-light">
                                 <tr>
                                     <th>Details</th>
@@ -459,7 +431,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                             </tbody>
                         </table>
                     </div>
-                </section> <br> <br>
+                </section>
 
 
 
@@ -488,7 +460,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                                     echo "<hr>";
                                 }
                             } else {
-                                echo "<p><a href='dashboard/input-info.php'>Tidak ada informasi tersedia. klik untuk tambah informasi<a></p>";
+                                echo "<p><a href='input-info.php'>Tidak ada informasi tersedia. klik untuk tambah informasi<a></p>";
                             }
                         } catch (Exception $e) {
                             echo "<p>Error: " . htmlspecialchars($e->getMessage()) . "</p>";

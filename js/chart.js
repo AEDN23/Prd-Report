@@ -119,11 +119,11 @@ document.addEventListener("DOMContentLoaded", () => {
               text: `📊 ${label} - Line ${
                 lineId === 1 ? "A" : "B"
               } (${bulan}/${tahun})`,
-              font: { size: 15 },
+              font: { size: 20 },
             },
             legend: {
-              position: "bottom",
-              labels: { boxWidth: 15 },
+              position: "top",
+              labels: { boxWidth: 40 },
             },
           },
           scales: {
@@ -185,18 +185,23 @@ document.addEventListener("DOMContentLoaded", () => {
 // ============================================================================
 // 📅 BAR CHART TAHUNAN PER LINE
 // ============================================================================
+// ============================================================================
+// 📅 BAR CHART TAHUNAN LINE A & LINE B (TERPISAH, OTOMATIS TAHUN SEKARANG)
+// ============================================================================
 document.addEventListener("DOMContentLoaded", () => {
-  const ctx = document.getElementById("BarCharttahunan").getContext("2d");
-  const lineSelect = document.getElementById("lineSelect");
-  const tahunInput = document.getElementById("tahunInput");
+  const tahunSekarang = new Date().getFullYear();
 
-  const btnPrev = document.getElementById("prevTahunan");
-  const btnNext = document.getElementById("nextTahunan");
-  // const btnExport = document.getElementById("exportPDFbarcharttahunan");
+  // Tombol Navigasi (gunakan ID unik untuk tiap chart)
+  const btnPrevA = document.getElementById("prevTahunan");
+  const btnNextA = document.getElementById("nextTahunan");
+  const btnPrevB = document.getElementById("prevTahunanB");
+  const btnNextB = document.getElementById("nextTahunanB");
 
-  let currentMetric = 0;
-  let chart;
+  // Context Canvas
+  const ctxA = document.getElementById("BarCharttahunan").getContext("2d");
+  const ctxB = document.getElementById("BarCharttahunanLINEB").getContext("2d");
 
+  // Metric yang ditampilkan
   const metrics = [
     { key: "productivity", label: "Productivity (Ton/Shift)" },
     { key: "batch_count", label: "Batch Count (Per Day)" },
@@ -220,20 +225,17 @@ document.addEventListener("DOMContentLoaded", () => {
     "Desember",
   ];
 
-  function loadChartyears() {
-    fetch(
-      `backend/get_chart_tahunan.php?line=${lineSelect.value}&tahun=${tahunInput.value}`
-    )
-      .then((res) => res.json())
-      .then((data) => renderChart(data))
-      .catch((err) => console.error("Gagal ambil data chart tahunan:", err));
-  }
+  let currentMetricA = 0;
+  let currentMetricB = 0;
+  let chartA, chartB;
 
-  function renderChart(data) {
-    const metric = metrics[currentMetric];
+  // ==========================================================
+  // 🔧 Fungsi untuk Render Chart
+  // ==========================================================
+  function renderChart(ctx, data, metric, lineName, chartRef) {
     const dataBulan = data.bulanData || {};
     const targetData = data.target || {};
-    const tahun = data.tahun || tahunInput.value;
+    const tahun = data.tahun || tahunSekarang;
 
     const produksiData = bulanLabels.map((_, i) => {
       const bulan = i + 1;
@@ -249,9 +251,9 @@ document.addEventListener("DOMContentLoaded", () => {
         ? parseFloat(targetData[targetKey])
         : 0;
 
-    if (chart) chart.destroy();
+    if (chartRef.chart) chartRef.chart.destroy();
 
-    chart = new Chart(ctx, {
+    chartRef.chart = new Chart(ctx, {
       type: "bar",
       data: {
         labels: bulanLabels,
@@ -282,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
         plugins: {
           title: {
             display: true,
-            text: `📘 Grafik ${metric.label} vs Target (${tahun})`,
+            text: `📘 ${lineName} — ${metric.label} vs Target (${tahun})`,
             font: { size: 16 },
           },
         },
@@ -294,22 +296,67 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  btnNext.addEventListener("click", () => {
-    currentMetric = (currentMetric + 1) % metrics.length;
-    loadChartyears();
-  });
-  btnPrev.addEventListener("click", () => {
-    currentMetric = (currentMetric - 1 + metrics.length) % metrics.length;
-    loadChartyears();
-  });
-  // btnExport.addEventListener("click", () =>
-  //   exportChartPDF("BarCharttahunan", "Chart_Tahunan")
-  // );
+  // ==========================================================
+  // 📊 Fungsi untuk Load Data Line A dan B
+  // ==========================================================
+  function loadChartA() {
+    fetch(`backend/get_chart_tahunan.php?line=1&tahun=${tahunSekarang}`)
+      .then((res) => res.json())
+      .then((data) =>
+        renderChart(ctxA, data, metrics[currentMetricA], "Line A", {
+          chart: chartA,
+        })
+      )
+      .catch((err) => console.error("Gagal load chart Line A:", err));
+  }
 
-  [lineSelect, tahunInput].forEach((el) =>
-    el.addEventListener("change", loadChartyears)
-  );
-  loadChartyears();
+  function loadChartB() {
+    fetch(`backend/get_chart_tahunan.php?line=2&tahun=${tahunSekarang}`)
+      .then((res) => res.json())
+      .then((data) =>
+        renderChart(ctxB, data, metrics[currentMetricB], "Line B", {
+          chart: chartB,
+        })
+      )
+      .catch((err) => console.error("Gagal load chart Line B:", err));
+  }
+
+  // ==========================================================
+  // 🎛️ Navigasi Metric (Next/Prev)
+  // ==========================================================
+  btnNextA.addEventListener("click", () => {
+    currentMetricA = (currentMetricA + 1) % metrics.length;
+    loadChartA();
+  });
+
+  btnPrevA.addEventListener("click", () => {
+    currentMetricA = (currentMetricA - 1 + metrics.length) % metrics.length;
+    loadChartA();
+  });
+
+  btnNextB.addEventListener("click", () => {
+    currentMetricB = (currentMetricB + 1) % metrics.length;
+    loadChartB();
+  });
+
+  btnPrevB.addEventListener("click", () => {
+    currentMetricB = (currentMetricB - 1 + metrics.length) % metrics.length;
+    loadChartB();
+  });
+
+  // ==========================================================
+  // 🔁 Auto Refresh tiap 30 detik
+  // ==========================================================
+  setInterval(() => {
+    loadChartA();
+    loadChartB();
+  }, 30000);
+
+  // ==========================================================
+  // 🚀 Load pertama kali
+  // ==========================================================
+  loadChartA();
+  loadChartB();
 });
 
 // ============================================================================
