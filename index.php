@@ -179,6 +179,33 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
             scroll-behavior: smooth;
         }
     </style>
+    <style>
+        /* semua teks dalam section informasi jadi merah */
+        #informasi {
+            color: red !important;
+        }
+
+        /* biar judul & tanggal juga merah */
+        #informasi h1,
+        #informasi h2,
+        #informasi h3,
+        #informasi div,
+        #informasi p,
+        #informasi a {
+            color: red !important;
+        }
+
+        /* opsional: garis <hr> juga merah */
+        #informasi hr {
+            border-color: red !important;
+        }
+
+        /* link hover jadi merah tua */
+        #informasi a:hover {
+            color: darkred !important;
+            text-decoration: underline;
+        }
+    </style>
 
 
     <!-- SCRIPTS -->
@@ -224,7 +251,6 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                 <!-- =========================================================================================================================================-->
                 <!-- ========================== LINE A BULANAN =========================== -->
                 <section id="chart-bar-bulanan-LINEA" style="height: 100vh;" class="mb-5">
-                    <br>
                     <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE A</h6>
                     <div class="chart-container">
                         <div class="chart-toolbar mb-2">
@@ -237,7 +263,6 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
 
                 <!-- ========================== LINE B BULANAN =========================== -->
                 <section id="chart-bar-bulanan-LINEB" class="mb-5" style="height: 100vh">
-                    <br>
                     <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE B</h6>
                     <div class="chart-container">
                         <div class="chart-toolbar mb-2">
@@ -253,10 +278,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                 <!-- =========================================================================================================================================-->
 
                 <!-- ========================== LINE A TAHUNAN =========================== -->
-                <!-- ========================== LINE A TAHUNAN =========================== -->
                 <section id="chart-tahunan-LINEA" style="height: 100vh;">
-                    <br>
-                    <hr>
                     <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI LINE-A (TAHUNAN)</h6>
                     <div class="chart-container">
                         <div class="chart-toolbar">
@@ -318,8 +340,6 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                             </tbody>
                         </table>
                     </div>
-                    <br>
-                    <br>
                     <h2 class="fw-bold">📋 DATA PRODUKSI LINE A TAHUN <?= $tahunSekarang ?></h2>
                     <div class="table-responsive border rounded p-2">
                         <table class="table table-bordered table-sm mb-0 text-center">
@@ -467,10 +487,9 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                         }
                         ?>
                         <b>
-                            <hr>
                         </b>
                     </div>
-                </section> <br>
+                </section>
             </div> <!-- end card-body -->
         </div> <!-- end card -->
     </div> <!-- end container -->

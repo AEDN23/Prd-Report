@@ -166,62 +166,85 @@ $page_title = "Halaman chart"
                         <div class="card-body">
 
                             <!-- =========================================================================================================================================-->
+                            <!-- 📈 CHART PRODUKSI (BULANAN) -->
+                            <!-- =========================================================================================================================================-->
+                            <section id="chart-bulanan" class="mb-5">
+                                <h6 class="fw-bold text-primary mb-3">📈 CHART PRODUKSI (BULANAN)</h6>
+
+                                <form id="filterchart" class="row g-3 mb-3">
+                                    <div class="col-md-2">
+                                        <label class="form-label">Bulan</label>
+                                        <select id="bulanUtama" name="bulan" class="form-select">
+                                            <?php for ($m = 1; $m <= 12; $m++): ?>
+                                                <option value="<?= $m ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
+                                                    <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
+                                                </option>
+                                            <?php endfor; ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Tahun</label>
+                                        <input id="tahunUtama" type="number" name="tahun" value="<?= $selectedYear ?>" class="form-control">
+                                    </div>
+                                </form>
+
+                                <div class="chart-container">
+                                    <div class="chart-toolbar">
+                                        <button id="prevLine" class="btn btn-sm btn-secondary">◀ Prev</button>
+                                        <button id="nextLine" class="btn btn-sm btn-primary">Next ▶</button>
+                                        <button id="exportPDF" class="btn btn-sm btn-danger">Export PDF</button>
+                                    </div>
+                                    <canvas id="myChart" style="width:100%; height:400px;"></canvas>
+                                </div>
+                            </section>
+
+
+
+                            <!-- =========================================================================================================================================-->
                             <!-- 📊 CHART BAR (BULANAN) -->
                             <!-- =========================================================================================================================================-->
-                            <!-- ========================== LINE A BULANAN =========================== -->
-                            <section id="chart-bar-bulanan-LINEA" style="height: 100vh;" class="mb-5">
-                                <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE A</h6>
+
+                            <section id="chart-bar-bulanan" class="mb-5">
+                                <hr>
+                                <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI</h6>
                                 <div class="chart-container">
-                                    <div class="chart-toolbar mb-2">
-                                        <button id="prevBarA" class="btn btn-sm btn-secondary">◀ Prev</button>
-                                        <button id="nextBarA" class="btn btn-sm btn-primary">Next ▶</button>
+                                    <div class="chart-toolbar">
+                                        <button id="prevBar" class="btn btn-sm btn-secondary">◀ Prev</button>
+                                        <button id="nextBar" class="btn btn-sm btn-primary">Next ▶</button>
+                                        <button id="exportPDFbarchart" class="btn btn-sm btn-danger">Export PDF</button>
                                     </div>
-                                    <canvas id="BarChartA" style="width:100%; height: 85vh"></canvas>
+                                    <canvas id="BarChart" style="width:100%; height:400px;"></canvas>
                                 </div>
                             </section>
 
-                            <!-- ========================== LINE B BULANAN =========================== -->
-                            <section id="chart-bar-bulanan-LINEB" class="mb-5" style="height: 100vh">
-                                <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE B</h6>
-                                <div class="chart-container">
-                                    <div class="chart-toolbar mb-2">
-                                        <button id="prevBarB" class="btn btn-sm btn-secondary">◀ Prev</button>
-                                        <button id="nextBarB" class="btn btn-sm btn-primary">Next ▶</button>
-                                    </div>
-                                    <canvas id="BarChartB" style="width:100%; height:85vh;"></canvas>
+
+                            <!-- =========================================================================================================================================-->
+                            <!-- 📅 CHART TAHUNAN PER LINE -->
+                            <section id="chart-tahunan">
+                                <hr>
+                                <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI (TAHUNAN)</h6>
+                                <div class="d-flex align-items-center mb-3 gap-2">
+                                    <form id="filterTahunan" class="d-flex mb-0 gap-2" hidden>
+                                        <select id="lineSelect" name="line" hidden class="form-control form-control-sm" style="width: 160px;">
+                                            <?php foreach ($lines as $line): ?>
+                                                <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
+                                                    <?= htmlspecialchars($line['nama_line']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <input id="tahunInput" type="number" name="tahun" class="form-control form-control-sm"
+                                            value="<?= $selectedYear ?>" style="width: 110px;">
+                                    </form>
                                 </div>
-                            </section>
-
-                            <!-- =========================================================================================================================================-->
-                            <!-- 📅 CHART TAHUNAN PER LINE A  DAN B-->
-                            <!-- =========================================================================================================================================-->
-
-                            <!-- ========================== LINE A TAHUNAN =========================== -->
-                            <section id="chart-tahunan-LINEA" style="height: 100vh;">
-                                <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI LINE-A (TAHUNAN)</h6>
                                 <div class="chart-container">
                                     <div class="chart-toolbar">
                                         <button id="prevTahunan" class="btn btn-sm btn-secondary">◀ Prev</button>
                                         <button id="nextTahunan" class="btn btn-sm btn-primary">Next ▶</button>
+                                        <!-- <button id="exportPDFbarcharttahunan" class="btn btn-sm btn-danger">Export PDF</button> -->
                                     </div>
-                                    <canvas id="BarCharttahunan" style="width:100%; height:85vh;"></canvas>
+                                    <canvas id="BarCharttahunan" style="width:100%; height:400px;"></canvas>
                                 </div>
                             </section>
-
-                            <!-- ========================== LINE B TAHUNAN =========================== -->
-                            <section id="chart-tahunan-LINEB" style="height: 100vh;">
-                                <hr>
-                                <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI LINE-B (TAHUNAN)</h6>
-                                <div class="chart-container">
-                                    <div class="chart-toolbar">
-                                        <button id="prevTahunanB" class="btn btn-sm btn-secondary">◀ Prev</button>
-                                        <button id="nextTahunanB" class="btn btn-sm btn-primary">Next ▶</button>
-                                    </div>
-                                    <canvas id="BarCharttahunanLINEB" style="width:100%; height:85vh;"></canvas>
-                                </div>
-                            </section>
-
-
                         </div> <!-- end card-body -->
                     </div> <!-- end card -->
                 </div> <!-- end container -->
@@ -232,9 +255,32 @@ $page_title = "Halaman chart"
         <!-- End of Content Wrapper -->
 
     </div>
+    <!-- End of Page Wrapper -->
 
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
 
-
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

@@ -1,31 +1,24 @@
-// SCRIPT DI DASHBOARD/CHART.PHP FUNGSI NYA UNTUK MENAMPILKAN CHART DI DASHBOARD/INDEX.
-
-// ============================================================================
-// 📈 LINE CHART BULANAN
-// ============================================================================
-// ============================================================================
-// 📊 BAR CHART BULANAN
-// ============================================================================
-// ============================================================================
-// 📅 BAR CHART TAHUNAN
-// ============================================================================
-// ============================================================================
-// 🧾 Fungsi Export PDF (dipakai semua chart)
-// ============================================================================
-
 // ============================================================================
 // 📈 LINE CHART BULANAN
 // ============================================================================
 document.addEventListener("DOMContentLoaded", () => {
-  const ctx = document.getElementById("myChart").getContext("2d");
-  const bulan = document.getElementById("bulanUtama");
-  const tahun = document.getElementById("tahunUtama");
+  const bulan = new Date().getMonth() + 1;
+  const tahun = new Date().getFullYear();
 
-  const btnPrev = document.getElementById("prevLine");
-  const btnNext = document.getElementById("nextLine");
-  const btnExport = document.getElementById("exportPDF");
+  // 🎨 Warna dan dataset
+  const warna = [
+    "#1B1E23",
+    "#FF90BB",
+    "#FF0000",
+    "#6f42c1",
+    "#450693",
+    "#E9FF97",
+    "#fd7e14",
+    "#6610f2",
+    "#17a2b8",
+    "#adb5bd",
+  ];
 
-  let currentDataset = 0;
   const datasetKeys = [
     "batch_count",
     "productivity",
@@ -38,255 +31,161 @@ document.addEventListener("DOMContentLoaded", () => {
     "Production Speed",
     "Feed Raw Material",
   ];
-  let chartInstance;
 
-  function loadChart() {
-    const bulanVal = bulan.value;
-    const tahunVal = tahun.value;
+  let currentDataset = 0; // 🔁 sinkronisasi global antar line
 
-    fetch(`../backend/chart-line.php?bulan=${bulanVal}&tahun=${tahunVal}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.lines) renderChart(data.lines);
-        else console.error("Data chart tidak sesuai format:", data);
-      })
-      .catch((err) => console.error("Gagal load chart:", err));
-  }
+  // ========================================================================
+  // 🧠 FUNGSI BUAT CHART
+  // ========================================================================
+  function createBarChart({ canvasId, prevBtnId, nextBtnId, lineId }) {
+    const ctx = document.getElementById(canvasId).getContext("2d");
+    const btnPrev = document.getElementById(prevBtnId);
+    const btnNext = document.getElementById(nextBtnId);
+    let chartInstance;
 
-  function renderChart(lines) {
-    const key = datasetKeys[currentDataset];
-    const label = datasetLabels[currentDataset];
-    const labels = Array.from({ length: 31 }, (_, i) => i + 1);
+    // 🔄 Render ulang chart
+    function loadChart() {
+      fetch(
+        `../backend/chart-line.php?bulan=${bulan}&tahun=${tahun}&line=${lineId}`
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.lines && data.lines.length > 0) {
+            renderChart(data.lines, data.target || {});
+          } else {
+            console.warn("Tidak ada data untuk line " + lineId);
+          }
+        })
+        .catch((err) => console.error("Gagal load chart line " + lineId, err));
+    }
 
-    const warna = [
-      "#0046FF",
-      "#F9E400",
-      "#FF90BB",
-      "#450693",
-      "#6f42c1",
-      "#E9FF97",
-      "#fd7e14",
-      "#6610f2",
-      "#17a2b8",
-      "#adb5bd",
-    ];
+    // 🎨 Render chart dengan garis target
+    function renderChart(rows, targetData) {
+      const key = datasetKeys[currentDataset];
+      const label = datasetLabels[currentDataset];
+      const labels = Array.from({ length: 31 }, (_, i) => i + 1);
 
-    const datasets = Object.entries(lines).map(([lineName, dataLine], i) => {
       const dataMap = {};
-      dataLine.forEach((row) => {
-        const hari = parseInt(row.hari);
-        dataMap[hari] = parseFloat(row[key]) || 0;
+      rows.forEach((r) => {
+        dataMap[parseInt(r.hari)] = parseFloat(r[key]) || 0;
       });
-      return {
-        label: `${lineName} - ${label}`,
-        data: labels.map((hari) => dataMap[hari] || 0),
-        borderColor: warna[i % warna.length],
-        backgroundColor: warna[i % warna.length] + "33",
-        fill: true,
-        tension: 0.3,
-        pointRadius: 3,
-      };
-    });
 
-    if (chartInstance) chartInstance.destroy();
+      const values = labels.map((hari) => dataMap[hari] || 0);
+      const targetKey = `target_${key}`;
+      const targetVal =
+        targetData && targetData[targetKey] !== undefined
+          ? parseFloat(targetData[targetKey])
+          : 0;
 
-    const namaBulan = [
-      "Januari",
-      "Februari",
-      "Maret",
-      "April",
-      "Mei",
-      "Juni",
-      "Juli",
-      "Agustus",
-      "September",
-      "Oktober",
-      "November",
-      "Desember",
-    ];
-    const bulanNama = namaBulan[parseInt(bulan.value, 10) - 1] || bulan.value;
-
-    chartInstance = new Chart(ctx, {
-      type: "line",
-      data: { labels, datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          title: {
-            display: true,
-            text: `📊 ${label} Antar Line Produksi Bulan ${bulanNama} - ${tahun.value}`,
-            font: { size: 16 },
-          },
-          legend: {
-            labels: { pointStyle: "rectRounded" },
-          },
-        },
-        scales: {
-          y: { beginAtZero: true },
-          x: { title: { display: true, text: "Hari (1–31)" } },
-        },
-      },
-    });
-  }
-
-  btnNext.addEventListener("click", () => {
-    currentDataset = (currentDataset + 1) % datasetKeys.length;
-    loadChart();
-  });
-  btnPrev.addEventListener("click", () => {
-    currentDataset =
-      (currentDataset - 1 + datasetKeys.length) % datasetKeys.length;
-    loadChart();
-  });
-  btnExport.addEventListener("click", () =>
-    exportChartPDF("myChart", "Chart_Produksi_Bulanan")
-  );
-
-  // setInterval(() => {
-  //   currentDataset = (currentDataset + 1) % datasetKeys.length;
-  //   loadChart();
-  // }, 50000); //UBAH ANGKA NYAA
-
-  [bulan, tahun].forEach((el) => el.addEventListener("change", loadChart));
-  loadChart();
-});
-
-// ============================================================================
-// 📊 BAR CHART BULANAN
-// ============================================================================
-document.addEventListener("DOMContentLoaded", () => {
-  const ctx = document.getElementById("BarChart").getContext("2d");
-  const bulan = document.getElementById("bulanUtama");
-  const tahun = document.getElementById("tahunUtama");
-
-  const btnPrev = document.getElementById("prevBar");
-  const btnNext = document.getElementById("nextBar");
-  const btnExport = document.getElementById("exportPDFbarchart");
-
-  let currentDataset = 0;
-  const datasetKeys = [
-    "batch_count",
-    "productivity",
-    "production_speed",
-    "feed_raw_material",
-  ];
-  const datasetLabels = [
-    "Batch Count",
-    "Productivity",
-    "Production Speed",
-    "Feed Raw Material",
-  ];
-  let chartInstance;
-
-  function loadChart() {
-    fetch(`../backend/chart-line.php?bulan=${bulan.value}&tahun=${tahun.value}`)
-      .then((res) => res.json())
-      .then((data) => renderChart(data.lines))
-      .catch((err) => console.error("Gagal load bar chart:", err));
-  }
-
-  function renderChart(lines) {
-    const key = datasetKeys[currentDataset];
-    const label = datasetLabels[currentDataset];
-    const labels = Array.from({ length: 31 }, (_, i) => i + 1);
-    const warna = [
-      "#0046FF",
-      "#F9E400",
-      "#FF90BB",
-      "#450693",
-      "#6f42c1",
-      "#E9FF97",
-      "#fd7e14",
-      "#6610f2",
-      "#17a2b8",
-      "#adb5bd",
-    ];
-
-    const datasets = Object.entries(lines).map(([lineName, dataLine], i) => {
-      const dataMap = {};
-      dataLine.forEach(
-        (row) => (dataMap[parseInt(row.hari)] = parseFloat(row[key]) || 0)
-      );
-      return {
-        label: `${lineName} - ${label}`,
-        data: labels.map((hari) => dataMap[hari] || 0),
-        backgroundColor: warna[i % warna.length] + "88",
-        borderColor: warna[i % warna.length],
+      const datasetBars = {
+        label: `${label}`,
+        data: values,
+        backgroundColor: warna[lineId % warna.length] + "88",
+        borderColor: warna[lineId % warna.length],
         borderWidth: 1.5,
       };
-    });
 
-    if (chartInstance) chartInstance.destroy();
+      const datasetTargetLine = {
+        label: `🎯 Target ${label}`,
+        data: Array(31).fill(targetVal),
+        type: "line",
+        borderColor: "#ff0000",
+        borderWidth: 2,
+        borderDash: [6, 4],
+        pointRadius: 0,
+        fill: false,
+      };
 
-    const namaBulan = [
-      "Januari",
-      "Februari",
-      "Maret",
-      "April",
-      "Mei",
-      "Juni",
-      "Juli",
-      "Agustus",
-      "September",
-      "Oktober",
-      "November",
-      "Desember",
-    ];
-    const bulanNama = namaBulan[parseInt(bulan.value, 10) - 1] || bulan.value;
+      if (chartInstance) chartInstance.destroy();
 
-    chartInstance = new Chart(ctx, {
-      type: "bar",
-      data: { labels, datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          title: {
-            display: true,
-            text: `📊 ${label} Antar Line Produksi Bulan ${bulanNama} - ${tahun.value}`,
-            font: { size: 16 },
+      chartInstance = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [datasetBars, datasetTargetLine],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: `📊 ${label} - Line ${
+                lineId === 1 ? "A" : "B"
+              } (${bulan}/${tahun})`,
+              font: { size: 20 },
+            },
+            legend: {
+              position: "top",
+              labels: { boxWidth: 40 },
+            },
+          },
+          scales: {
+            y: { beginAtZero: true },
+            x: { title: { display: true, text: "Hari (1–31)" } },
           },
         },
-        scales: {
-          y: { beginAtZero: true },
-          x: { title: { display: true, text: "Hari (1–31)" } },
-        },
-      },
+      });
+    }
+
+    // Tombol manual
+    btnNext.addEventListener("click", () => {
+      currentDataset = (currentDataset + 1) % datasetKeys.length;
+      refreshAllCharts();
     });
+
+    btnPrev.addEventListener("click", () => {
+      currentDataset =
+        (currentDataset - 1 + datasetKeys.length) % datasetKeys.length;
+      refreshAllCharts();
+    });
+
+    // Load awal
+    loadChart();
+
+    return { loadChart };
   }
 
-  btnNext.addEventListener("click", () => {
-    currentDataset = (currentDataset + 1) % datasetKeys.length;
-    loadChart();
+  // ========================================================================
+  // 🅰️ & 🅱️ BUAT DUA CHART SEKALIGUS
+  // ========================================================================
+  const chartA = createBarChart({
+    canvasId: "BarChartA",
+    prevBtnId: "prevBarA",
+    nextBtnId: "nextBarA",
+    lineId: 1,
   });
-  btnPrev.addEventListener("click", () => {
-    currentDataset =
-      (currentDataset - 1 + datasetKeys.length) % datasetKeys.length;
-    loadChart();
+  const chartB = createBarChart({
+    canvasId: "BarChartB",
+    prevBtnId: "prevBarB",
+    nextBtnId: "nextBarB",
+    lineId: 2,
   });
-  btnExport.addEventListener("click", () =>
-    exportChartPDF("BarChart", "Chart_Bar_Bulanan")
-  );
 
-  [bulan, tahun].forEach((el) => el.addEventListener("change", loadChart));
-  loadChart();
+  // ========================================================================
+  // 🔄 AUTO REFRESH SINKRON SETIAP 5 DETIK
+  // ========================================================================
+  function refreshAllCharts() {
+    chartA.loadChart();
+    chartB.loadChart();
+  }
+
+  setInterval(() => {
+    currentDataset = (currentDataset + 1) % datasetKeys.length;
+    refreshAllCharts();
+  }, 5000); // GANTI DATASET SETIAP 5 DETIK
 });
 
 // ============================================================================
-// 📅 BAR CHART TAHUNAN
+// 📅 BAR CHART TAHUNAN PER LINE
 // ============================================================================
+
 document.addEventListener("DOMContentLoaded", () => {
-  const ctx = document.getElementById("BarCharttahunan").getContext("2d");
-  const lineSelect = document.getElementById("lineSelect");
-  const tahunInput = document.getElementById("tahunInput");
+  const tahun = new Date().getFullYear();
 
-  const btnPrev = document.getElementById("prevTahunan");
-  const btnNext = document.getElementById("nextTahunan");
-  // const btnExport = document.getElementById("exportPDFbarcharttahunan");
-
-  let currentMetric = 0;
-  let chart;
+  // 🎨 Warna berbeda untuk tiap line
+  const warnaA = "#007bff"; // biru
+  const warnaB = "#28a745"; // hijau
 
   const metrics = [
     { key: "productivity", label: "Productivity (Ton/Shift)" },
@@ -311,20 +210,15 @@ document.addEventListener("DOMContentLoaded", () => {
     "Desember",
   ];
 
-  function loadChartyears() {
-    fetch(
-      `../backend/get_chart_tahunan.php?line=${lineSelect.value}&tahun=${tahunInput.value}`
-    )
-      .then((res) => res.json())
-      .then((data) => renderChart(data))
-      .catch((err) => console.error("Gagal ambil data chart tahunan:", err));
-  }
+  let currentMetric = 0; // 🔁 sinkron antar line
+  let chartA, chartB;
 
-  function renderChart(data) {
-    const metric = metrics[currentMetric];
+  // ========================================================================
+  // 🔧 GENERIC RENDER CHART
+  // ========================================================================
+  function renderChart({ ctx, data, metric, warna, lineName }) {
     const dataBulan = data.bulanData || {};
     const targetData = data.target || {};
-    const tahun = data.tahun || tahunInput.value;
 
     const produksiData = bulanLabels.map((_, i) => {
       const bulan = i + 1;
@@ -340,18 +234,19 @@ document.addEventListener("DOMContentLoaded", () => {
         ? parseFloat(targetData[targetKey])
         : 0;
 
-    if (chart) chart.destroy();
+    // Hapus chart lama
+    if (ctx.chartInstance) ctx.chartInstance.destroy();
 
-    chart = new Chart(ctx, {
+    ctx.chartInstance = new Chart(ctx, {
       type: "bar",
       data: {
         labels: bulanLabels,
         datasets: [
           {
-            label: `Rata-rata ${metric.label}`,
+            label: `${metric.label}`,
             data: produksiData,
-            backgroundColor: "rgba(0,123,255,0.6)",
-            borderColor: "#007bff",
+            backgroundColor: warna + "88",
+            borderColor: warna,
             borderWidth: 1.5,
             borderRadius: 4,
           },
@@ -373,9 +268,10 @@ document.addEventListener("DOMContentLoaded", () => {
         plugins: {
           title: {
             display: true,
-            text: `📘 Grafik ${metric.label} vs Target (${tahun})`,
+            text: `📘 ${lineName} — ${metric.label} vs Target (${tahun})`,
             font: { size: 16 },
           },
+          legend: { position: "top" },
         },
         scales: {
           y: { beginAtZero: true },
@@ -385,22 +281,88 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  btnNext.addEventListener("click", () => {
-    currentMetric = (currentMetric + 1) % metrics.length;
-    loadChartyears();
-  });
-  btnPrev.addEventListener("click", () => {
-    currentMetric = (currentMetric - 1 + metrics.length) % metrics.length;
-    loadChartyears();
-  });
-  // btnExport.addEventListener("click", () =>
-  //   exportChartPDF("BarCharttahunan", "Chart_Tahunan")
-  // );
+  // ========================================================================
+  // 🔄 LOAD CHART PER LINE
+  // ========================================================================
+  function loadChartA() {
+    const ctx = document.getElementById("BarCharttahunan").getContext("2d");
+    fetch(`../backend/get_chart_tahunan.php?line=1&tahun=${tahun}`)
+      .then((res) => res.json())
+      .then((data) =>
+        renderChart({
+          ctx,
+          data,
+          metric: metrics[currentMetric],
+          warna: warnaA,
+          lineName: "Line A",
+        })
+      )
+      .catch((err) => console.error("❌ Gagal load chart Line A:", err));
+  }
 
-  [lineSelect, tahunInput].forEach((el) =>
-    el.addEventListener("change", loadChartyears)
+  function loadChartB() {
+    const ctx = document
+      .getElementById("BarCharttahunanLINEB")
+      .getContext("2d");
+    fetch(`../backend/get_chart_tahunan.php?line=2&tahun=${tahun}`)
+      .then((res) => res.json())
+      .then((data) =>
+        renderChart({
+          ctx,
+          data,
+          metric: metrics[currentMetric],
+          warna: warnaB,
+          lineName: "Line B",
+        })
+      )
+      .catch((err) => console.error("❌ Gagal load chart Line B:", err));
+  }
+
+  // ========================================================================
+  // 🔁 REFRESH SEMUA CHART
+  // ========================================================================
+  function refreshAllCharts() {
+    loadChartA();
+    loadChartB();
+  }
+
+  // ========================================================================
+  // 🎛️ NEXT / PREV BUTTON
+  // ========================================================================
+  const btnNextA = document.getElementById("nextTahunan");
+  const btnPrevA = document.getElementById("prevTahunan");
+  const btnNextB = document.getElementById("nextTahunanB");
+  const btnPrevB = document.getElementById("prevTahunanB");
+
+  const nextHandler = () => {
+    currentMetric = (currentMetric + 1) % metrics.length;
+    refreshAllCharts();
+  };
+
+  const prevHandler = () => {
+    currentMetric = (currentMetric - 1 + metrics.length) % metrics.length;
+    refreshAllCharts();
+  };
+
+  [btnNextA, btnNextB].forEach((btn) =>
+    btn.addEventListener("click", nextHandler)
   );
-  loadChartyears();
+  [btnPrevA, btnPrevB].forEach((btn) =>
+    btn.addEventListener("click", prevHandler)
+  );
+
+  // ========================================================================
+  // ⏱️ AUTO REFRESH TIAP 5 DETIK
+  // ========================================================================
+  setInterval(() => {
+    currentMetric = (currentMetric + 1) % metrics.length;
+    refreshAllCharts();
+  }, 5000);
+
+  // ========================================================================
+  // 🚀 LOAD PERTAMA
+  // ========================================================================
+  refreshAllCharts();
 });
 
 // ============================================================================

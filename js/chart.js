@@ -1,12 +1,6 @@
 // ============================================================================
 // 📈 LINE CHART BULANAN
 // ============================================================================
-// ============================================================================
-// 📊 BAR CHART BULANAN PER LINE (A & B TERPISAH)
-// ============================================================================
-// ============================================================================
-// 📊 BAR CHART BULANAN PER LINE (A & B TERPISAH) DENGAN GARIS TARGET
-// ============================================================================
 document.addEventListener("DOMContentLoaded", () => {
   const bulan = new Date().getMonth() + 1;
   const tahun = new Date().getFullYear();
@@ -185,23 +179,14 @@ document.addEventListener("DOMContentLoaded", () => {
 // ============================================================================
 // 📅 BAR CHART TAHUNAN PER LINE
 // ============================================================================
-// ============================================================================
-// 📅 BAR CHART TAHUNAN LINE A & LINE B (TERPISAH, OTOMATIS TAHUN SEKARANG)
-// ============================================================================
+
 document.addEventListener("DOMContentLoaded", () => {
-  const tahunSekarang = new Date().getFullYear();
+  const tahun = new Date().getFullYear();
 
-  // Tombol Navigasi (gunakan ID unik untuk tiap chart)
-  const btnPrevA = document.getElementById("prevTahunan");
-  const btnNextA = document.getElementById("nextTahunan");
-  const btnPrevB = document.getElementById("prevTahunanB");
-  const btnNextB = document.getElementById("nextTahunanB");
+  // 🎨 Warna berbeda untuk tiap line
+  const warnaA = "#007bff"; // biru
+  const warnaB = "#28a745"; // hijau
 
-  // Context Canvas
-  const ctxA = document.getElementById("BarCharttahunan").getContext("2d");
-  const ctxB = document.getElementById("BarCharttahunanLINEB").getContext("2d");
-
-  // Metric yang ditampilkan
   const metrics = [
     { key: "productivity", label: "Productivity (Ton/Shift)" },
     { key: "batch_count", label: "Batch Count (Per Day)" },
@@ -225,17 +210,15 @@ document.addEventListener("DOMContentLoaded", () => {
     "Desember",
   ];
 
-  let currentMetricA = 0;
-  let currentMetricB = 0;
+  let currentMetric = 0; // 🔁 sinkron antar line
   let chartA, chartB;
 
-  // ==========================================================
-  // 🔧 Fungsi untuk Render Chart
-  // ==========================================================
-  function renderChart(ctx, data, metric, lineName, chartRef) {
+  // ========================================================================
+  // 🔧 GENERIC RENDER CHART
+  // ========================================================================
+  function renderChart({ ctx, data, metric, warna, lineName }) {
     const dataBulan = data.bulanData || {};
     const targetData = data.target || {};
-    const tahun = data.tahun || tahunSekarang;
 
     const produksiData = bulanLabels.map((_, i) => {
       const bulan = i + 1;
@@ -251,18 +234,19 @@ document.addEventListener("DOMContentLoaded", () => {
         ? parseFloat(targetData[targetKey])
         : 0;
 
-    if (chartRef.chart) chartRef.chart.destroy();
+    // Hapus chart lama
+    if (ctx.chartInstance) ctx.chartInstance.destroy();
 
-    chartRef.chart = new Chart(ctx, {
+    ctx.chartInstance = new Chart(ctx, {
       type: "bar",
       data: {
         labels: bulanLabels,
         datasets: [
           {
-            label: `Rata-rata ${metric.label}`,
+            label: `${metric.label}`,
             data: produksiData,
-            backgroundColor: "rgba(0,123,255,0.6)",
-            borderColor: "#007bff",
+            backgroundColor: warna + "88",
+            borderColor: warna,
             borderWidth: 1.5,
             borderRadius: 4,
           },
@@ -287,6 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
             text: `📘 ${lineName} — ${metric.label} vs Target (${tahun})`,
             font: { size: 16 },
           },
+          legend: { position: "top" },
         },
         scales: {
           y: { beginAtZero: true },
@@ -296,67 +281,88 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ==========================================================
-  // 📊 Fungsi untuk Load Data Line A dan B
-  // ==========================================================
+  // ========================================================================
+  // 🔄 LOAD CHART PER LINE
+  // ========================================================================
   function loadChartA() {
-    fetch(`backend/get_chart_tahunan.php?line=1&tahun=${tahunSekarang}`)
+    const ctx = document.getElementById("BarCharttahunan").getContext("2d");
+    fetch(`backend/get_chart_tahunan.php?line=1&tahun=${tahun}`)
       .then((res) => res.json())
       .then((data) =>
-        renderChart(ctxA, data, metrics[currentMetricA], "Line A", {
-          chart: chartA,
+        renderChart({
+          ctx,
+          data,
+          metric: metrics[currentMetric],
+          warna: warnaA,
+          lineName: "Line A",
         })
       )
-      .catch((err) => console.error("Gagal load chart Line A:", err));
+      .catch((err) => console.error("❌ Gagal load chart Line A:", err));
   }
 
   function loadChartB() {
-    fetch(`backend/get_chart_tahunan.php?line=2&tahun=${tahunSekarang}`)
+    const ctx = document
+      .getElementById("BarCharttahunanLINEB")
+      .getContext("2d");
+    fetch(`backend/get_chart_tahunan.php?line=2&tahun=${tahun}`)
       .then((res) => res.json())
       .then((data) =>
-        renderChart(ctxB, data, metrics[currentMetricB], "Line B", {
-          chart: chartB,
+        renderChart({
+          ctx,
+          data,
+          metric: metrics[currentMetric],
+          warna: warnaB,
+          lineName: "Line B",
         })
       )
-      .catch((err) => console.error("Gagal load chart Line B:", err));
+      .catch((err) => console.error("❌ Gagal load chart Line B:", err));
   }
 
-  // ==========================================================
-  // 🎛️ Navigasi Metric (Next/Prev)
-  // ==========================================================
-  btnNextA.addEventListener("click", () => {
-    currentMetricA = (currentMetricA + 1) % metrics.length;
+  // ========================================================================
+  // 🔁 REFRESH SEMUA CHART
+  // ========================================================================
+  function refreshAllCharts() {
     loadChartA();
-  });
-
-  btnPrevA.addEventListener("click", () => {
-    currentMetricA = (currentMetricA - 1 + metrics.length) % metrics.length;
-    loadChartA();
-  });
-
-  btnNextB.addEventListener("click", () => {
-    currentMetricB = (currentMetricB + 1) % metrics.length;
     loadChartB();
-  });
+  }
 
-  btnPrevB.addEventListener("click", () => {
-    currentMetricB = (currentMetricB - 1 + metrics.length) % metrics.length;
-    loadChartB();
-  });
+  // ========================================================================
+  // 🎛️ NEXT / PREV BUTTON
+  // ========================================================================
+  const btnNextA = document.getElementById("nextTahunan");
+  const btnPrevA = document.getElementById("prevTahunan");
+  const btnNextB = document.getElementById("nextTahunanB");
+  const btnPrevB = document.getElementById("prevTahunanB");
 
-  // ==========================================================
-  // 🔁 Auto Refresh tiap 30 detik
-  // ==========================================================
+  const nextHandler = () => {
+    currentMetric = (currentMetric + 1) % metrics.length;
+    refreshAllCharts();
+  };
+
+  const prevHandler = () => {
+    currentMetric = (currentMetric - 1 + metrics.length) % metrics.length;
+    refreshAllCharts();
+  };
+
+  [btnNextA, btnNextB].forEach((btn) =>
+    btn.addEventListener("click", nextHandler)
+  );
+  [btnPrevA, btnPrevB].forEach((btn) =>
+    btn.addEventListener("click", prevHandler)
+  );
+
+  // ========================================================================
+  // ⏱️ AUTO REFRESH TIAP 5 DETIK
+  // ========================================================================
   setInterval(() => {
-    loadChartA();
-    loadChartB();
-  }, 30000);
+    currentMetric = (currentMetric + 1) % metrics.length;
+    refreshAllCharts();
+  }, 5000);
 
-  // ==========================================================
-  // 🚀 Load pertama kali
-  // ==========================================================
-  loadChartA();
-  loadChartB();
+  // ========================================================================
+  // 🚀 LOAD PERTAMA
+  // ========================================================================
+  refreshAllCharts();
 });
 
 // ============================================================================
