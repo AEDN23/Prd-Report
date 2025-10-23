@@ -366,14 +366,36 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ============================================================================
-// 🧾 Fungsi Export PDF (dipakai semua chart)
+// 🧾 Fungsi Export PDF (sudah ada di atas)
 // ============================================================================
-// function exportChartPDF(canvasId, title) {
-//   const { jsPDF } = window.jspdf;
-//   const pdf = new jsPDF();
-//   const canvas = document.getElementById(canvasId);
-//   const imgData = canvas.toDataURL("image/png");
-//   pdf.text(title, 15, 15);
-//   pdf.addImage(imgData, "PNG", 10, 25, 190, 100);
-//   pdf.save(`${title}.pdf`);
-// }
+function exportChartPDF(canvasId, title) {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("l", "mm", "a4"); // 🔄 tambah orientasi landscape biar lebar muat
+  const canvas = document.getElementById(canvasId);
+  const imgData = canvas.toDataURL("image/png");
+  pdf.text(title, 15, 15);
+  pdf.addImage(imgData, "PNG", 10, 25, 270, 150);
+  pdf.save(`${title}.pdf`);
+}
+
+// ============================================================================
+// 📥 AKTIFKAN TOMBOL EXPORT PDF DI SEMUA CHART
+// ============================================================================
+document.addEventListener("DOMContentLoaded", () => {
+  const pdfButtons = document.querySelectorAll(".exportChartPDF");
+
+  pdfButtons.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const section = e.target.closest("section"); // cari section terdekat
+      const canvas = section.querySelector("canvas"); // ambil canvas chart di dalam section itu
+      if (canvas) {
+        const title = section.querySelector("h6")?.innerText || "Chart";
+        exportChartPDF(canvas.id, title); // panggil fungsi export
+      } else {
+        alert("Canvas chart tidak ditemukan di section ini!");
+      }
+    });
+  });
+});
+
+

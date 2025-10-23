@@ -18,6 +18,9 @@ $page_title = "Halaman chart"
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../css/style.css">
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="../js/script.js"></script>
@@ -168,6 +171,7 @@ $page_title = "Halaman chart"
                             <!-- =========================================================================================================================================-->
                             <!-- 📊 CHART BAR (BULANAN) -->
                             <!-- =========================================================================================================================================-->
+
                             <!-- ========================== LINE A BULANAN =========================== -->
                             <section id="chart-bar-bulanan-LINEA" style="height: 100vh;" class="mb-5">
                                 <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE A</h6>
@@ -175,6 +179,8 @@ $page_title = "Halaman chart"
                                     <div class="chart-toolbar mb-2">
                                         <button id="prevBarA" class="btn btn-sm btn-secondary">◀ Prev</button>
                                         <button id="nextBarA" class="btn btn-sm btn-primary">Next ▶</button>
+                                       <button class="btn btn-sm btn-danger exportChartPDF">Export PDF</button>
+
                                     </div>
                                     <canvas id="BarChartA" style="width:100%; height: 85vh"></canvas>
                                 </div>
@@ -187,6 +193,9 @@ $page_title = "Halaman chart"
                                     <div class="chart-toolbar mb-2">
                                         <button id="prevBarB" class="btn btn-sm btn-secondary">◀ Prev</button>
                                         <button id="nextBarB" class="btn btn-sm btn-primary">Next ▶</button>
+                                        <button class="btn btn-sm btn-danger exportChartPDF">Export PDF</button>
+
+
                                     </div>
                                     <canvas id="BarChartB" style="width:100%; height:85vh;"></canvas>
                                 </div>
@@ -203,6 +212,9 @@ $page_title = "Halaman chart"
                                     <div class="chart-toolbar">
                                         <button id="prevTahunan" class="btn btn-sm btn-secondary">◀ Prev</button>
                                         <button id="nextTahunan" class="btn btn-sm btn-primary">Next ▶</button>
+
+                                        <button class="btn btn-sm btn-danger exportChartPDF">Export PDF</button>
+
                                     </div>
                                     <canvas id="BarCharttahunan" style="width:100%; height:85vh;"></canvas>
                                 </div>
@@ -216,6 +228,8 @@ $page_title = "Halaman chart"
                                     <div class="chart-toolbar">
                                         <button id="prevTahunanB" class="btn btn-sm btn-secondary">◀ Prev</button>
                                         <button id="nextTahunanB" class="btn btn-sm btn-primary">Next ▶</button>
+                                     <button class="btn btn-sm btn-danger exportChartPDF">Export PDF</button>
+
                                     </div>
                                     <canvas id="BarCharttahunanLINEB" style="width:100%; height:85vh;"></canvas>
                                 </div>
