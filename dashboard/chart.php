@@ -167,10 +167,30 @@ $page_title = "Halaman chart"
                 <div class="container-fluid">
                     <div class="card shadow mb-4">
                         <div class="card-body">
-
                             <!-- =========================================================================================================================================-->
                             <!-- 📊 CHART BAR (BULANAN) -->
                             <!-- =========================================================================================================================================-->
+
+                            <!-- FILTER CHART BULANAN -->
+                            <form id="filter-chart-bulanan" class="row g-3 mb-3">
+                                <div class="col-md-2">
+                                    <label class="form-label">Bulan</label>
+                                    <select id="bulanUtama" name="bulan" class="form-select">
+                                        <?php for ($m = 1; $m <= 12; $m++): ?>
+                                            <option value="<?= $m ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
+                                                <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
+                                            </option>
+                                        <?php endfor; ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">Tahun</label>
+                                    <input id="tahunUtama" type="number" name="tahun" value="<?= $selectedYear ?>" class="form-control">
+                                </div>
+                            </form>
+                            <!-- FILTER CHART BULANAN -->
+
+
 
                             <!-- ========================== LINE A BULANAN =========================== -->
                             <section id="chart-bar-bulanan-LINEA" style="height: 100vh;" class="mb-5">
@@ -179,7 +199,7 @@ $page_title = "Halaman chart"
                                     <div class="chart-toolbar mb-2">
                                         <button id="prevBarA" class="btn btn-sm btn-secondary">◀ Prev</button>
                                         <button id="nextBarA" class="btn btn-sm btn-primary">Next ▶</button>
-                                       <button class="btn btn-sm btn-danger exportChartPDF">Export PDF</button>
+                                        <button class="btn btn-sm btn-danger exportChartPDF">Export PDF</button>
 
                                     </div>
                                     <canvas id="BarChartA" style="width:100%; height: 85vh"></canvas>
@@ -205,6 +225,15 @@ $page_title = "Halaman chart"
                             <!-- 📅 CHART TAHUNAN PER LINE A  DAN B-->
                             <!-- =========================================================================================================================================-->
 
+                            <!-- FILTER CHART TAHUNAN-->
+                            <form id="filter-chart-tahunan" class="row g-3 mb-3">
+                                <div class="col-md-2">
+                                    <label class="form-label">Tahun</label>
+                                    <input id="tahunUtama" type="number" name="tahun" value="<?= $selectedYear ?>" class="form-control">
+                                </div>
+                            </form>
+                            <!-- FILTER CHART TAHUNAN -->
+
                             <!-- ========================== LINE A TAHUNAN =========================== -->
                             <section id="chart-tahunan-LINEA" style="height: 100vh;">
                                 <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI LINE-A (TAHUNAN)</h6>
@@ -228,7 +257,7 @@ $page_title = "Halaman chart"
                                     <div class="chart-toolbar">
                                         <button id="prevTahunanB" class="btn btn-sm btn-secondary">◀ Prev</button>
                                         <button id="nextTahunanB" class="btn btn-sm btn-primary">Next ▶</button>
-                                     <button class="btn btn-sm btn-danger exportChartPDF">Export PDF</button>
+                                        <button class="btn btn-sm btn-danger exportChartPDF">Export PDF</button>
 
                                     </div>
                                     <canvas id="BarCharttahunanLINEB" style="width:100%; height:85vh;"></canvas>

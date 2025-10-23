@@ -110,10 +110,9 @@ document.addEventListener("DOMContentLoaded", () => {
           plugins: {
             title: {
               display: true,
-              text: `📊 ${label} - Line ${
-                lineId === 1 ? "A" : "B"
-              } (${bulan}/${tahun})`,
-              font: { size: 20 },
+              // Menggabungkan label dan target ke dalam title
+              text: [`📊 ${label} - Line ${lineId === 1 ? "A" : "B"} (${bulan}/${tahun})`, `Target: ${targetVal}`],
+              font: { size: 16 },
             },
             legend: {
               position: "top",
@@ -122,7 +121,17 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           scales: {
             y: { beginAtZero: true },
-            x: { title: { display: true, text: "Hari (1–31)" } },
+            x: { 
+              title: { display: true, text: "Hari (1–31)" },
+              // Menambahkan label tambahan untuk menampilkan result
+              ticks: {
+                callback: function(val, index) {
+                  const day = labels[index];
+                  const resultValue = dataMap[day];
+                  return [day, resultValue !== undefined ? resultValue.toFixed(1) + '' : ''];
+                }
+              }
+            },
           },
         },
       });
@@ -268,14 +277,25 @@ document.addEventListener("DOMContentLoaded", () => {
         plugins: {
           title: {
             display: true,
-            text: `📘 ${lineName} — ${metric.label} vs Target (${tahun})`,
+            // Menggabungkan label dan target ke dalam title
+            text: [`📘 ${lineName} — ${metric.label} (${tahun})`, `Target: ${targetValue}`],
             font: { size: 16 },
           },
           legend: { position: "top" },
         },
         scales: {
           y: { beginAtZero: true },
-          x: { title: { display: true, text: "Bulan" } },
+          x: { 
+            title: { display: true, text: "Bulan" },
+            // Menambahkan label tambahan untuk menampilkan result
+            ticks: {
+                callback: function(val, index) {
+                  const monthName = bulanLabels[index];
+                  const resultValue = produksiData[index];
+                  return [monthName, resultValue !== undefined ? resultValue.toFixed(1) + '' : ''];
+                }
+            }
+          },
         },
       },
     });
@@ -373,9 +393,17 @@ function exportChartPDF(canvasId, title) {
   const pdf = new jsPDF("l", "mm", "a4"); // 🔄 tambah orientasi landscape biar lebar muat
   const canvas = document.getElementById(canvasId);
   const imgData = canvas.toDataURL("image/png");
+
+  // Dapatkan tanggal saat ini
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0'); // Bulan dimulai dari 0
+  const day = String(today.getDate()).padStart(2, '0');
+  const dateString = `${year}-${month}-${day}`; // Format YYYY-MM-DD
+
   pdf.text(title, 15, 15);
   pdf.addImage(imgData, "PNG", 10, 25, 270, 150);
-  pdf.save(`${title}.pdf`);
+  pdf.save(`${title}_${dateString}.pdf`); // ⬅️ Nama file sekarang termasuk tanggal
 }
 
 // ============================================================================

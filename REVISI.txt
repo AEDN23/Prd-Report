@@ -9,4 +9,6 @@ REVISI WEB PRODUKSI REPORT
 - Buat halaman tabel, chart semuanya jadi 1 slide ✅
 - Chart refresh 5 detik, scroll 20 detik ✅ 
 
-
+|23- OKTOBER - 2025| 
+- Tambahkan filter tahun dan bulan di halaman chart.php (bukan hal awal)
+- Export pdf dan excel di halaman dashboard (Yang tabel harian)

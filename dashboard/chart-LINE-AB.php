@@ -129,7 +129,7 @@ $page_title = "Halaman chart"
                 <br>
 
 
-                <script src="../js/chart.js"></script>
+                <script src="../js/chart-LINEAB.js"></script>
                 <link href="../css/ind.css" rel="stylesheet">
                 <style>
                     /* ===== Sticky Navbar ===== */
