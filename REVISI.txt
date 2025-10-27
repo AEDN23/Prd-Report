@@ -1,14 +1,59 @@
-REVISI WEB PRODUKSI REPORT
-
-|17/10/2025|
+                                            ======================= REVISI WEB PRODUKSI REPORT =======================  
+17/10/2025
 - Bar chart pisah antar line a dan b
 
-|22-OKTOBER-2025|
+22-OKTOBER-2025
 - Memisahkan bar chart tahunan dan harian  ✅  
 - Menambahkan garis target di chart harian ✅
 - Buat halaman tabel, chart semuanya jadi 1 slide ✅
 - Chart refresh 5 detik, scroll 20 detik ✅ 
 
-|23- OKTOBER - 2025| 
+23- OKTOBER - 2025
 - Tambahkan filter tahun dan bulan di halaman chart.php (bukan hal awal)
 - Export pdf dan excel di halaman dashboard (Yang tabel harian)
+
+
+
+                                            ======================= PROGRESS WEB PRODUKSI REPORT =======================
+24 - OKTOBER - 2025
+- Membuat target di halaman chart menjadi merah agar lebih mudah terlihat
+
+
+
+
+
+
+
+
+                                            ======================= PROGRESS KERJA =======================
+20 - OKTOBER - 2025- 24 - OKTOBER - 2025
+- Cek monitor QC, WEIGHTING, SETTING BATCH LINE A DAN B
+- mendata monitoring pc qc, warehouse, WEIGHTING
+- Survey kabel jaringan FO
+
+25 - OKTOBER - 2025
+- MEMINDAHKAN JALUR JARINGAN CCTV CHEMICAL 1,2,3 
+
+26 - OKTOBER - 2025
+- LIBUR
+
+27 - OKTOBER - 2025
+- 
+
+
+
+
+
+
+
+                                            ======================= TROUBLE LIST ===========================
+ 23 - OKTOBER - 2025  
+- Setting cctv setting batch (bagian packing tidak hidup)
+
+ 24 - OKTOBER - 2025 
+- Excel QC error saat scroll
+- Touchpad Laptop pak haris tidak berfungsi
+- Scanner bu nani tidak masuk ke folder Scan
+
+26 - OKTOBER - 2025
+- CCTV LINE B MATI (KNEADER)

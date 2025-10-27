@@ -110,27 +110,48 @@ document.addEventListener("DOMContentLoaded", () => {
           plugins: {
             title: {
               display: true,
-              // Menggabungkan label dan target ke dalam title
-              text: [`📊 ${label} - Line ${lineId === 1 ? "A" : "B"} (${bulan}/${tahun})`, `Target: ${targetVal}`],
+              text: [
+                `📊 ${label} -  Line ${
+                  lineId === 1 ? "A" : "B"
+                } (${bulan}/${tahun})`,
+              ],
               font: { size: 16 },
+              color: "#000000", // warna default teks
             },
+            subtitle: {
+              display: true,
+              text: `==================🎯 Target: ${targetVal} ==================`,
+              color: "#FF0000", // warna merah
+              font: { size: 16 },
+              padding: { top: 5 },
+            },
+            // TOMBOL LEGEND (FILTER DATA LINE A ATAU TARGET)
             legend: {
               position: "top",
               labels: { boxWidth: 40 },
+              font: { size: 14 },
             },
           },
+          // SCALE AXIS SUMBU X Y
           scales: {
             y: { beginAtZero: true },
-            x: { 
+            x: {
               title: { display: true, text: "Hari (1–31)" },
+              color: "#000000",
               // Menambahkan label tambahan untuk menampilkan result
               ticks: {
-                callback: function(val, index) {
+                callback: function (val, index) {
                   const day = labels[index];
+                  color: "#F4F754";
                   const resultValue = dataMap[day];
-                  return [day, resultValue !== undefined ? resultValue.toFixed(1) + '' : ''];
-                }
-              }
+                  return [
+                    day,
+                    resultValue !== undefined
+                      ? resultValue.toFixed(1) + ""
+                      : "",
+                  ];
+                },
+              },
             },
           },
         },
@@ -271,30 +292,42 @@ document.addEventListener("DOMContentLoaded", () => {
           },
         ],
       },
+      responsive: true,
       options: {
-        responsive: true,
         maintainAspectRatio: false,
         plugins: {
           title: {
             display: true,
-            // Menggabungkan label dan target ke dalam title
-            text: [`📘 ${lineName} — ${metric.label} (${tahun})`, `Target: ${targetValue}`],
+            text: `📘 ${lineName} — ${metric.label} (${tahun})`,
             font: { size: 16 },
+            color: "#000000", // warna hitam buat judul utama
+          },
+          subtitle: {
+            display: true,
+            text: `====================== Target: ${targetValue} ======================`,
+            color: "#FF0000", // 🎯 warna merah untuk target
+            font: { size: 16 },
+            padding: { top: 5 },
           },
           legend: { position: "top" },
         },
+
         scales: {
           y: { beginAtZero: true },
-          x: { 
-            title: { display: true, text: "Bulan" },
+          x: {
+            title: { display: true, text: `Tahun ${tahun}`
+            },
             // Menambahkan label tambahan untuk menampilkan result
             ticks: {
-                callback: function(val, index) {
-                  const monthName = bulanLabels[index];
-                  const resultValue = produksiData[index];
-                  return [monthName, resultValue !== undefined ? resultValue.toFixed(1) + '' : ''];
-                }
-            }
+              callback: function (val, index) {
+                const monthName = bulanLabels[index];
+                const resultValue = produksiData[index];
+                return [
+                  monthName,
+                  resultValue !== undefined ? resultValue.toFixed(1) + "" : "",
+                ];
+              },
+            },
           },
         },
       },

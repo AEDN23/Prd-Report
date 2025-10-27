@@ -10,40 +10,45 @@ include '../layout/header.php';
         <div class="card-body">
 
             <!-- ============================== -->
-            <!-- ⿡ FILTER DATA PRODUKSI -->
+            <!-- ⿡ Data Produksi harian -->
             <!-- ============================== -->
-            <section id="filter-section" class="mb-4">
-                <b>
-                    <h2 class="fw-bold text-dark mb-3">📋 DATA PRODUKSI</h2>
-                </b>
-                <form id="filterUtama" class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label">Line Produksi</label>
-                        <select id="lineUtama" name="line" class="form-select">
-                            <?php foreach ($lines as $line): ?>
-                                <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($line['nama_line']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+            <!-- ============================== -->
+            <!-- ⿡ Data Produksi Harian -->
+            <!-- ============================== -->
+            <section id="Harian-section" class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="fw-bold text-dark mb-0">📋 DATA PRODUKSI</h2>
 
-                    <div class="col-md-2">
-                        <label class="form-label">Bulan</label>
-                        <select id="bulanUtama" name="bulan" class="form-select">
-                            <?php for ($m = 1; $m <= 12; $m++): ?>
-                                <option value="<?= $m ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
-                                    <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
-                                </option>
-                            <?php endfor; ?>
-                        </select>
-                    </div>
+                    <div class="d-flex gap-2 align-items-center">
+                        <form id="filterUtama" class="d-flex gap-2 mb-0">
+                            <select id="lineUtama" name="line" class="form-select form-select-sm" style="width: 150px;">
+                                <?php foreach ($lines as $line): ?>
+                                    <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($line['nama_line']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
 
-                    <div class="col-md-2">
-                        <label class="form-label">Tahun</label>
-                        <input id="tahunUtama" type="number" name="tahun" value="<?= $selectedYear ?>" class="form-control">
+                            <select id="bulanUtama" name="bulan" class="form-select form-select-sm" style="width: 130px;">
+                                <?php for ($m = 1; $m <= 12; $m++): ?>
+                                    <option value="<?= $m ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
+                                        <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
+                                    </option>
+                                <?php endfor; ?>
+                            </select>
+
+                            <input id="tahunUtama" type="number" name="tahun" value="<?= $selectedYear ?>"
+                                class="form-control form-control-sm" style="width: 100px;">
+                        </form>
+
+                        <div class="btn-group">
+                            <a id="btnPDF" href="../export/export-pdf-harian.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
+                                class="btn btn-danger btn-sm">Export PDF</a>
+                            <a id="btnExcel" href="../export/export_excel-harian.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
+                                class="btn btn-success btn-sm">Export Excel</a>
+                        </div>
                     </div>
-                </form>
+                </div>
 
                 <div class="table-container mt-3">
                     <div class="text-center py-3 text-muted">Memuat data...</div>
