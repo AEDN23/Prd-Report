@@ -42,4 +42,31 @@
 // });
 
 
+document.addEventListener("DOMContentLoaded", () => {
+  const lineSelect = document.getElementById("lineUtama");
+  const bulanSelect = document.getElementById("bulanUtama");
+  const tahunInput = document.getElementById("tahunUtama");
+
+  const btnPDF = document.getElementById("btnPDFHarian");
+  const btnExcel = document.getElementById("btnExcelHarian");
+
+  function updateExportLinks() {
+    const line = lineSelect.value;
+    const bulan = bulanSelect.value;
+    const tahun = tahunInput.value;
+
+    btnPDF.href = `../export/export-pdf-harian.php?line=${line}&bulan=${bulan}&tahun=${tahun}`;
+    btnExcel.href = `../export/export-excel-harian.php?line=${line}&bulan=${bulan}&tahun=${tahun}`;
+  }
+
+  // Update saat user ubah filter
+  lineSelect.addEventListener("change", updateExportLinks);
+  bulanSelect.addEventListener("change", updateExportLinks);
+  tahunInput.addEventListener("input", updateExportLinks);
+
+  // Set awal biar sesuai filter sekarang
+  updateExportLinks();
+});
+
+
 

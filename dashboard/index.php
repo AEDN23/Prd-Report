@@ -42,10 +42,18 @@ include '../layout/header.php';
                         </form>
 
                         <div class="btn-group">
-                            <a id="btnPDFHarian" href="../export/export-pdf-harian.php?line=<?= $selectedLine ?>&bulan=<?= $selectedMonth ?>&tahun=<?= $selectedYear ?>"
-                                class="btn btn-danger btn-sm" style="margin-right: 10px;">Export PDF</a>
-                            <a id="btnExcelHarian" href="../export/export-excel-harian.php?line=<?= $selectedLine ?>&bulan=<?= $selectedMonth ?>&tahun=<?= $selectedYear ?>"
-                                class="btn btn-success btn-sm">Export Excel</a>
+                            <a id="btnPDFHarian"
+                                href="../export/export-pdf-harian.php?line=<?= $selectedLine ?>&bulan=<?= $selectedMonth ?>&tahun=<?= $selectedYear ?>"
+                                class="btn btn-danger btn-sm" style="margin-right: 10px;">
+                                <i class="fas fa-file-pdf"></i> Export PDF
+                            </a>
+
+                            <a id="btnExcelHarian"
+                                href="../export/export-excel-harian.php?line=<?= $selectedLine ?>&bulan=<?= $selectedMonth ?>&tahun=<?= $selectedYear ?>"
+                                class="btn btn-success btn-sm">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </a>
+
                         </div>
                     </div>
                 </div>
@@ -67,9 +75,10 @@ include '../layout/header.php';
 
                     <div class="btn-group">
                         <a id="btnPDFParameter" href="../export/export-pdf-parameter.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
-                            class="btn btn-danger btn-sm" style="margin-right: 10px;">Export PDF</a>
+                            class="btn btn-danger btn-sm" style="margin-right: 10px;">
+                            <i class="fas fa-file-pdf"></i> Export PDF</a>
                         <a id="btnExcelParameter" href="../export/export-excel-parameter.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
-                            class="btn btn-success btn-sm">Export Excel</a>
+                            class="btn btn-success btn-sm"><i class="fas fa-file-excel"></i> Export Excel</a>
                     </div>
                 </div>
 
@@ -83,15 +92,15 @@ include '../layout/header.php';
             <!-- ============================== -->
             <section id="rangkuman-section">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 id="judulTahunan" class="fw-bold text-primary mb-0">
+                    <h6 id="judulTahunan" class="fw-bold text-primary mb-0">
                         📘 DATA TARGET PRODUKSI <?= htmlspecialchars($selectedLineName ?? '') ?> - <?= $selectedYear ?>
-                    </h2>
+                    </h6>
 
                     <div class="btn-group">
                         <a id="btnPDFTahunan" href="../export/exportpdf.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
-                            class="btn btn-danger btn-sm" style="margin-right: 10px;">Export PDF</a>
+                            class="btn btn-danger btn-sm" style="margin-right: 10px;"> <i class="fas fa-file-pdf"></i> Export PDF</a>
                         <a id="btnExcelTahunan" href="../export/export_excel.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
-                            class="btn btn-success btn-sm">Export Excel</a>
+                            class="btn btn-success btn-sm"><i class="fas fa-file-excel"></i> Export Excel</a>
                     </div>
                 </div>
 

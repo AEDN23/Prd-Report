@@ -1,4 +1,4 @@
-<!-- FUNCTION EXPORT PDF DI TABEL REPORT PRODUKSI TAHUNAN -->
+<!-- FUNCTION EXPORT PDF DI TABEL REPORT PRODUKSI TAHUNAN (exportpdf.php)-->
 
 <?php
 include '../backend/config.php';

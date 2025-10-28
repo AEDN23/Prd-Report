@@ -1,4 +1,4 @@
-<!-- FUNCTION EXPORT EXCEL DI TABEL REPORT PRODUKSI HARIAN -->
+<!-- FUNCTION EXPORT EXCEL DI TABEL REPORT PRODUKSI HARIAN  (export-excel-harian.php )-->
 
 <?php
 require '../vendor/autoload.php';
@@ -9,6 +9,8 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+
 
 $line = $_GET['line'] ?? 1;
 $bulan = $_GET['bulan'] ?? date('n');
@@ -78,7 +80,7 @@ $row = 3;
 $headers = ['Details', 'Unit', 'Target', 'Average'];
 for ($d = 1; $d <= 31; $d++) $headers[] = $d;
 $sheet->fromArray($headers, null, "A{$row}");
-$lastCol = chr(64 + count($headers));
+$lastCol = Coordinate::stringFromColumnIndex(count($headers));
 $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray([
     'font' => ['bold' => true],
     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
