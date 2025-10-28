@@ -1,3 +1,4 @@
+<!-- FUNGSI UNTUK MENAMPILKAN DATA TABEL HARIAN DI HALAMAN DASHBOARD -->
 <?php
 include 'config.php';
 

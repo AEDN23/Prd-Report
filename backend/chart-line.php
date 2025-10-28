@@ -1,4 +1,6 @@
 <?php
+
+// <!-- FUNGSI UNTUK MENAMPILKAN CHART LINE HARIAN -->
 require_once 'config.php';
 
 $bulan = $_GET['bulan'] ?? date('n');

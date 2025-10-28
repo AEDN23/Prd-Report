@@ -10,18 +10,18 @@ include '../layout/header.php';
         <div class="card-body">
 
             <!-- ============================== -->
-            <!-- ⿡ Data Produksi harian -->
-            <!-- ============================== -->
-            <!-- ============================== -->
             <!-- ⿡ Data Produksi Harian -->
             <!-- ============================== -->
             <section id="Harian-section" class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="fw-bold text-dark mb-0">📋 DATA PRODUKSI</h2>
+                    <h6 id="judulHarian" class="fw-bold text-primary mb-0">
+                        📋 DATA PRODUKSI <?= htmlspecialchars($selectedLineName ?? '') ?> -
+                        <?= date('F', mktime(0, 0, 0, $selectedMonth, 10)) ?> <?= $selectedYear ?>
+                    </h6>
 
                     <div class="d-flex gap-2 align-items-center">
                         <form id="filterUtama" class="d-flex gap-2 mb-0">
-                            <select id="lineUtama" name="line" class="form-select form-select-sm" style="width: 150px;">
+                            <select id="lineUtama" name="line" class="form-control form-control-sm" style="width: 160px; margin-right: 10px;">
                                 <?php foreach ($lines as $line): ?>
                                     <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($line['nama_line']) ?>
@@ -29,7 +29,7 @@ include '../layout/header.php';
                                 <?php endforeach; ?>
                             </select>
 
-                            <select id="bulanUtama" name="bulan" class="form-select form-select-sm" style="width: 130px;">
+                            <select id="bulanUtama" name="bulan" class="form-control form-control-sm" style="width: 160px; margin-right: 10px;">
                                 <?php for ($m = 1; $m <= 12; $m++): ?>
                                     <option value="<?= $m ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
                                         <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
@@ -38,13 +38,13 @@ include '../layout/header.php';
                             </select>
 
                             <input id="tahunUtama" type="number" name="tahun" value="<?= $selectedYear ?>"
-                                class="form-control form-control-sm" style="width: 100px;">
+                                class="form-control form-control-sm" style="width: 100px; margin-right: 10px;">
                         </form>
 
                         <div class="btn-group">
-                            <a id="btnPDF" href="../export/export-pdf-harian.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
-                                class="btn btn-danger btn-sm">Export PDF</a>
-                            <a id="btnExcel" href="../export/export_excel-harian.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
+                            <a id="btnPDFHarian" href="../export/export-pdf-harian.php?line=<?= $selectedLine ?>&bulan=<?= $selectedMonth ?>&tahun=<?= $selectedYear ?>"
+                                class="btn btn-danger btn-sm" style="margin-right: 10px;">Export PDF</a>
+                            <a id="btnExcelHarian" href="../export/export-excel-harian.php?line=<?= $selectedLine ?>&bulan=<?= $selectedMonth ?>&tahun=<?= $selectedYear ?>"
                                 class="btn btn-success btn-sm">Export Excel</a>
                         </div>
                     </div>
@@ -55,96 +55,52 @@ include '../layout/header.php';
                 </div>
             </section>
 
-
             <!-- ============================== -->
             <!-- ⿢ PARAMETER LINE -->
             <!-- ============================== -->
             <section id="parameter-section" class="mb-4">
                 <hr>
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold text-primary mb-0">📈 PARAMETER LINE</h6>
-                    <div class="d-flex gap-2 align-items-center">
-                        <select id="lineSelectParam" name="line" class="form-control form-control-sm" style="width: 160px;">
-                            <?php foreach ($lines as $line): ?>
-                                <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($line['nama_line']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <input id="tahunParam" type="number" class="form-control form-control-sm" value="<?= date('Y') ?>" style="width: 100px;">
-                        <div class="btn-group">
-                            <a id="btnPDF" href="../export/exportpdf.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>" class="btn btn-danger btn-sm">Export PDF</a>
-                            <a id="btnExcel" href="../export/export_excel.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>" class="btn btn-success btn-sm">Export Excel</a>
-                        </div>
+                    <h6 id="judulParameter" class="fw-bold text-primary mb-0">
+                        📈 PARAMETER <?= htmlspecialchars($selectedLineName ?? '') ?> - <?= $selectedYear ?>
+                    </h6>
+
+                    <div class="btn-group">
+                        <a id="btnPDFParameter" href="../export/export-pdf-parameter.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
+                            class="btn btn-danger btn-sm" style="margin-right: 10px;">Export PDF</a>
+                        <a id="btnExcelParameter" href="../export/export-excel-parameter.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
+                            class="btn btn-success btn-sm">Export Excel</a>
                     </div>
                 </div>
 
-                <div id="parameterB" class="border rounded p-3 bg-light text-center text-muted">
+                <div id="parameterB" class="border rounded p-3 text-center text-muted">
                     Memuat data...
                 </div>
             </section>
-            <hr>
 
             <!-- ============================== -->
             <!-- ⿣ DATA TARGET PRODUKSI (TAHUNAN) -->
             <!-- ============================== -->
             <section id="rangkuman-section">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold text-primary mb-0">📘 DATA TARGET PRODUKSI (Rangkuman Tahunan)</h6>
+                    <h2 id="judulTahunan" class="fw-bold text-primary mb-0">
+                        📘 DATA TARGET PRODUKSI <?= htmlspecialchars($selectedLineName ?? '') ?> - <?= $selectedYear ?>
+                    </h2>
 
-                    <div class="d-flex gap-2 align-items-center">
-                        <form id="filterTahunan" class="d-flex gap-2 mb-0">
-                            <select id="lineSelectTahunan" name="line" class="form-control form-control-sm" style="width: 140px;">
-                                <?php foreach ($lines as $line): ?>
-                                    <option value="<?= $line['id'] ?>" <?= $line['id'] == $selectedLine ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($line['nama_line']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <input id="tahunTahunan" type="number" name="tahun" class="form-control form-control-sm"
-                                value="<?= $selectedYear ?>" style="width: 100px;">
-                        </form>
-
-                        <div class="btn-group">
-                            <a id="btnPDF" href="../export/exportpdf.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>" class="btn btn-danger btn-sm">Export PDF</a>
-                            <a id="btnExcel" href="../export/export_excel.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>" class="btn btn-success btn-sm">Export Excel</a>
-                        </div>
+                    <div class="btn-group">
+                        <a id="btnPDFTahunan" href="../export/exportpdf.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
+                            class="btn btn-danger btn-sm" style="margin-right: 10px;">Export PDF</a>
+                        <a id="btnExcelTahunan" href="../export/export_excel.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
+                            class="btn btn-success btn-sm">Export Excel</a>
                     </div>
                 </div>
 
-                <div class="table-responsive border rounded p-2" id="tabelContainer">
-                    <table class="table table-bordered table-sm mb-0">
-                        <thead>
-                            <tr>
-                                <th>Details</th>
-                                <th>Unit</th>
-                                <th>Target</th>
-                                <th>Average</th>
-                                <?php
-                                $namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                                foreach ($namaBulan as $b): ?>
-                                    <th><?= $b ?></th>
-                                <?php endforeach; ?>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($fields as $key => [$label, $unit]): ?>
-                                <tr>
-                                    <td><?= $label ?></td>
-                                    <td><?= $unit ?></td>
-                                    <td><?= $target['target_' . $key] ?? '-' ?></td>
-                                    <td><?= $averages[$key] ?></td>
-                                    <?php for ($m = 1; $m <= 12; $m++): ?>
-                                        <td>
-                                            <?= isset($bulanData[$m]['avg_' . $key]) ? round($bulanData[$m]['avg_' . $key], 2) : '-' ?>
-                                        </td>
-                                    <?php endfor; ?>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                <div class="table-responsive border rounded p-2" id="tabelTahunanContainer">
+                    <div class="text-center py-3 text-muted">Memuat data...</div>
                 </div>
             </section>
+
+
 
         </div> <!-- end card-body -->
     </div> <!-- end card -->

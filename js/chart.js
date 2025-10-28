@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(() => {
     currentDataset = (currentDataset + 1) % datasetKeys.length;
     refreshAllCharts();
-  }, 5000); // GANTI DATASET SETIAP 5 DETIK
+  }, 4000); // GANTI DATASET SETIAP 5 DETIK
 });
 
 // ============================================================================
@@ -410,7 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(() => {
     currentMetric = (currentMetric + 1) % metrics.length;
     refreshAllCharts();
-  }, 5000);
+  }, 4000);
 
   // ========================================================================
   // 🚀 LOAD PERTAMA

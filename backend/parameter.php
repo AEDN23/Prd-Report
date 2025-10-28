@@ -1,6 +1,7 @@
+<!-- FUNGSI UNTUK MENAMPILKAN DATA TABEL PARAMETER DI HALAMAN DASHBOD -->
+<!-- // BACKLINK DARI ../produksi-report/INDEX.php -->
 <?php
 include 'config.php';
-// BACKLINK DARI ../produksi-report/INDEX.php
 // BAGIAN PARAMETER
 $line = $_GET['line'] ?? 1;
 $tahun = $_GET['tahun'] ?? date('Y');

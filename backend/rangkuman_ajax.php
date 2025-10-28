@@ -1,3 +1,5 @@
+<!-- FUNGSI UNTUK MENAMPILKAN DATA RANGKUMAN DI HALAMAN DASHBOARD -->
+
 
 <?php
 include 'config.php';

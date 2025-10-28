@@ -1,6 +1,6 @@
-// =========================================================================================================================================================
-// SCRIPT UNTUK TABEL PRODUKSI HARIAN
-// =========================================================================================================================================================
+// // =========================================================================================================================================================
+// // SCRIPT UNTUK TABEL PRODUKSI HARIAN
+// // =========================================================================================================================================================
 // document.addEventListener("DOMContentLoaded", () => {
 //   const lineSelect = document.getElementById("lineSelect");
 //   const tahunInput = document.getElementById("tahunInput");
@@ -42,40 +42,4 @@
 // });
 
 
-// =========================================================================================================================================================
-// SCRIPT UNTUK TABEL PRODUKSI HARIAN
-// =========================================================================================================================================================
-document.addEventListener("DOMContentLoaded", () => {
-  const lineUtama = document.getElementById("lineUtama");
-  const bulanUtama = document.getElementById("bulanUtama");
-  const tahunUtama = document.getElementById("tahunUtama");
-  const tabelUtama = document.querySelector(".table-container");
 
-  function updateTabelUtama() {
-    const line = lineUtama.value;
-    const bulan = bulanUtama.value;
-    const tahun = tahunUtama.value;
-
-    tabelUtama.innerHTML =
-      '<div class="text-center py-3 text-muted">Loading data...</div>';
-
-    fetch(
-      `../backend/inputharianajax.php?line=${line}&bulan=${bulan}&tahun=${tahun}`
-    )
-      .then((res) => res.text())
-      .then((html) => (tabelUtama.innerHTML = html))
-      .catch((err) => {
-        tabelUtama.innerHTML =
-          '<div class="text-danger text-center py-3">Gagal memuat data!</div>';
-        console.error(err);
-      });
-  }
-
-  // Auto update ketika filter berubah
-  [lineUtama, bulanUtama, tahunUtama].forEach((el) => {
-    el.addEventListener("change", updateTabelUtama);
-  });
-
-  // Load pertama kali
-  updateTabelUtama();
-});
