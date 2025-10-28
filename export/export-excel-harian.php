@@ -1,6 +1,8 @@
 <!-- FUNCTION EXPORT EXCEL DI TABEL REPORT PRODUKSI HARIAN  (export-excel-harian.php )-->
 
 <?php
+ob_clean();
+ob_start();
 require '../vendor/autoload.php';
 include '../backend/config.php';
 
@@ -120,5 +122,6 @@ $filename = "ProduksiHarian_{$lineName}_{$bulan}_{$tahun}.xlsx";
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header("Content-Disposition: attachment; filename=\"$filename\"");
 $writer = new Xlsx($spreadsheet);
+ob_end_clean(); // tambahkan ini
 $writer->save('php://output');
 exit;

@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(() => {
     currentDataset = (currentDataset + 1) % datasetKeys.length;
     refreshAllCharts();
-  }, 4000); // GANTI DATASET SETIAP 5 DETIK
+  }, 4000); 
 });
 
 // ============================================================================
@@ -405,7 +405,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   // ========================================================================
-  // ⏱️ AUTO REFRESH TIAP 5 DETIK
+  // ⏱️ AUTO REFRESH TIAP 5 DETIK = 5000 MS
   // ========================================================================
   setInterval(() => {
     currentMetric = (currentMetric + 1) % metrics.length;

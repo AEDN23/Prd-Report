@@ -105,7 +105,7 @@ $today = date('Y-m-d');
                             </label>
                             <input type="number" id="productivity" name="productivity"
                                 step="0.01" min="0" required
-                                value=""
+                                value="">
                             <small class="form-help">Ton per shift</small>
                         </div>
                     </div>

@@ -381,7 +381,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                 <!-- ===================================================================== -->
                 <!-- 📋 DATA PRODUKSI LINE B -->
                 <!-- ===================================================================== -->
-                <section id="DATA-PRODUKSI-LINEB"  class="mb-4">
+                <section id="DATA-PRODUKSI-LINEB" class="mb-4">
                     <h2>📋 DATA PRODUKSI HARIAN LINE B (<?= $namaBulan[$bulanSekarang] . " " . $tahunSekarang ?>)</h2>
                     <div class="table-responsive border rounded p-2">
                         <table class="table table-bordered table-sm mb-0 align-middle text-center">
@@ -458,7 +458,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                 <!-- =========================================================================================================================================-->
                 <!-- 📅 INFORMASI -->
                 <!-- =========================================================================================================================================-->
-            <h2 id="DAFTAR-INFORMASI">Daftar Informasi</h2>
+                <h2 id="DAFTAR-INFORMASI">Daftar Informasi</h2>
                 <section id="informasi">
                     <hr>
                     <div class="card-body">

@@ -1,83 +1,98 @@
 <!-- FUNCTION EXPORT EXCEL DI TABEL REPORT PRODUKSI PARAMETER (export-excel-parameter.php) -->
-
-
 <?php
+ob_clean();
+ob_start();
 require '../vendor/autoload.php';
 include '../backend/config.php';
+
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-$selectedLine = $_GET['line'] ?? 1;
-$selectedYear = $_GET['tahun'] ?? date('Y');
+$line = $_GET['line'] ?? 1;
+$tahun = $_GET['tahun'] ?? date('Y');
 
+// Ambil nama line
 $stmt = $pdo->prepare("SELECT nama_line FROM line_produksi WHERE id=?");
-$stmt->execute([$selectedLine]);
+$stmt->execute([$line]);
 $lineName = $stmt->fetchColumn();
 
+// Ambil target
+$stmt = $pdo->prepare("SELECT * FROM target WHERE line_id = ? AND tahun_target = ?");
+$stmt->execute([$line, $tahun]);
+$target = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Ambil data actual (average)
 $stmt = $pdo->prepare("
     SELECT 
         AVG(batch_count) AS avg_batch_count,
         AVG(productivity) AS avg_productivity,
-        AVG(production_speed) AS avg_production_speed,
-        AVG(batch_weight) AS avg_batch_weight,
         AVG(operation_factor) AS avg_operation_factor,
         AVG(cycle_time) AS avg_cycle_time,
-        AVG(grade_change_sequence) AS avg_grade_change_sequence,
-        AVG(grade_change_time) AS avg_grade_change_time,
-        AVG(feed_raw_material) AS avg_feed_raw_material
+        AVG(grade_change_time) AS avg_grade_change_time
     FROM input_harian
     WHERE line_id = ? AND YEAR(tanggal) = ?
 ");
-$stmt->execute([$selectedLine, $selectedYear]);
-$data = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt->execute([$line, $tahun]);
+$actual = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// Field mapping
 $fields = [
-    'batch_count' => 'Batch Count',
-    'productivity' => 'Productivity',
-    'production_speed' => 'Production Speed',
-    'batch_weight' => 'Batch Weight',
-    'operation_factor' => 'Operation Factor',
-    'cycle_time' => 'Cycle Time',
-    'grade_change_sequence' => 'Grade Change Sequence',
-    'grade_change_time' => 'Grade Change Time',
-    'feed_raw_material' => 'Feed Raw Material'
+    'batch_count' => ['Batch Count', 'per day'],
+    'productivity' => ['Productivity', 'Ton/Shift'],
+    'operation_factor' => ['Operation Factor', '%'],
+    'cycle_time' => ['Cycle Time', 'min/Batch'],
+    'grade_change_time' => ['Grade Change Time', 'min/grade']
 ];
 
+// Buat Excel
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
-$sheet->setCellValue('A1', "PARAMETER LINE - {$lineName} ({$selectedYear})");
-$sheet->mergeCells('A1:B1');
+$sheet->setCellValue('A1', "📈 PARAMETER LINE - {$lineName} ({$tahun})");
+$sheet->mergeCells('A1:D1');
 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
 $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
+// Header
 $row = 3;
-$sheet->fromArray(['Parameter', 'Average'], null, "A{$row}");
-$sheet->getStyle("A{$row}:B{$row}")->applyFromArray([
+$sheet->fromArray(['Parameter Check', 'Target', 'Actual', 'Hasil (%)'], null, "A{$row}");
+$sheet->getStyle("A{$row}:D{$row}")->applyFromArray([
     'font' => ['bold' => true],
     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
     'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'CCE5FF']],
     'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
 ]);
 
+// Isi data
 $row++;
-foreach ($fields as $k => $v) {
-    $sheet->setCellValue("A{$row}", $v);
-    $sheet->setCellValue("B{$row}", $data['avg_' . $k] ? round($data['avg_' . $k], 2) : '-');
-    $sheet->getStyle("A{$row}:B{$row}")->applyFromArray([
+foreach ($fields as $key => [$label, $unit]) {
+    $targetVal = isset($target['target_' . $key]) ? floatval($target['target_' . $key]) : 0;
+    $actualVal = isset($actual['avg_' . $key]) ? round($actual['avg_' . $key], 2) : 0;
+    $hasil = $targetVal > 0 ? round(($actualVal / $targetVal) * 100, 1) : 0;
+
+    $sheet->setCellValue("A{$row}", $label);
+    $sheet->setCellValue("B{$row}", $targetVal);
+    $sheet->setCellValue("C{$row}", $actualVal);
+    $sheet->setCellValue("D{$row}", "{$hasil}%");
+
+    $sheet->getStyle("A{$row}:D{$row}")->applyFromArray([
         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
     ]);
     $row++;
 }
 
-foreach (['A','B'] as $col) $sheet->getColumnDimension($col)->setAutoSize(true);
+// Lebar kolom otomatis
+foreach (['A', 'B', 'C', 'D'] as $col) {
+    $sheet->getColumnDimension($col)->setAutoSize(true);
+}
 
-$filename = "ParameterLine_{$lineName}_{$selectedYear}.xlsx";
+// Export
+$filename = "Parameter-Line-{$lineName}-{$tahun}.xlsx";
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header("Content-Disposition: attachment; filename=\"$filename\"");
 $writer = new Xlsx($spreadsheet);
 $writer->save('php://output');
+ob_end_clean(); // tambahkan ini
 exit;
-?>

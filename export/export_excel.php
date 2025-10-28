@@ -1,6 +1,8 @@
 <!-- FUNCTION EXPORT EXCEL DI TABEL REPORT PRODUKSI TAHUNAN  (EXPORT_EXCEL.PHP) -->
 
 <?php
+ob_clean();
+ob_start();
 require '../vendor/autoload.php';
 include '../backend/config.php';
 
@@ -139,5 +141,6 @@ $filename = "Rangkuman_{$lineName}_{$selectedYear}.xlsx";
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header("Content-Disposition: attachment; filename=\"$filename\"");
 $writer = new Xlsx($spreadsheet);
+ob_end_clean(); // tambahkan ini
 $writer->save('php://output');
 exit;

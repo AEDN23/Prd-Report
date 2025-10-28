@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===============================================================================================================================
   // FUNGSI UNTUK SCROLL 1000 = 1 DETIK
   // ===============================================================================================================================
-  const intervalMs = 2000;
+  const intervalMs = 20000;
 
   function scrollToNext() {
     const target = scrollTargets[currentIndex];
