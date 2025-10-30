@@ -12,7 +12,11 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 $line = $_GET['line'] ?? 1;
+$bulan = $_GET['bulan'] ?? date('n'); // ✅ ambil bulan dari parameter
 $tahun = $_GET['tahun'] ?? date('Y');
+
+// Konversi nama bulan biar lebih enak dibaca
+$namaBulan = date('F', mktime(0, 0, 0, $bulan, 1));
 
 // Ambil nama line
 $stmt = $pdo->prepare("SELECT nama_line FROM line_produksi WHERE id=?");
@@ -24,7 +28,7 @@ $stmt = $pdo->prepare("SELECT * FROM target WHERE line_id = ? AND tahun_target =
 $stmt->execute([$line, $tahun]);
 $target = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Ambil data actual (average)
+// Ambil data actual (average per bulan)
 $stmt = $pdo->prepare("
     SELECT 
         AVG(batch_count) AS avg_batch_count,
@@ -33,9 +37,9 @@ $stmt = $pdo->prepare("
         AVG(cycle_time) AS avg_cycle_time,
         AVG(grade_change_time) AS avg_grade_change_time
     FROM input_harian
-    WHERE line_id = ? AND YEAR(tanggal) = ?
+    WHERE line_id = ? AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?
 ");
-$stmt->execute([$line, $tahun]);
+$stmt->execute([$line, $bulan, $tahun]);
 $actual = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Field mapping
@@ -50,7 +54,7 @@ $fields = [
 // Buat Excel
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
-$sheet->setCellValue('A1', "📈 PARAMETER LINE - {$lineName} ({$tahun})");
+$sheet->setCellValue('A1', "📈 PARAMETER LINE - {$lineName} ({$namaBulan} {$tahun})");
 $sheet->mergeCells('A1:D1');
 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
 $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
@@ -89,10 +93,11 @@ foreach (['A', 'B', 'C', 'D'] as $col) {
 }
 
 // Export
-$filename = "Parameter-Line-{$lineName}-{$tahun}.xlsx";
+$filename = "Parameter-{$lineName}-{$namaBulan}_{$tahun}.xlsx"; 
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header("Content-Disposition: attachment; filename=\"$filename\"");
+header('Cache-Control: max-age=0');
 $writer = new Xlsx($spreadsheet);
+ob_end_clean(); 
 $writer->save('php://output');
-ob_end_clean(); // tambahkan ini
 exit;

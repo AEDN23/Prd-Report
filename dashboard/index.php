@@ -82,7 +82,7 @@ include '../layout/header.php';
                     </div>
                 </div>
 
-                <div id="parameterB" class="border rounded p-3 text-center text-muted">
+                <div id="parameterB" class=" border rounded p-3 text-center text-muted">
                     Memuat data...
                 </div>
             </section>
@@ -97,8 +97,8 @@ include '../layout/header.php';
                     </h6>
 
                     <div class="btn-group">
-                        <a id="btnPDFTahunan" href="../export/exportpdf.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
-                            class="btn btn-danger btn-sm" style="margin-right: 10px;"> <i class="fas fa-file-pdf"></i> Export PDF</a>
+                        <a id="btnPDFTahunan" href="../export/export_excel.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
+                            class="btn btn-danger btn-sm" style="margin-right: 10px;"> <i class="fas fa-file-pdf"></i> Export PDFdddddd</a>
                         <a id="btnExcelTahunan" href="../export/export_excel.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
                             class="btn btn-success btn-sm"><i class="fas fa-file-excel"></i> Export Excel</a>
                     </div>

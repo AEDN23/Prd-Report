@@ -144,3 +144,5 @@ $writer = new Xlsx($spreadsheet);
 ob_end_clean(); // tambahkan ini
 $writer->save('php://output');
 exit;
+
+
