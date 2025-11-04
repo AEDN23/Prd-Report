@@ -138,20 +138,24 @@ document.addEventListener("DOMContentLoaded", () => {
             x: {
               title: { display: true, text: "Hari (1–31)" },
               color: "#000000",
+              // ========================================================
               // Menambahkan label tambahan untuk menampilkan result
-              ticks: {
-                callback: function (val, index) {
-                  const day = labels[index];
-                  color: "#F4F754";
-                  const resultValue = dataMap[day];
-                  return [
-                    day,
-                    resultValue !== undefined
-                      ? resultValue.toFixed(1) + ""
-                      : "",
-                  ];
-                },
-              },
+              // ========================================================
+              // ticks: {
+              //   callback: function (val, index) {
+              //     const day = labels[index];
+              //     color: "#F4F754";
+              //     const resultValue = dataMap[day];
+              //     return [
+              //       day,
+              //       resultValue !== undefined
+              //         ? resultValue.toFixed(1) + ""
+              //         : "",
+              //     ];
+              //   },
+              // },
+              // ========================================================
+              // ========================================================
             },
           },
         },
@@ -203,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(() => {
     currentDataset = (currentDataset + 1) % datasetKeys.length;
     refreshAllCharts();
-  }, 4000); 
+  }, 4000);
 });
 
 // ============================================================================
@@ -315,19 +319,24 @@ document.addEventListener("DOMContentLoaded", () => {
         scales: {
           y: { beginAtZero: true },
           x: {
-            title: { display: true, text: `Tahun ${tahun}`
-            },
+            title: { display: true, text: `Tahun ${tahun}` },
+
+            // ========================================================
             // Menambahkan label tambahan untuk menampilkan result
-            ticks: {
-              callback: function (val, index) {
-                const monthName = bulanLabels[index];
-                const resultValue = produksiData[index];
-                return [
-                  monthName,
-                  resultValue !== undefined ? resultValue.toFixed(1) + "" : "",
-                ];
-              },
-            },
+            // ========================================================
+            // ticks: {
+            //   callback: function (val, index) {
+            //     const monthName = bulanLabels[index];
+            //     const resultValue = produksiData[index];
+            //     return [
+            //       monthName,
+            //       resultValue !== undefined ? resultValue.toFixed(1) + "" : "",
+            //     ];
+            //   },
+            // },
+            // ========================================================
+            // Menambahkan label tambahan untuk menampilkan result END
+            // ========================================================
           },
         },
       },

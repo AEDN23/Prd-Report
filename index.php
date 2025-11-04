@@ -171,6 +171,8 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
     <!-- STYLES -->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <link href="css/ind.css" rel="stylesheet">
+
+    <script src="js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         /* ===== Sticky Navbar ===== */
@@ -212,7 +214,12 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
     <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script> -->
     <script src="js/autoscroll.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/bundele/chart.js"></script>
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> <!--SCRIPT UNTUK IMPORT PDF-->
+    <script src="js/bundele/jspdf.umd.min.js"></script>
+
     <script src="js/script.js"></script>
     <script src="js/export.js"></script>
     <script src="js/chart.js"></script>
@@ -305,7 +312,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                 <!-- ===================================================================== -->
                 <!-- 📋 TABEL DATA PRODUKSI LINE A -->
                 <!-- ===================================================================== -->
-                <section id="DATA-PRODUKSI-LINEA" class="mb-4">
+                <!-- <section id="DATA-PRODUKSI-LINEA" class="mb-4">
                     <h2>📋 DATA PRODUKSI HARIAN LINE A (<?= $namaBulan[$bulanSekarang] . " " . $tahunSekarang ?>)</h2>
                     <div class="table-responsive border rounded p-2">
                         <table class="table table-bordered table-sm mb-0 align-middle text-center">
@@ -316,14 +323,14 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                                     <th>Target</th>
                                     <th>Average</th>
                                     <?php for ($i = 1; $i <= 31; $i++): ?><th><?= $i ?></th><?php endfor; ?>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($fields as $key => [$label, $unit]):
-                                    $targetVal = $targetA['target_' . $key] ?? 0;
-                                    $avgVal = $averagesA[$key];
-                                    $avgColor = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
-                                ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($fields as $key => [$label, $unit]):
+                                        $targetVal = $targetA['target_' . $key] ?? 0;
+                                        $avgVal = $averagesA[$key];
+                                        $avgColor = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
+                                    ?>
                                     <tr>
                                         <td class="text-start"><?= htmlspecialchars($label) ?></td>
                                         <td><?= htmlspecialchars($unit) ?></td>
@@ -334,12 +341,12 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                                             $color = ($val !== '-' && $targetVal > 0 && $val < $targetVal) ? 'red' : 'black';
                                         ?>
                                             <td style="color:<?= $color ?>"><?= is_numeric($val) ? round($val, 2) : '-' ?></td>
-                                        <?php endfor; ?>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                                            <?php endfor; ?>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                     <h2 class="fw-bold">📋 DATA PRODUKSI LINE A TAHUN <?= $tahunSekarang ?></h2>
                     <div class="table-responsive border rounded p-2">
                         <table class="table table-bordered table-sm mb-0 text-center">
@@ -350,14 +357,14 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                                     <th>Target</th>
                                     <th>Average</th>
                                     <?php foreach ($namaBulan as $b): ?><th><?= $b ?></th><?php endforeach; ?>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($fields as $key => [$label, $unit]):
-                                    $targetVal = $summaryA['target']['target_' . $key] ?? 0;
-                                    $avgVal = $summaryA['averages'][$key];
-                                    $avgColor = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
-                                ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($fields as $key => [$label, $unit]):
+                                        $targetVal = $summaryA['target']['target_' . $key] ?? 0;
+                                        $avgVal = $summaryA['averages'][$key];
+                                        $avgColor = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
+                                    ?>
                                     <tr>
                                         <td><?= htmlspecialchars($label) ?></td>
                                         <td><?= htmlspecialchars($unit) ?></td>
@@ -369,19 +376,23 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                                             $color = ($val !== '-' && $targetVal > 0 && $val < $targetVal) ? 'red' : 'black';
                                         ?>
                                             <td style="color:<?= $color ?>"><?= is_numeric($val) ? round($val, 2) : '-' ?></td>
-                                        <?php endfor; ?>
+                                            <?php endfor; ?>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
-                </section>
+                </section> -->
+                <!-- ===================================================================== -->
+                <!-- 📋 TABEL DATA PRODUKSI LINE A -->
+                <!-- ===================================================================== -->
 
 
                 <!-- ===================================================================== -->
                 <!-- 📋 DATA PRODUKSI LINE B -->
                 <!-- ===================================================================== -->
-                <section id="DATA-PRODUKSI-LINEB" class="mb-4">
+                <!-- ===================================================================== -->
+                <!-- <section id="DATA-PRODUKSI-LINEB" class="mb-4">
                     <h2>📋 DATA PRODUKSI HARIAN LINE B (<?= $namaBulan[$bulanSekarang] . " " . $tahunSekarang ?>)</h2>
                     <div class="table-responsive border rounded p-2">
                         <table class="table table-bordered table-sm mb-0 align-middle text-center">
@@ -451,7 +462,9 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                             </tbody>
                         </table>
                     </div>
-                </section>
+                </section> -->
+                <!-- ===================================================================== -->
+                <!-- 📋 DATA PRODUKSI LINE B -->
 
 
 
