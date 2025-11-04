@@ -1,3 +1,5 @@
+<!-- FILE UNTUK LIAT CHART LINE A, B, C DALAM SATU CHART, JS NYA ADA DI FILE chartlineab -->
+
 <?php
 require_once '../backend/config.php';
 $page_title = "Halaman chart"

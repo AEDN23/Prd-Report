@@ -2,7 +2,6 @@
 $page_title = "Halaman Utama";
 include '../layout/header.php';
 ?>
-<script src="../js/dash.js"></script>
 
 <div class="container-fluid">
     <div class="card shadow mb-4">

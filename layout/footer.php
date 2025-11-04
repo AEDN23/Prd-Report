@@ -58,42 +58,58 @@
 <!-- ===========================================================================================================-->
 <!-- // 📘 SCRIPT UNTUK RANGKUMAN TAHUNAN -->
 <!-- =========================================================================================================== -->
-
-<!-- ===========================================================================================================-->
-<!-- // 📘 SCRIPT UNTUK TABEL PARAMETER-->
-<!-- =========================================================================================================== -->
-<!-- <script>
+<script>
     document.addEventListener("DOMContentLoaded", () => {
-        const lineB = document.getElementById("lineSelectParam");
-        const tahunB = document.getElementById("tahunParam");
-        const containerB = document.getElementById("parameterB");
+        // === FILTER UTAMA (HARIAN) ===
+        const lineUtama = document.getElementById("lineUtama");
+        const bulanUtama = document.getElementById("bulanUtama");
+        const tahunUtama = document.getElementById("tahunUtama");
 
-        function updateParameterB() {
-            const line = lineB.value;
-            const tahun = tahunB.value;
-            containerB.innerHTML =
-                '<div class="text-center py-3 text-muted">Loading...</div>';
+        // === RANGKUMAN TAHUNAN ===
+        const tabelTahunan = document.getElementById("tabelTahunanContainer");
+        const btnPDFTahunan = document.getElementById("btnPDFTahunan");
+        const btnExcelTahunan = document.getElementById("btnExcelTahunan");
+        const judulTahunan = document.getElementById("judulTahunan");
 
-            fetch(`../backend/parameter.php?line=${line}&tahun=${tahun}`)
-                .then((res) => res.text())
-                .then((html) => (containerB.innerHTML = html))
-                .catch((err) => {
-                    containerB.innerHTML =
-                        '<div class="text-danger">Gagal memuat data.</div>';
+        // Data nama line dari PHP
+        const lineNames = <?= json_encode(array_column($lines, 'nama_line', 'id')) ?>;
+
+        // Fungsi update tahunan
+        function updateTahunanDariHarian() {
+            const line = lineUtama.value;
+            const tahun = tahunUtama.value;
+            const namaLine = lineNames[line] || "Line";
+
+            // Update judul
+            judulTahunan.textContent = `📘 DATA TARGET PRODUKSI ${namaLine} - ${tahun}`;
+
+            // Update tombol export
+            btnPDFTahunan.href = `../export/exportpdf.php?line=${line}&tahun=${tahun}`;
+            btnExcelTahunan.href = `../export/export_excel.php?line=${line}&tahun=${tahun}`;
+
+            // Update tabel tahunan
+            tabelTahunan.innerHTML = '<div class="text-center py-3 text-muted">Loading data...</div>';
+            fetch(`../backend/rangkuman_ajax.php?line=${line}&tahun=${tahun}`)
+                .then(res => res.text())
+                .then(html => tabelTahunan.innerHTML = html)
+                .catch(err => {
+                    tabelTahunan.innerHTML = '<div class="text-danger text-center py-3">Gagal memuat data!</div>';
                     console.error(err);
                 });
         }
 
-        // auto update saat filter berubah
-        [lineB, tahunB].forEach((el) =>
-            el.addEventListener("change", updateParameterB)
-        );
+        // Saat filter harian berubah → tahunan ikut update
+        [lineUtama, bulanUtama, tahunUtama].forEach(el => {
+            el.addEventListener("change", updateTahunanDariHarian);
+        });
 
-        // load pertama
-        updateParameterB();
+        // Load awal
+        updateTahunanDariHarian();
     });
-</script> -->
-
+</script>
+<!-- ===========================================================================================================-->
+<!-- // 📘 SCRIPT UNTUK TABEL PARAMETER-->
+<!-- =========================================================================================================== -->
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         // === FILTER UTAMA (HARIAN) ===
@@ -237,54 +253,5 @@
         updateJudulHarian();
         updateJudulParameter();
         updateJudulTahunan();
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        // === FILTER UTAMA (HARIAN) ===
-        const lineUtama = document.getElementById("lineUtama");
-        const bulanUtama = document.getElementById("bulanUtama");
-        const tahunUtama = document.getElementById("tahunUtama");
-
-        // === RANGKUMAN TAHUNAN ===
-        const tabelTahunan = document.getElementById("tabelTahunanContainer");
-        const btnPDFTahunan = document.getElementById("btnPDFTahunan");
-        const btnExcelTahunan = document.getElementById("btnExcelTahunan");
-        const judulTahunan = document.getElementById("judulTahunan");
-
-        // Data nama line dari PHP
-        const lineNames = <?= json_encode(array_column($lines, 'nama_line', 'id')) ?>;
-
-        // Fungsi update tahunan
-        function updateTahunanDariHarian() {
-            const line = lineUtama.value;
-            const tahun = tahunUtama.value;
-            const namaLine = lineNames[line] || "Line";
-
-            // Update judul
-            judulTahunan.textContent = `📘 DATA TARGET PRODUKSI ${namaLine} - ${tahun}`;
-
-            // Update tombol export
-            btnPDFTahunan.href = `../export/exportpdf.php?line=${line}&tahun=${tahun}`;
-            btnExcelTahunan.href = `../export/export_excel.php?line=${line}&tahun=${tahun}`;
-
-            // Update tabel tahunan
-            tabelTahunan.innerHTML = '<div class="text-center py-3 text-muted">Loading data...</div>';
-            fetch(`../backend/rangkuman_ajax.php?line=${line}&tahun=${tahun}`)
-                .then(res => res.text())
-                .then(html => tabelTahunan.innerHTML = html)
-                .catch(err => {
-                    tabelTahunan.innerHTML = '<div class="text-danger text-center py-3">Gagal memuat data!</div>';
-                    console.error(err);
-                });
-        }
-
-        // Saat filter harian berubah → tahunan ikut update
-        [lineUtama, bulanUtama, tahunUtama].forEach(el => {
-            el.addEventListener("change", updateTahunanDariHarian);
-        });
-
-        // Load awal
-        updateTahunanDariHarian();
     });
 </script>
