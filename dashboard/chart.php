@@ -20,6 +20,7 @@ $page_title = "Halaman chart"
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<<<<<<< HEAD
     <<<<<<< HEAD
         <script src="../js/chartdashboard.js">
         </script>
@@ -28,6 +29,11 @@ $page_title = "Halaman chart"
         <script src="../js/export.js"></script>
         <!-- chartdashboard.js tidak lagi diperlukan eksternal; script lengkap disertakan di bawah -->
         >>>>>>> 399e89c (revisi filter chart)
+=======
+    <script src="../js/script.js"></script>
+    <script src="../js/export.js"></script>
+    <!-- chartdashboard.js tidak lagi diperlukan eksternal; script lengkap disertakan di bawah -->
+>>>>>>> 399e89c (revisi filter chart)
 </head>
 
 <body id="page-top">
