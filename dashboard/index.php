@@ -42,7 +42,7 @@ include '../layout/header.php';
                         </form>
 
                         <div class="btn-group">
-                            <a id="btnPDFHarian"
+                            <a id="btnPDFHarian" hidden
                                 href="../export/export-pdf-harian.php?line=<?= $selectedLine ?>&bulan=<?= $selectedMonth ?>&tahun=<?= $selectedYear ?>"
                                 class="btn btn-danger btn-sm" style="margin-right: 10px;">
                                 <i class="fas fa-file-pdf"></i> Export PDF
@@ -65,7 +65,7 @@ include '../layout/header.php';
             <!-- ============================== -->
             <!-- ⿢ PARAMETER LINE -->
             <!-- ============================== -->
-            <section id="parameter-section" class="mb-4">
+            <!-- <section id="parameter-section" class="mb-4">
                 <hr>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 id="judulParameter" class="fw-bold text-primary mb-0">
@@ -84,7 +84,7 @@ include '../layout/header.php';
                 <div id="parameterB" class=" border rounded p-3 text-center text-muted">
                     Memuat data...
                 </div>
-            </section>
+            </section> -->
             <!-- ============================== -->
             <!-- ⿣ DATA TARGET PRODUKSI (TAHUNAN) -->
             <!-- ============================== -->
@@ -95,7 +95,7 @@ include '../layout/header.php';
                     </h6>
 
                     <div class="btn-group">
-                        <a id="btnPDFTahunan" href="../export/export_excel.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
+                        <a hidden id="btnPDFTahunan" href="../export/export_excel.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
                             class="btn btn-danger btn-sm" style="margin-right: 10px;"> <i class="fas fa-file-pdf"></i> Export PDFdddddd</a>
                         <a id="btnExcelTahunan" href="../export/export_excel.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
                             class="btn btn-success btn-sm"><i class="fas fa-file-excel"></i> Export Excel</a>

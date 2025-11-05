@@ -14,39 +14,38 @@ include '../layout/header.php';
                         <span class="required">*</span>
                     </label>
                     <input type="text" id="judul" name="judul" required
-                        value="<?= htmlspecialchars($data['judul'] ?? '') ?>"
+                        value=""
                         style="width: 100%; cursor: text;">
+
                     <label for="deskripsi">
                         Deskripsi
                         <span class="required">*</span>
                     </label>
                     <textarea id="deskripsi" name="deskripsi" required
-                        style="width: 100%; cursor: text;"><?= htmlspecialchars($data['deskripsi'] ?? '') ?></textarea>
+                        style="width: 100%; cursor: text;"></textarea>
 
                     <label for="isi_informasi">
                         Isi Informasi
                         <span class="required">*</span>
                     </label>
                     <textarea id="isi_informasi" name="isi_informasi" required
-                        style="width: 100%; cursor: text;"><?= htmlspecialchars($data['isi_informasi'] ?? '') ?></textarea>
+                        style="width: 100%; cursor: text;"></textarea>
 
-                    <!-- <label for="file">
+                    <label for="file">
                         Upload File (jika ada)
-                    </label> -->
-
-                    <!-- <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png" style="width: 100%; cursor: text;" onclick=""> -->
-
+                    </label>
+                    <input type="file" id="file" name="file"
+                        accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png"
+                        style="width: 100%; cursor: text;">
                 </div>
-
             </div>
         </div>
-
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary btn-large">
                 💾 Simpan Data
             </button>
-            <!-- <a href="data-harian.php" class="btn btn-secondary">📋 Lihat Data</a> -->
+            <a href="informasi.php" class="btn btn-secondary">📋 Lihat Data</a>
             <a href="index.php" class="btn btn-secondary">❌ Batal</a>
         </div>
     </form>

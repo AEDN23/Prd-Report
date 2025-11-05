@@ -9,7 +9,6 @@ include '../layout/header.php';
         <div class="card-body">
 
             <?php
-
             try {
                 $stmt = $pdo->query("SELECT * FROM info ORDER BY created_at DESC");
                 $infos = $stmt->fetchAll();
@@ -89,9 +88,11 @@ include '../layout/header.php';
         </div>
     </div>
 
-    <div class="card-footer"></div>
-    <a href="input-info.php" class="btn btn-primary">Tambah Informasi Baru</a>
+    <div class="card-footer">
+        <a href="input-info.php" class="btn btn-primary">Tambah Informasi Baru</a>
+    </div>
+</div>
 
-    <?php
-    include '../layout/footer.php';
-    ?>
+<?php
+include '../layout/footer.php';
+?>

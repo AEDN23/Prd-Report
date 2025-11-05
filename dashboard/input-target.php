@@ -31,7 +31,7 @@ include '../layout/header.php';
                         <div class="form-group"> <label for="tahun">Tahun:</label>
                             <select name="tahun" id="tahun" required>
                                 <option value="">-- Pilih Tahun --</option>
-                                <?php $tahunSekarang = date("Y") + 3;
+                                <?php $tahunSekarang = date("Y") + 2;
                                 for ($tahun = $tahunSekarang; $tahun >= 2013; $tahun--) {
                                     echo "<option value='$tahun'>$tahun</option>";
                                 } ?>

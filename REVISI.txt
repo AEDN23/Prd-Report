@@ -1,4 +1,4 @@
-                                            ======================= REVISI WEB PRODUKSI REPORT =======================  
+ ======================= REVISI WEB PRODUKSI REPORT =======================  
 17/10/2025
 - Bar chart pisah antar line a dan b
 
@@ -10,10 +10,14 @@
 
 23- OKTOBER - 2025
 - Tambahkan filter tahun dan bulan di halaman chart.php (bukan hal awal)  ✅ 
-- Export pdf dan excel di halaman dashboard (Yang tabel harian) 
+- Export pdf dan excel di halaman dashboard (Yang tabel harian) ✅  (Note hanya excel saja)
+
+05 - NOVEMBER - 2025
+- filter chart tidak berfungsi (halaman dashboard/chart.php) ✅ 
+- update fitur hapus dan edit informasi ✅ 
 
 
-                                            ======================= TROUBLE LIST ===========================
+ ======================= TROUBLE LIST ===========================
  23 - OKTOBER - 2025  
 - Setting cctv setting batch (bagian packing tidak hidup)
 
@@ -28,3 +32,4 @@
 27 - OKTOBER - 2025
 - CCTV SEKITAR TPS MATI
 - CCTV KNEADER LINE B MATI
+
