@@ -20,7 +20,14 @@ $page_title = "Halaman chart"
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    <script src="../js/chartdashboard.js"></script>
+    <<<<<<< HEAD
+        <script src="../js/chartdashboard.js">
+        </script>
+        =======
+        <script src="../js/script.js"></script>
+        <script src="../js/export.js"></script>
+        <!-- chartdashboard.js tidak lagi diperlukan eksternal; script lengkap disertakan di bawah -->
+        >>>>>>> 399e89c (revisi filter chart)
 </head>
 
 <body id="page-top">
@@ -148,9 +155,10 @@ $page_title = "Halaman chart"
                             <form id="filter-chart-bulanan" class="row g-3 mb-3">
                                 <div class="col-md-2">
                                     <label class="form-label">Bulan</label>
-                                    <select id="bulanUtama" name="bulan" class="form-select">
+                                    <!-- ganti id jadi bulanFilter supaya tidak bentrok -->
+                                    <select id="bulanFilter" name="bulan" class="form-select">
                                         <?php for ($m = 1; $m <= 12; $m++): ?>
-                                            <option value="<?= $m ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
+                                            <option value="<?= $m ?>" <?= $m == date('n') ? 'selected' : '' ?>>
                                                 <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
                                             </option>
                                         <?php endfor; ?>
@@ -158,7 +166,8 @@ $page_title = "Halaman chart"
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label">Tahun</label>
-                                    <input id="tahunUtama" type="number" name="tahun" value="<?= $selectedYear ?>" class="form-control">
+                                    <!-- ganti id jadi tahunFilterBulanan supaya unik -->
+                                    <input id="tahunFilterBulanan" type="number" name="tahun" value="<?= date('Y') ?>" class="form-control">
                                 </div>
                             </form>
                             <!-- FILTER CHART BULANAN -->
@@ -193,7 +202,8 @@ $page_title = "Halaman chart"
                             <form id="filter-chart-tahunan" class="row g-3 mb-3">
                                 <div class="col-md-2">
                                     <label class="form-label">Tahun</label>
-                                    <input id="tahunUtama" type="number" name="tahun" value="<?= $selectedYear ?>" class="form-control">
+                                    <!-- gunakan id tahunFilterTahunan supaya unik -->
+                                    <input id="tahunFilterTahunan" type="number" name="tahun" value="<?= date('Y') ?>" class="form-control">
                                 </div>
                             </form>
                             <!-- FILTER CHART TAHUNAN -->
@@ -233,3 +243,481 @@ $page_title = "Halaman chart"
 </body>
 
 </html>
+
+<script>
+    // ============================================================================
+    // 📈 LINE CHART BULANAN
+    // ============================================================================
+    // Catatan: semua komentar aslinya tetap dipertahankan di bawah ini
+    document.addEventListener("DOMContentLoaded", () => {
+        // default values diambil dari input filter (jika ada) agar sinkron
+        function getBulananFilters() {
+            const bulanEl = document.getElementById('bulanFilter');
+            const tahunEl = document.getElementById('tahunFilterBulanan');
+            const bulan = bulanEl ? parseInt(bulanEl.value) : (new Date().getMonth() + 1);
+            const tahun = tahunEl ? parseInt(tahunEl.value) : new Date().getFullYear();
+            return {
+                bulan,
+                tahun
+            };
+        }
+
+        function getTahunanFilters() {
+            const tahunEl = document.getElementById('tahunFilterTahunan');
+            const tahun = tahunEl ? parseInt(tahunEl.value) : new Date().getFullYear();
+            return {
+                tahun
+            };
+        }
+
+        // 🎨 Warna dan dataset
+        const warna = [
+            "#1B1E23",
+            "#FF90BB",
+            "#FF0000",
+            "#6f42c1",
+            "#450693",
+            "#E9FF97",
+            "#fd7e14",
+            "#6610f2",
+            "#17a2b8",
+            "#adb5bd",
+        ];
+
+        const datasetKeys = [
+            "batch_count",
+            "productivity",
+            "production_speed",
+            "feed_raw_material",
+        ];
+        const datasetLabels = [
+            "Batch Count",
+            "Productivity",
+            "Production Speed",
+            "Feed Raw Material",
+        ];
+
+        let currentDataset = 0; // 🔁 sinkronisasi global antar line
+
+        // ========================================================================
+        // 🧠 FUNGSI BUAT CHART (bulanan)
+        // ========================================================================
+        function createBarChart({
+            canvasId,
+            prevBtnId,
+            nextBtnId,
+            lineId
+        }) {
+            const ctx = document.getElementById(canvasId).getContext("2d");
+            const btnPrev = document.getElementById(prevBtnId);
+            const btnNext = document.getElementById(nextBtnId);
+            let chartInstance = null;
+
+            // 🔄 Render ulang chart (mengambil filter saat ini)
+            function loadChart() {
+                const {
+                    bulan,
+                    tahun
+                } = getBulananFilters();
+                fetch(`../backend/chart-line.php?bulan=${bulan}&tahun=${tahun}&line=${lineId}`)
+                    .then((res) => res.json())
+                    .then((data) => {
+                        // data format: { lines: [...], target: {...} }
+                        // ketika tidak ada data, tetap render kosong (agar chart tetap muncul)
+                        const rows = data.lines || [];
+                        const target = data.target || {};
+                        renderChart(rows, target, bulan, tahun);
+                    })
+                    .catch((err) => console.error("Gagal load chart line " + lineId, err));
+            }
+
+            // 🎨 Render chart dengan garis target
+            function renderChart(rows, targetData, bulan, tahun) {
+                const key = datasetKeys[currentDataset];
+                const label = datasetLabels[currentDataset];
+                const labels = Array.from({
+                    length: 31
+                }, (_, i) => i + 1);
+
+                const dataMap = {};
+                rows.forEach((r) => {
+                    // pastikan hari valid integer
+                    const h = parseInt(r.hari);
+                    if (!isNaN(h)) dataMap[h] = parseFloat(r[key]) || 0;
+                });
+
+                const values = labels.map((hari) => (dataMap[hari] !== undefined ? dataMap[hari] : 0));
+                const targetKey = `target_${key}`;
+                const targetVal = (targetData && targetData[targetKey] !== undefined) ? parseFloat(targetData[targetKey]) : 0;
+
+                const datasetBars = {
+                    label: `${label}`,
+                    data: values,
+                    backgroundColor: warna[(lineId - 1) % warna.length] + "88",
+                    borderColor: warna[(lineId - 1) % warna.length],
+                    borderWidth: 1.5,
+                };
+
+                const datasetTargetLine = {
+                    label: `🎯 Target ${label}`,
+                    data: Array(31).fill(targetVal),
+                    type: "line",
+                    borderColor: "#ff0000",
+                    borderWidth: 2,
+                    borderDash: [6, 4],
+                    pointRadius: 0,
+                    fill: false,
+                };
+
+                if (chartInstance) chartInstance.destroy();
+
+                chartInstance = new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels,
+                        datasets: [datasetBars, datasetTargetLine],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                // Menggabungkan label dan target ke dalam title
+                                text: [`📊 ${label} - Line ${lineId === 1 ? "A" : "B"} (${bulan}/${tahun})`, `Target: ${targetVal}`],
+                                font: {
+                                    size: 16
+                                },
+                            },
+                            legend: {
+                                position: "top",
+                                labels: {
+                                    boxWidth: 40
+                                },
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: "Hari (1–31)"
+                                },
+                                ticks: {
+                                    callback: function(val, index) {
+                                        const day = labels[index];
+                                        const resultValue = dataMap[day];
+                                        // tampilkan hari dan value di tick label baris pertama
+                                        return [day, resultValue !== undefined ? (Math.round(resultValue * 10) / 10) : ''];
+                                    }
+                                }
+                            },
+                        },
+                    },
+                });
+            }
+
+            // Tombol manual
+            btnNext.addEventListener("click", () => {
+                currentDataset = (currentDataset + 1) % datasetKeys.length;
+                refreshAllBulananCharts();
+            });
+
+            btnPrev.addEventListener("click", () => {
+                currentDataset = (currentDataset - 1 + datasetKeys.length) % datasetKeys.length;
+                refreshAllBulananCharts();
+            });
+
+            return {
+                loadChart
+            };
+        }
+
+        // ========================================================================
+        // 🅰️ & 🅱️ BUAT DUA CHART BULANAN SEKALIGUS
+        // ========================================================================
+        const chartA = createBarChart({
+            canvasId: "BarChartA",
+            prevBtnId: "prevBarA",
+            nextBtnId: "nextBarA",
+            lineId: 1,
+        });
+        const chartB = createBarChart({
+            canvasId: "BarChartB",
+            prevBtnId: "prevBarB",
+            nextBtnId: "nextBarB",
+            lineId: 2,
+        });
+
+        // Kalau filter bulan/tahun bulanan berubah, reload chart bulanan
+        document.getElementById('bulanFilter')?.addEventListener('change', () => {
+            refreshAllBulananCharts();
+        });
+        document.getElementById('tahunFilterBulanan')?.addEventListener('change', () => {
+            refreshAllBulananCharts();
+        });
+
+        function refreshAllBulananCharts() {
+            chartA.loadChart();
+            chartB.loadChart();
+        }
+
+        // ========================================================================
+        // 🔄 AUTO REFRESH SINKRON SETIAP 5 DETIK (ganti dataset otomatis)
+        // ========================================================================
+        setInterval(() => {
+            currentDataset = (currentDataset + 1) % datasetKeys.length;
+            refreshAllBulananCharts();
+        }, 5000); // GANTI DATASET SETIAP 5 DETIK
+
+
+        // ============================================================================
+        // 📅 BAR CHART TAHUNAN PER LINE
+        // ============================================================================
+        // kita buat fungsi terpusat agar bisa dipanggil ulang saat filter tahun tahunan berubah
+        const warnaA = "#007bff"; // biru
+        const warnaB = "#28a745"; // hijau
+
+        const metrics = [{
+                key: "productivity",
+                label: "Productivity (Ton/Shift)"
+            },
+            {
+                key: "batch_count",
+                label: "Batch Count (Per Day)"
+            },
+            {
+                key: "production_speed",
+                label: "Production Speed (Kg/Min)"
+            },
+            {
+                key: "feed_raw_material",
+                label: "Feed Raw Material (Kg/Day)"
+            },
+            {
+                key: "operation_factor",
+                label: "Operation Factor (%)"
+            },
+        ];
+
+        const bulanLabels = [
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+        ];
+
+        let currentMetric = 0; // 🔁 sinkron antar line
+
+        function renderTahunanChart({
+            ctx,
+            data,
+            metric,
+            warna,
+            lineName,
+            tahun
+        }) {
+            const dataBulan = data.bulanData || {};
+            const targetData = data.target || {};
+
+            const produksiData = bulanLabels.map((_, i) => {
+                const bulan = i + 1;
+                const avgKey = `avg_${metric.key}`;
+                return dataBulan[bulan] && dataBulan[bulan][avgKey] !== undefined ?
+                    parseFloat(dataBulan[bulan][avgKey]) :
+                    0;
+            });
+
+            const targetKey = `target_${metric.key}`;
+            const targetValue = targetData && targetData[targetKey] !== undefined ?
+                parseFloat(targetData[targetKey]) :
+                0;
+
+            if (ctx.chartInstance) ctx.chartInstance.destroy();
+
+            ctx.chartInstance = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: bulanLabels,
+                    datasets: [{
+                            label: `${metric.label}`,
+                            data: produksiData,
+                            backgroundColor: warna + "88",
+                            borderColor: warna,
+                            borderWidth: 1.5,
+                            borderRadius: 4,
+                        },
+                        {
+                            label: `🎯 Target ${metric.label}`,
+                            data: Array(12).fill(targetValue),
+                            type: "line",
+                            borderColor: "#ff0000",
+                            borderWidth: 2,
+                            borderDash: [6, 4],
+                            pointRadius: 0,
+                            fill: false,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: [`📘 ${lineName} — ${metric.label} (${tahun})`, `Target: ${targetValue}`],
+                            font: {
+                                size: 16
+                            },
+                        },
+                        legend: {
+                            position: "top"
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: "Bulan"
+                            },
+                            ticks: {
+                                callback: function(val, index) {
+                                    const monthName = bulanLabels[index];
+                                    const resultValue = produksiData[index];
+                                    return [monthName, resultValue !== undefined ? (Math.round(resultValue * 10) / 10) : ''];
+                                }
+                            }
+                        },
+                    },
+                },
+            });
+        }
+
+        // fungsi load tahunan per line; ambil tahun dari filter tahun tahunan
+        function loadTahunanCharts() {
+            const {
+                tahun
+            } = getTahunanFilters();
+
+            // Line A
+            const ctxA = document.getElementById("BarCharttahunan").getContext("2d");
+            fetch(`../backend/get_chart_tahunan.php?line=1&tahun=${tahun}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    renderTahunanChart({
+                        ctx: ctxA,
+                        data,
+                        metric: metrics[currentMetric],
+                        warna: warnaA,
+                        lineName: "Line A",
+                        tahun
+                    });
+                })
+                .catch((err) => console.error("❌ Gagal load chart Line A (tahunan):", err));
+
+            // Line B
+            const ctxB = document.getElementById("BarCharttahunanLINEB").getContext("2d");
+            fetch(`../backend/get_chart_tahunan.php?line=2&tahun=${tahun}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    renderTahunanChart({
+                        ctx: ctxB,
+                        data,
+                        metric: metrics[currentMetric],
+                        warna: warnaB,
+                        lineName: "Line B",
+                        tahun
+                    });
+                })
+                .catch((err) => console.error("❌ Gagal load chart Line B (tahunan):", err));
+        }
+
+        // tombol next/prev untuk tahunan
+        document.getElementById('nextTahunan')?.addEventListener('click', () => {
+            currentMetric = (currentMetric + 1) % metrics.length;
+            loadTahunanCharts();
+        });
+        document.getElementById('prevTahunan')?.addEventListener('click', () => {
+            currentMetric = (currentMetric - 1 + metrics.length) % metrics.length;
+            loadTahunanCharts();
+        });
+        document.getElementById('nextTahunanB')?.addEventListener('click', () => {
+            currentMetric = (currentMetric + 1) % metrics.length;
+            loadTahunanCharts();
+        });
+        document.getElementById('prevTahunanB')?.addEventListener('click', () => {
+            currentMetric = (currentMetric - 1 + metrics.length) % metrics.length;
+            loadTahunanCharts();
+        });
+
+        // jika filter tahun tahunan berubah, reload
+        document.getElementById('tahunFilterTahunan')?.addEventListener('change', loadTahunanCharts);
+
+        // auto rotate metric tiap 5 detik (tahunan)
+        setInterval(() => {
+            currentMetric = (currentMetric + 1) % metrics.length;
+            loadTahunanCharts();
+        }, 5000);
+
+        // load pertama kali
+        refreshAllBulananCharts();
+        loadTahunanCharts();
+
+
+        // ============================================================================
+        // 🧾 Fungsi Export PDF (umum, dipakai oleh tombol export di tiap section)
+        // ============================================================================
+        function exportChartPDF(canvasId, title) {
+            const {
+                jsPDF
+            } = window.jspdf;
+            const pdf = new jsPDF("l", "mm", "a4");
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                alert('Canvas tidak ditemukan');
+                return;
+            }
+            const imgData = canvas.toDataURL("image/png");
+            // Dapatkan tanggal saat ini
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const dateString = `${year}-${month}-${day}`;
+            pdf.text(title, 15, 15);
+            // ukuran & posisi gambar disesuaikan agar muat
+            // width 277mm pada landscape A4 (pdf internal unit mm) minus margin 20 -> sekitar 257
+            pdf.addImage(imgData, "PNG", 10, 25, 277 - 20, 160);
+            pdf.save(`${title}_${dateString}.pdf`);
+        }
+
+        // ============================================================================
+        // 📥 AKTIFKAN TOMBOL EXPORT PDF DI SEMUA CHART
+        // ============================================================================
+        document.querySelectorAll(".exportChartPDF").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+                // cari section terdekat -> ambil canvas di dalamnya
+                const section = e.target.closest("section");
+                const canvas = section ? section.querySelector("canvas") : null;
+                const title = section ? (section.querySelector("h6")?.innerText || "Chart") : "Chart";
+                if (canvas) {
+                    exportChartPDF(canvas.id, title);
+                } else {
+                    alert("Canvas chart tidak ditemukan di section ini!");
+                }
+            });
+        });
+
+    }); // end DOMContentLoaded utama
+</script>

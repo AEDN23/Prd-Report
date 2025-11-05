@@ -2,8 +2,8 @@
 require_once 'backend/config.php';
 date_default_timezone_set('Asia/Jakarta');
 
-$tahunSekarang  = date('Y');
-$bulanSekarang  = date('n');
+$tahunSekarang = date('Y');
+$bulanSekarang = date('n');
 
 // =====================================================================
 // 💡 FIELD DATA PRODUKSI
@@ -40,13 +40,13 @@ function getAnnualSummary(PDO $pdo, int $lineId, int $tahun)
             AVG(productivity) AS avg_productivity,
             AVG(production_speed) AS avg_production_speed,
             AVG(batch_weight) AS avg_batch_weight,
-            AVG(operation_factor) AS avg_operation_factor,
+                    AVG(operation_factor) AS avg_operation_factor,
             AVG(cycle_time) AS avg_cycle_time,
             AVG(grade_change_sequence) AS avg_grade_change_sequence,
             AVG(grade_change_time) AS avg_grade_change_time,
             AVG(feed_raw_material) AS avg_feed_raw_material
         FROM input_harian
-        WHERE line_id = ? AND YEAR(tanggal) = ?
+             WHERE line_id = ? AND YEAR(tanggal) = ?
         GROUP BY bulan
         ORDER BY bulan
     ");
@@ -134,7 +134,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
     // Susun data per tanggal
     $perHari = [];
     foreach ($dataHarian as $row) {
-        $perHari[(int)$row['hari']] = $row;
+        $perHari[(int) $row['hari']] = $row;
     }
 
     // Hitung average
@@ -173,7 +173,8 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
     <link href="css/ind.css" rel="stylesheet">
 
     <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+ <script src="js/bundele/bootstrap.bundle.min.js"></script>  
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
     <style>
         /* ===== Sticky Navbar ===== */
 
@@ -213,11 +214,13 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
     <!-- SCRIPTS -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script> -->
     <script src="js/autoscroll.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
     <script src="js/bundele/chart.js"></script>
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> <!--SCRIPT UNTUK IMPORT PDF-->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
+    <!--SCRIPT UNTUK IMPORT PDF-->
     <script src="js/bundele/jspdf.umd.min.js"></script>
 
     <script src="js/script.js"></script>
@@ -330,7 +333,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                                         $targetVal = $targetA['target_' . $key] ?? 0;
                                         $avgVal = $averagesA[$key];
                                         $avgColor = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
-                                    ?>
+                                        ?>
                                     <tr>
                                         <td class="text-start"><?= htmlspecialchars($label) ?></td>
                                         <td><?= htmlspecialchars($unit) ?></td>
@@ -339,7 +342,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                                         <?php for ($i = 1; $i <= 31; $i++):
                                             $val = $perHariA[$i][$key] ?? '-';
                                             $color = ($val !== '-' && $targetVal > 0 && $val < $targetVal) ? 'red' : 'black';
-                                        ?>
+                                            ?>
                                             <td style="color:<?= $color ?>"><?= is_numeric($val) ? round($val, 2) : '-' ?></td>
                                             <?php endfor; ?>
                                         </tr>
@@ -364,7 +367,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                                         $targetVal = $summaryA['target']['target_' . $key] ?? 0;
                                         $avgVal = $summaryA['averages'][$key];
                                         $avgColor = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
-                                    ?>
+                                        ?>
                                     <tr>
                                         <td><?= htmlspecialchars($label) ?></td>
                                         <td><?= htmlspecialchars($unit) ?></td>
@@ -374,7 +377,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                                             $avgKey = 'avg_' . $key;
                                             $val = $summaryA['bulanData'][$m][$avgKey] ?? '-';
                                             $color = ($val !== '-' && $targetVal > 0 && $val < $targetVal) ? 'red' : 'black';
-                                        ?>
+                                            ?>
                                             <td style="color:<?= $color ?>"><?= is_numeric($val) ? round($val, 2) : '-' ?></td>
                                             <?php endfor; ?>
                                     </tr>
@@ -410,7 +413,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                                     $targetVal = $targetB['target_' . $key] ?? 0;
                                     $avgVal = $averagesB[$key];
                                     $avgColor = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
-                                ?>
+                                    ?>
                                     <tr>
                                         <td class="text-start"><?= htmlspecialchars($label) ?></td>
                                         <td><?= htmlspecialchars($unit) ?></td>
@@ -419,7 +422,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                                         <?php for ($i = 1; $i <= 31; $i++):
                                             $val = $perHariB[$i][$key] ?? '-';
                                             $color = ($val !== '-' && $targetVal > 0 && $val < $targetVal) ? 'red' : 'black';
-                                        ?>
+                                            ?>
                                             <td style="color:<?= $color ?>"><?= is_numeric($val) ? round($val, 2) : '-' ?></td>
                                         <?php endfor; ?>
                                     </tr>
@@ -444,7 +447,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                                     $targetVal = $summaryB['target']['target_' . $key] ?? 0;
                                     $avgVal = $summaryB['averages'][$key];
                                     $avgColor = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
-                                ?>
+                                    ?>
                                     <tr>
                                         <td><?= htmlspecialchars($label) ?></td>
                                         <td><?= htmlspecialchars($unit) ?></td>
@@ -454,7 +457,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                                             $avgKey = 'avg_' . $key;
                                             $val = $summaryB['bulanData'][$m][$avgKey] ?? '-';
                                             $color = ($val !== '-' && $targetVal > 0 && $val < $targetVal) ? 'red' : 'black';
-                                        ?>
+                                            ?>
                                             <td style="color:<?= $color ?>"><?= is_numeric($val) ? round($val, 2) : '-' ?></td>
                                         <?php endfor; ?>
                                     </tr>
@@ -485,7 +488,7 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                             if ($infos) {
                                 foreach ($infos as $info) {
                                     echo "<h1 class='text-center' style='word-break:break-word; white-space:normal;'>" . htmlspecialchars($info['judul']) . "</h1><div>" . htmlspecialchars(date('d-m-Y', strtotime($info['created_at']))) . "</div>";
-                                    echo "<div class='text-center'>"  . '|  ' . htmlspecialchars($info['deskripsi']) . ' |</div>  <br>';
+                                    echo "<div class='text-center'>" . '|  ' . htmlspecialchars($info['deskripsi']) . ' |</div>  <br>';
                                     echo "<p class='text-justify' style='word-break:break-word; white-space:normal;'>" . nl2br(htmlspecialchars($info['isi'])) . "</p>";
                                     if (!empty($info['file'])) {
                                         echo "<a href='../uploads/info/" . htmlspecialchars($info['file']) . "' target='_blank'>Lihat File</a><br>";
@@ -532,8 +535,8 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                 '<div class="text-center py-3 text-muted">Loading data...</div>';
 
             fetch(
-                    `backend/inputharianajax.php?line=${line}&bulan=${bulan}&tahun=${tahun}`
-                )
+                `backend/inputharianajax.php?line=${line}&bulan=${bulan}&tahun=${tahun}`
+            )
                 .then((res) => res.text())
                 .then((html) => (tabelUtama.innerHTML = html))
                 .catch((err) => {
