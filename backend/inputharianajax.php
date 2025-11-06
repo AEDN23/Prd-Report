@@ -70,6 +70,7 @@ foreach ($fields as $key => $v) {
             <th>Unit</th>
             <th>Target</th>
             <th>Average</th>
+            <th>Hasil (%)</th>
             <?php for ($d = 1; $d <= 31; $d++): ?>
                 <th><?= $d ?></th>
             <?php endfor; ?>
@@ -77,25 +78,24 @@ foreach ($fields as $key => $v) {
     </thead>
     <tbody class="text-center align-middle">
         <?php foreach ($fields as $key => [$label, $unit]): ?>
-            <?php $targetVal = isset($target['target_' . $key]) ? floatval($target['target_' . $key]) : 0; ?>
+            <?php
+            $targetVal = isset($target['target_' . $key]) ? floatval($target['target_' . $key]) : 0;
+            $avgVal = $averages[$key];
+            $hasil = ($avgVal !== '-' && $targetVal > 0) ? round(($avgVal / $targetVal) * 100, 1) : '-';
+            $color = ($hasil !== '-' && $hasil < 100) ? 'red' : 'black';
+            ?>
             <tr>
                 <td><?= htmlspecialchars($label) ?></td>
                 <td><?= htmlspecialchars($unit) ?></td>
                 <td style="color: black; font-weight:bold;"><?= $targetVal ?: '-' ?></td>
-                <?php
-                $targetVal = isset($target['target_' . $key]) ? floatval($target['target_' . $key]) : 0;
-                $avgVal = $averages[$key];
-                $color = ($avgVal !== '-' && $targetVal > 0 && $avgVal < $targetVal) ? 'red' : 'black';
-                ?>
-                <td style="color: <?= $color ?>; font-weight:;"><?= $avgVal ?></td>
-
+                <td style="color: <?= $color ?>;"><?= $avgVal ?></td>
+                <td style="color: <?= $color ?>; font-weight:bold;"><?= $hasil !== '-' ? $hasil . '%' : '-' ?></td>
 
                 <?php for ($d = 1; $d <= 31; $d++): ?>
                     <?php
                     $val = $data[$d][$key] ?? null;
                     $style = '';
 
-                    // kalau ada nilai dan target > 0
                     if ($val !== null && $targetVal > 0) {
                         if ($val < $targetVal) {
                             $style = 'style="color:red;font-weight:bold"';

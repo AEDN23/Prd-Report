@@ -73,14 +73,17 @@ $lineName = $stmt->fetchColumn();
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 $sheet->setCellValue('A1', "📋 DATA PRODUKSI HARIAN - {$lineName} (" . date('F', mktime(0, 0, 0, $bulan, 10)) . " {$tahun})");
-$sheet->mergeCells('A1:AG1');
+$sheet->mergeCells('A1:AH1'); // karena total kolom nambah 1
+
 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
 $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
 // Header
 $row = 3;
-$headers = ['Details', 'Unit', 'Target', 'Average'];
+$headers = ['Details', 'Unit', 'Target', 'Average', 'Hasil (%)'];
+
 for ($d = 1; $d <= 31; $d++) $headers[] = $d;
+
 $sheet->fromArray($headers, null, "A{$row}");
 $lastCol = Coordinate::stringFromColumnIndex(count($headers));
 $sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray([
@@ -100,13 +103,21 @@ foreach ($fields as $key => [$label, $unit]) {
     $sheet->setCellValue("C{$row}", $targetVal);
     $sheet->setCellValue("D{$row}", $avgVal);
 
-    $colIndex = 5; // mulai dari kolom E
+    // Hitung hasil (%)
+    $hasil = ($avgVal !== '-' && $targetVal > 0) ? round(($avgVal / $targetVal) * 100, 1) : '-';
+    $sheet->setCellValue("E{$row}", $hasil !== '-' ? $hasil . '%' : '-');
+
+    // Warna merah kalau hasil < 100%
+    $sheet->getStyle("E{$row}")->getFont()->getColor()->setRGB(($hasil !== '-' && $hasil < 100) ? 'FF0000' : '000000');
+
+    $colIndex = 6; // kolom F untuk tanggal 1
     for ($d = 1; $d <= 31; $d++) {
         $val = $data[$d][$key] ?? '-';
         $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
         $sheet->setCellValue("{$col}{$row}", $val);
         $colIndex++;
     }
+
 
     $sheet->getStyle("A{$row}:AG{$row}")->applyFromArray([
         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
@@ -118,7 +129,8 @@ foreach (range('A', $lastCol) as $col) {
     $sheet->getColumnDimension($col)->setAutoSize(true);
 }
 
-$filename = "ProduksiHarian_{$lineName}_{$bulan}_{$tahun}.xlsx";
+$filename = "ProduksiHarian_{$lineName}_" . date('F', mktime(0, 0, 0, $bulan, 10)) . "_{$tahun}.xlsx";
+
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header("Content-Disposition: attachment; filename=\"$filename\"");
 $writer = new Xlsx($spreadsheet);
