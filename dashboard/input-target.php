@@ -69,7 +69,7 @@ include '../layout/header.php';
                         <div class="form-group"> <label for="target_grade_change_time">Target Grade Change Time</label> <input type="number" id="target_grade_change_time" name="target_grade_change_time" step="0.01" min="0" required value="<?= $existing_data['target_grade_change_time'] ?? '' ?>"> <small class="form-help">Menit per grade change</small> </div>
                     </div>
                     <div class="form-group"> <label for="target_feed_raw_material">Target Feed Raw Material</label> <input type="number" id="target_feed_raw_material" name="target_feed_raw_material" step="0.01" min="0" required value="<?= $existing_data['target_feed_raw_material'] ?? '' ?>"> <small class="form-help">Kg material per hari</small>
-                        <div class="form-actions"> <button type="submit" class="btn btn-primary btn-large"> 💾 Simpan Target </button> <a href="index.php" class="btn btn-secondary">❌ Batal</a> </div>
+                        <div class="form-actions"> <button type="submit" class="btn btn-primary btn-large"> 💾 Simpan Target </button><a href="index.php" class="btn btn-secondary">❌ Batal</a><a href="edit-target.php" class="btn btn-success">✒️ Edit target yang sudah ada</a> </div>
                     </div>
                 </div>
             </form>

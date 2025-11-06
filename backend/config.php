@@ -239,3 +239,13 @@ foreach ($fields as $f => $v) {
     }
     $averages[$f] = $count > 0 ? round($sum / $count, 2) : '-';
 }
+
+// Tambahkan fungsi helper ini di backend/config.php
+function showErrorEdit($message)
+{
+    echo "<script>
+        alert('Gagal mengupdate: ' + " . json_encode($message) . ");
+        window.location.href = '../dashboard/data-target.php';
+    </script>";
+    exit();
+}

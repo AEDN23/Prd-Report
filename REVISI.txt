@@ -16,6 +16,10 @@
 - filter chart tidak berfungsi (halaman dashboard/chart.php) ✅ 
 - update fitur hapus dan edit informasi ✅ 
 
+06 - NOVEMBER - 2025
+- Menambahkan fitur edit dan hapus data target ✅ 
+
+
 
  ======================= TROUBLE LIST ===========================
  23 - OKTOBER - 2025  
