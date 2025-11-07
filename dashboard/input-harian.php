@@ -177,7 +177,7 @@ $today = date('Y-m-d');
                                 Grade Change Time
                             </label>
                             <input type="number" id="grade_change_time" name="grade_change_time"
-                            step="0.01" min="0" required
+                                step="0.01" min="0" required
                                 value="">
                             <small class="form-help">Menit per grade change</small>
                         </div>
@@ -198,11 +198,12 @@ $today = date('Y-m-d');
                     </div>
                 </div>
 
+                <!-- Di bagian form-actions, tambahkan link ke data harian -->
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary btn-large">
                         💾 Simpan Data
                     </button>
-                    <!-- <a href="data-harian.php" class="btn btn-secondary">📋 Lihat Data</a> -->
+                    <a href="data-harian.php" class="btn btn-secondary">📋 Lihat & Edit Data</a>
                     <a href="index.php" class="btn btn-secondary">❌ Batal</a>
                 </div>
             </form>

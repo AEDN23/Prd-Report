@@ -11,10 +11,11 @@ $stmt = $pdo->prepare("SELECT * FROM target WHERE line_id=? AND tahun_target=?")
 $stmt->execute([$line, $tahun]);
 $target = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// ambil data harian
+// ambil data harian dengan ID
 $stmt = $pdo->prepare("
     SELECT 
         DAY(tanggal) AS hari,
+        tanggal as full_tanggal,
         batch_count,
         productivity,
         production_speed,
@@ -23,7 +24,8 @@ $stmt = $pdo->prepare("
         cycle_time,
         grade_change_sequence,
         grade_change_time,
-        feed_raw_material
+        feed_raw_material,
+        id
     FROM input_harian
     WHERE line_id = ? AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?
     ORDER BY tanggal ASC
@@ -31,8 +33,12 @@ $stmt = $pdo->prepare("
 $stmt->execute([$line, $bulan, $tahun]);
 
 $data = [];
+$dataIds = []; // Untuk menyimpan ID data per tanggal
+$dataFullTanggal = []; // Untuk menyimpan tanggal lengkap
 while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $data[$r['hari']] = $r;
+    $dataIds[$r['hari']] = $r['id']; // Simpan ID untuk edit
+    $dataFullTanggal[$r['hari']] = $r['full_tanggal']; // Simpan tanggal lengkap
 }
 
 // daftar field dan unit
@@ -108,5 +114,23 @@ foreach ($fields as $key => $v) {
                 <?php endfor; ?>
             </tr>
         <?php endforeach; ?>
+
+        <tr class="table-warning">
+            <td colspan="5"><strong> Edit</strong></td>
+            <?php for ($d = 1; $d <= 31; $d++): ?>
+                <td>
+                    <?php if (isset($dataIds[$d])): ?>
+                        <a href="../dashboard/edit-harian.php?id=<?= $dataIds[$d] ?>"
+                            class="btn btn-sm btn-outline-primary"
+                            title="Edit semua data tanggal <?= date('d/m/Y', strtotime($dataFullTanggal[$d])) ?>"
+                            style="padding: 0.1rem 0.4rem; font-size: 0.75rem;">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    <?php else: ?>
+                        <span class="text-muted">-</span>
+                    <?php endif; ?>
+                </td>
+            <?php endfor; ?>
+        </tr>
     </tbody>
 </table>
