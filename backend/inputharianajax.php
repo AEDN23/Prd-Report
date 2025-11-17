@@ -1,4 +1,3 @@
-<!-- FUNGSI UNTUK MENAMPILKAN DATA TABEL HARIAN DI HALAMAN DASHBOARD -->
 <?php
 include 'config.php';
 
@@ -11,34 +10,46 @@ $stmt = $pdo->prepare("SELECT * FROM target WHERE line_id=? AND tahun_target=?")
 $stmt->execute([$line, $tahun]);
 $target = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// ambil data harian dengan ID
 $stmt = $pdo->prepare("
     SELECT 
         DAY(tanggal) AS hari,
         tanggal as full_tanggal,
-        batch_count,
-        productivity,
-        production_speed,
-        batch_weight,
-        operation_factor,
-        cycle_time,
-        grade_change_sequence,
-        grade_change_time,
-        feed_raw_material,
-        id
+        SUM(batch_count) as batch_count,
+        SUM(productivity) as productivity,
+        SUM(production_speed) as production_speed,
+        SUM(batch_weight) as batch_weight,
+        SUM(operation_factor) as operation_factor,
+        SUM(cycle_time) as cycle_time,
+        SUM(grade_change_sequence) as grade_change_sequence,
+        SUM(grade_change_time) as grade_change_time,
+        SUM(feed_raw_material) as feed_raw_material
     FROM input_harian
     WHERE line_id = ? AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?
+    GROUP BY tanggal
     ORDER BY tanggal ASC
 ");
 $stmt->execute([$line, $bulan, $tahun]);
 
 $data = [];
-$dataIds = []; // Untuk menyimpan ID data per tanggal
-$dataFullTanggal = []; // Untuk menyimpan tanggal lengkap
+$dataFullTanggal = [];
+
+// Untuk edit, kita perlu ambil semua ID per tanggal (semua shift)
+$stmtIds = $pdo->prepare("
+    SELECT DAY(tanggal) AS hari, GROUP_CONCAT(id) as ids
+    FROM input_harian
+    WHERE line_id = ? AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?
+    GROUP BY tanggal
+    ORDER BY tanggal ASC
+");
+$stmtIds->execute([$line, $bulan, $tahun]);
+$dataIds = [];
+while ($r = $stmtIds->fetch(PDO::FETCH_ASSOC)) {
+    $dataIds[$r['hari']] = $r['ids'];
+}
+
 while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $data[$r['hari']] = $r;
-    $dataIds[$r['hari']] = $r['id']; // Simpan ID untuk edit
-    $dataFullTanggal[$r['hari']] = $r['full_tanggal']; // Simpan tanggal lengkap
+    $dataFullTanggal[$r['hari']] = $r['full_tanggal'];
 }
 
 // daftar field dan unit
@@ -54,18 +65,18 @@ $fields = [
     'feed_raw_material' => ['Feed Raw Material', 'Kg/Day']
 ];
 
-// hitung average per field
+// hitung average per field dengan format 2 digit
 $averages = [];
 foreach ($fields as $key => $v) {
     $sum = 0;
     $count = 0;
     foreach ($data as $hari => $val) {
-        if (!empty($val[$key])) {
+        if (!empty($val[$key]) && $val[$key] != 0) {
             $sum += $val[$key];
             $count++;
         }
     }
-    $averages[$key] = $count ? round($sum / $count, 2) : '-';
+    $averages[$key] = $count ? number_format($sum / $count, 2) : '-';
 }
 ?>
 
@@ -87,45 +98,74 @@ foreach ($fields as $key => $v) {
             <?php
             $targetVal = isset($target['target_' . $key]) ? floatval($target['target_' . $key]) : 0;
             $avgVal = $averages[$key];
-            $hasil = ($avgVal !== '-' && $targetVal > 0) ? round(($avgVal / $targetVal) * 100, 1) : '-';
-            $color = ($hasil !== '-' && $hasil < 100) ? 'red' : 'black';
+
+            // Format hasil persentase
+            if ($avgVal !== '-' && $targetVal > 0) {
+                $hasilValue = round(($avgVal / $targetVal) * 100, 1);
+                $hasil = number_format($hasilValue, 1) . '%';
+                $color = $hasilValue < 100 ? 'red' : 'black';
+            } else {
+                $hasil = '-';
+                $color = 'black';
+            }
             ?>
             <tr>
                 <td><?= htmlspecialchars($label) ?></td>
                 <td><?= htmlspecialchars($unit) ?></td>
-                <td style="color: black; font-weight:bold;"><?= $targetVal ?: '-' ?></td>
-                <td style="color: <?= $color ?>;"><?= $avgVal ?></td>
-                <td style="color: <?= $color ?>; font-weight:bold;"><?= $hasil !== '-' ? $hasil . '%' : '-' ?></td>
+                <td style="color: black; font-weight:bold;">
+                    <?= $targetVal ? number_format($targetVal, 2) : '-' ?>
+                </td>
+                <td style="color: <?= $color ?>;">
+                    <?= $avgVal ?>
+                </td>
+                <td style="color: <?= $color ?>; font-weight:bold;">
+                    <?= $hasil ?>
+                </td>
 
                 <?php for ($d = 1; $d <= 31; $d++): ?>
                     <?php
                     $val = $data[$d][$key] ?? null;
                     $style = '';
+                    $displayVal = '-';
 
-                    if ($val !== null && $targetVal > 0) {
-                        if ($val < $targetVal) {
-                            $style = 'style="color:red;font-weight:bold"';
-                        } else {
-                            $style = 'style="color:black;"';
+                    if ($val !== null && $val != 0) {
+                        // Format semua nilai menjadi 2 digit
+                        $displayVal = number_format($val, 2);
+
+                        if ($targetVal > 0) {
+                            if ($val < $targetVal) {
+                                $style = 'style="color:red;font-weight:bold"';
+                            } else {
+                                $style = 'style="color:black;"';
+                            }
                         }
                     }
                     ?>
-                    <td <?= $style ?>><?= $val ?? '-' ?></td>
+                    <td <?= $style ?>><?= $displayVal ?></td>
                 <?php endfor; ?>
             </tr>
         <?php endforeach; ?>
 
         <tr class="table-warning">
-            <td colspan="5"><strong> Edit</strong></td>
+            <td colspan="5"><strong> Edit Data per Shift</strong></td>
             <?php for ($d = 1; $d <= 31; $d++): ?>
                 <td>
                     <?php if (isset($dataIds[$d])): ?>
-                        <a href="../dashboard/edit-harian.php?id=<?= $dataIds[$d] ?>"
-                            class="btn btn-sm btn-outline-primary"
-                            title="Edit semua data tanggal <?= date('d/m/Y', strtotime($dataFullTanggal[$d])) ?>"
-                            style="padding: 0.1rem 0.4rem; font-size: 0.75rem;">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
+                        <?php
+                        $ids = explode(',', $dataIds[$d]);
+                        if (count($ids) > 0):
+                        ?>
+                            <div class="btn-group-vertical btn-group-sm">
+                                <?php foreach ($ids as $index => $id): ?>
+                                    <a href="../dashboard/edit-harian.php?id=<?= $id ?>"
+                                        class="btn btn-outline-primary btn-sm mb-1"
+                                        title="Edit data shift"
+                                        style="padding: 0.1rem 0.4rem; font-size: 0.7rem;">
+                                        <i class="fas fa-edit"></i> Shift <?= $index + 1 ?>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
                     <?php else: ?>
                         <span class="text-muted">-</span>
                     <?php endif; ?>

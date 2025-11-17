@@ -5,6 +5,13 @@ $dbname = 'db_produksi_report';
 $username = 'root';
 $password = '';
 
+// FUNGSI UNTUK MENDAPATKAN DATA SHIFT
+function getMasterShift($pdo)
+{
+    $stmt = $pdo->query("SELECT * FROM master_shift ORDER BY jam_mulai");
+    return $stmt->fetchAll();
+}
+
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -13,10 +20,13 @@ try {
 }
 
 // Function helper
-function formatAngka($angka) {}
-
-
-
+function formatAngka($angka)
+{
+    if ($angka === null || $angka === '' || $angka == 0) {
+        return '-';
+    }
+    return number_format(floatval($angka), 2);
+}
 
 // FUNGSI UNTUK MENDAPATKAN DATA LINE PRODUKSI
 function getLineProduksi($pdo)
@@ -24,9 +34,6 @@ function getLineProduksi($pdo)
     $stmt = $pdo->query("SELECT * FROM line_produksi ORDER BY kode_line");
     return $stmt->fetchAll();
 }
-
-
-
 
 // FUNGSI UNTUK MENDAPATKAN DATA TARGET
 function getSemuaTarget($pdo)
@@ -44,9 +51,6 @@ function getSemuaTarget($pdo)
     return $stmt->fetchAll();
 }
 
-// FUNGSI UNTUK MENDAPATKAN DATA INPUT TARGET END
-
-
 // FUNGSI UNTUK MENDAPATKAN DATA INPUT HARIAN
 function getAllInputHarian($pdo)
 {
@@ -54,16 +58,38 @@ function getAllInputHarian($pdo)
         SELECT 
             ih.*,
             lp.kode_line,
-            lp.nama_line
+            lp.nama_line,
+            ms.kode_shift,
+            ms.nama_shift,
+            ms.jam_mulai,
+            ms.jam_selesai
         FROM input_harian ih
         JOIN line_produksi lp ON ih.line_id = lp.id
-        ORDER BY ih.tanggal DESC, lp.kode_line
+        LEFT JOIN master_shift ms ON ih.shift_id = ms.id
+        ORDER BY ih.tanggal DESC, lp.kode_line, ms.jam_mulai
     ";
     $stmt = $pdo->query($sql);
     return $stmt->fetchAll();
 }
-// FUNGSI UNTUK MENDAPATKAN DATA INPUT HARIAN END
 
+function getDataHarianByLine($pdo, $lineId)
+{
+    $stmt = $pdo->prepare("
+        SELECT 
+            ih.*,
+            lp.kode_line,
+            lp.nama_line,
+            ms.kode_shift,
+            ms.nama_shift
+        FROM input_harian ih
+        JOIN line_produksi lp ON ih.line_id = lp.id
+        LEFT JOIN master_shift ms ON ih.shift_id = ms.id
+        WHERE ih.line_id = ?
+        ORDER BY ih.tanggal DESC, ms.jam_mulai
+    ");
+    $stmt->execute([$lineId]);
+    return $stmt->fetchAll();
+}
 
 function showError($message)
 {
@@ -82,6 +108,7 @@ function showSuccess($message)
     </script>";
     exit();
 }
+
 function showSuccessTarget($message)
 {
     echo "<script>
@@ -91,25 +118,19 @@ function showSuccessTarget($message)
     exit();
 }
 
-function getDataHarianByLine($pdo, $lineId)
+function showErrorEdit($message)
 {
-    $stmt = $pdo->prepare("
-        SELECT 
-            ih.*,
-            lp.kode_line,
-            lp.nama_line
-        FROM input_harian ih
-        JOIN line_produksi lp ON ih.line_id = lp.id
-        WHERE ih.line_id = ?
-        ORDER BY ih.tanggal DESC
-    ");
-    $stmt->execute([$lineId]);
-    return $stmt->fetchAll();
+    echo "<script>
+        alert('Gagal mengupdate: ' + " . json_encode($message) . ");
+        window.location.href = '../dashboard/data-target.php';
+    </script>";
+    exit();
 }
 
+// =============================================
+// BAGIAN UNTUK DASHBOARD INDEX.PHP
+// =============================================
 
-
-// INDEX PROSES HARIAN
 // Ambil daftar line untuk dropdown
 $lines = getLineProduksi($pdo);
 
@@ -118,12 +139,25 @@ $selectedLine = $_GET['line'] ?? 1;
 $selectedMonth = $_GET['bulan'] ?? date('m');
 $selectedYear = $_GET['tahun'] ?? date('Y');
 
-// Ambil data input_harian sesuai filter
+// Ambil data input_harian sesuai filter (AGREGAT PER TANGGAL dari semua shift) - FIX DECIMAL
 $stmt = $pdo->prepare("
-    SELECT * FROM input_harian 
+    SELECT 
+        tanggal,
+        SUM(batch_count) as batch_count,
+        SUM(productivity) as productivity,
+        ROUND(AVG(production_speed), 2) as production_speed,
+        ROUND(AVG(batch_weight), 2) as batch_weight,
+        ROUND(AVG(operation_factor), 2) as operation_factor,
+        ROUND(AVG(cycle_time), 2) as cycle_time,
+        SUM(grade_change_sequence) as grade_change_sequence,
+        ROUND(AVG(grade_change_time), 2) as grade_change_time,
+        SUM(feed_raw_material) as feed_raw_material
+    FROM input_harian 
     WHERE line_id = ? 
     AND MONTH(tanggal) = ? 
     AND YEAR(tanggal) = ?
+    GROUP BY tanggal
+    ORDER BY tanggal
 ");
 $stmt->execute([$selectedLine, $selectedMonth, $selectedYear]);
 $dataHarian = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -143,7 +177,7 @@ foreach ($dataHarian as $row) {
     $perTanggal[$day] = $row;
 }
 
-// Hitung average per kolom
+// Hitung average per kolom (dari data agregat) dengan format 2 digit
 $fields = [
     'batch_count',
     'productivity',
@@ -161,15 +195,13 @@ foreach ($fields as $f) {
     $sum = 0;
     $count = 0;
     foreach ($dataHarian as $row) {
-        if (!empty($row[$f])) {
+        if (!empty($row[$f]) && $row[$f] != 0) {
             $sum += $row[$f];
             $count++;
         }
     }
-    $averages[$f] = $count > 0 ? round($sum / $count, 2) : 0;
+    $averages[$f] = $count > 0 ? number_format($sum / $count, 2) : 0;
 }
-
-
 
 // RANGKUMAN TAHUN INPUT HARIAN
 $lines = getLineProduksi($pdo);
@@ -186,18 +218,18 @@ $stmt = $pdo->prepare("
 $stmt->execute([$selectedLine, $selectedYear]);
 $target = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Ambil data harian selama 1 tahun untuk line & tahun yang dipilih
+// Ambil data harian selama 1 tahun untuk line & tahun yang dipilih - FIX DECIMAL
 $stmt = $pdo->prepare("
     SELECT 
         MONTH(tanggal) AS bulan,
         AVG(batch_count) AS avg_batch_count,
         AVG(productivity) AS avg_productivity,
-        AVG(production_speed) AS avg_production_speed,
-        AVG(batch_weight) AS avg_batch_weight,
-        AVG(operation_factor) AS avg_operation_factor,
-        AVG(cycle_time) AS avg_cycle_time,
+        ROUND(AVG(production_speed), 2) AS avg_production_speed,
+        ROUND(AVG(batch_weight), 2) AS avg_batch_weight,
+        ROUND(AVG(operation_factor), 2) AS avg_operation_factor,
+        ROUND(AVG(cycle_time), 2) AS avg_cycle_time,
         AVG(grade_change_sequence) AS avg_grade_change_sequence,
-        AVG(grade_change_time) AS avg_grade_change_time,
+        ROUND(AVG(grade_change_time), 2) AS avg_grade_change_time,
         AVG(feed_raw_material) AS avg_feed_raw_material
     FROM input_harian
     WHERE line_id = ? AND YEAR(tanggal) = ?
@@ -226,26 +258,16 @@ $fields = [
     'feed_raw_material' => ['Feed Raw Material', 'Kg/Day']
 ];
 
-// Hitung average tahunan dari data bulan
+// Hitung average tahunan dari data bulan dengan format 2 digit
 $averages = [];
 foreach ($fields as $f => $v) {
     $sum = 0;
     $count = 0;
     for ($m = 1; $m <= 12; $m++) {
-        if (!empty($bulanData[$m]['avg_' . $f])) {
+        if (!empty($bulanData[$m]['avg_' . $f]) && $bulanData[$m]['avg_' . $f] != 0) {
             $sum += $bulanData[$m]['avg_' . $f];
             $count++;
         }
     }
-    $averages[$f] = $count > 0 ? round($sum / $count, 2) : '-';
-}
-
-// Tambahkan fungsi helper ini di backend/config.php
-function showErrorEdit($message)
-{
-    echo "<script>
-        alert('Gagal mengupdate: ' + " . json_encode($message) . ");
-        window.location.href = '../dashboard/data-target.php';
-    </script>";
-    exit();
+    $averages[$f] = $count > 0 ? number_format($sum / $count, 2) : '-';
 }

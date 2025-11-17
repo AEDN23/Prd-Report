@@ -22,6 +22,10 @@
 07 - NOVEMBER - 2025
 - Tambah fitur edit input data harian ✅ 
 
+17 - NOVEMBER - 2025
+- INPUT PER SHIFT ✅
+- CHART LINE PER SHIFT ❌
+
 
 
 

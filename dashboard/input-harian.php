@@ -1,19 +1,18 @@
 <?php
-$page_title = "Input Harian";
+$page_title = "Input Harian Per Shift";
 include '../layout/header.php';
 
 // Get data for dropdowns
 $lines = getLineProduksi($pdo);
+$shifts = getMasterShift($pdo);
 
 // Get today's date for default value
 $today = date('Y-m-d');
 ?>
 
 <div class="container">
-
     <main>
-        <?php
-        if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+        <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
             <div class="alert alert-success">
                 ✅ Data berhasil disimpan!
             </div>
@@ -26,7 +25,7 @@ $today = date('Y-m-d');
                     $errorMsg = '⚠️ Semua field wajib diisi!';
                     break;
                 case '2':
-                    $errorMsg = '⚠️ Data untuk tanggal dan line ini sudah ada. Silakan ubah tanggal atau line.';
+                    $errorMsg = '⚠️ Data untuk tanggal, line, dan shift ini sudah ada.';
                     break;
                 case 'db':
                     $errorMsg = '❌ Terjadi kesalahan pada database. Silakan coba lagi.';
@@ -40,9 +39,9 @@ $today = date('Y-m-d');
             </div>
         <?php endif; ?>
 
-
         <div class="form-container">
             <form action="../backend/proses-harian.php" method="POST" id="formHarian">
+                <input type="hidden" name="action" value="create"> <!-- INI YANG DITAMBAH -->
                 <div class="form-section">
                     <h2 class="calendar-icon">Periode Data</h2>
                     <div class="form-row">
@@ -65,51 +64,52 @@ $today = date('Y-m-d');
                             </label>
                             <select id="line_id" name="line_id" required>
                                 <option value="">-- Pilih Line --</option>
-                                <?php
-                                if (!empty($lines)) {
-                                    foreach ($lines as $line):
-                                ?>
-                                        <option value="<?= $line['id'] ?>">
-                                            <?= htmlspecialchars($line['kode_line']) ?> - <?= htmlspecialchars($line['nama_line']) ?>
-                                        </option>
-                                <?php
-                                    endforeach;
-                                } else {
-                                    echo '<option value="">-- Data line tidak tersedia --</option>';
-                                }
-                                ?>
+                                <?php foreach ($lines as $line): ?>
+                                    <option value="<?= $line['id'] ?>">
+                                        <?= htmlspecialchars($line['kode_line']) ?> - <?= htmlspecialchars($line['nama_line']) ?>
+                                    </option>
+                                <?php endforeach; ?>
                             </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="shift_id">
+                                Shift
+                                <span class="required">*</span>
+                            </label>
+                            <select id="shift_id" name="shift_id" required>
+                                <option value="">-- Pilih Shift --</option>
+                                <?php foreach ($shifts as $shift): ?>
+                                    <option value="<?= $shift['id'] ?>"
+                                        data-start="<?= $shift['jam_mulai'] ?>"
+                                        data-end="<?= $shift['jam_selesai'] ?>">
+                                        <?= htmlspecialchars($shift['kode_shift']) ?> - <?= htmlspecialchars($shift['nama_shift']) ?>
+                                        (<?= substr($shift['jam_mulai'], 0, 5) ?> - <?= substr($shift['jam_selesai'], 0, 5) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <small class="form-help" id="shift-time-display"></small>
                         </div>
                     </div>
                 </div>
 
+
+
+                <!-- Data Produksi Section (sama seperti sebelumnya) -->
                 <div class="form-section">
                     <h2 class="production-icon">Data Produksi</h2>
-
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="batch_count">
-                                Batch Count
-                                <span class="required">*</span>
-                            </label>
-                            <input type="number" id="batch_count" name="batch_count"
-                                step="0.01" min="0" required
-                                value="">
-                            <small class="form-help">Jumlah batch hari ini</small>
+                            <label for="batch_count">Batch Count <span class="required">*</span></label>
+                            <input type="number" id="batch_count" name="batch_count" step="0.01" min="0" required>
+                            <small class="form-help">Jumlah batch shift ini</small>
                         </div>
-
                         <div class="form-group">
-                            <label for="productivity">
-                                Productivity
-                                <span class="required">*</span>
-                            </label>
-                            <input type="number" id="productivity" name="productivity"
-                                step="0.01" min="0" required
-                                value="">
+                            <label for="productivity">Productivity <span class="required">*</span></label>
+                            <input type="number" id="productivity" name="productivity" step="0.01" min="0" required>
                             <small class="form-help">Ton per shift</small>
                         </div>
                     </div>
-
                     <div class="form-row">
                         <div class="form-group">
                             <label for="production_speed">
@@ -197,26 +197,48 @@ $today = date('Y-m-d');
                         <small class="form-help">Kg material yang dipakai hari ini</small>
                     </div>
                 </div>
+                <div class="form-section">
+                    <h2 class="material-icon">Informasi Tambahan</h2>
+                    <div class="form-group">
+                        <textarea id="keterangan" name="keterangan" rows="3"
+                            placeholder="Catatan tambahan untuk shift ini..."
+                            style="width: 100%; box-sizing: border-box;"></textarea>
+                    </div>
+                </div>
 
-                <!-- Di bagian form-actions, tambahkan link ke data harian -->
+
+
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary btn-large">
-                        💾 Simpan Data
+                        💾 Simpan Data Shift
                     </button>
-                    <a href="data-harian.php" class="btn btn-secondary">📋 Lihat & Edit Data</a>
                     <a href="index.php" class="btn btn-secondary">❌ Batal</a>
                 </div>
             </form>
         </div>
-
     </main>
 </div>
 
 <script>
-    // Cek data existing
+    // Tampilkan info jam shift
+    document.getElementById('shift_id').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const startTime = selectedOption.getAttribute('data-start');
+        const endTime = selectedOption.getAttribute('data-end');
+        const display = document.getElementById('shift-time-display');
+
+        if (startTime && endTime) {
+            display.textContent = `Jam operasional: ${startTime.substring(0,5)} - ${endTime.substring(0,5)}`;
+        } else {
+            display.textContent = '';
+        }
+    });
+
+    // Cek data existing per shift
     document.addEventListener('DOMContentLoaded', function() {
         const tanggalInput = document.getElementById('tanggal');
         const lineSelect = document.getElementById('line_id');
+        const shiftSelect = document.getElementById('shift_id');
         const warningDiv = document.createElement('div');
         warningDiv.className = 'alert alert-warning';
         warningDiv.style.display = 'none';
@@ -228,15 +250,16 @@ $today = date('Y-m-d');
         function cekDataExist() {
             const tanggal = tanggalInput.value;
             const lineId = lineSelect.value;
+            const shiftId = shiftSelect.value;
 
-            if (tanggal && lineId) {
-                fetch(`../backend/cek-data-harian.php?tanggal=${tanggal}&line_id=${lineId}`)
+            if (tanggal && lineId && shiftId) {
+                fetch(`../backend/cek-data-harian.php?tanggal=${tanggal}&line_id=${lineId}&shift_id=${shiftId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.exists) {
                             warningDiv.style.display = 'block';
                             warningDiv.innerHTML =
-                                `⚠️ Data untuk ${data.tanggal} - ${data.line} sudah ada.`;
+                                `⚠️ Data untuk ${data.tanggal} - ${data.line} - ${data.shift} sudah ada.`;
                         } else {
                             warningDiv.style.display = 'none';
                         }
@@ -251,8 +274,7 @@ $today = date('Y-m-d');
 
         tanggalInput.addEventListener('change', cekDataExist);
         lineSelect.addEventListener('change', cekDataExist);
+        shiftSelect.addEventListener('change', cekDataExist);
     });
 </script>
-<?php
-include '../layout/footer.php';
-?>
+<?php include '../layout/footer.php'; ?>
