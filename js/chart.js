@@ -65,6 +65,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const label = datasetLabels[currentDataset];
       const labels = Array.from({ length: 31 }, (_, i) => i + 1);
 
+      // 🔍 Debug data
+      debugAggregatedData(rows, `Line ${lineId === 1 ? "A" : "B"}`);
+
       const dataMap = {};
       rows.forEach((r) => {
         dataMap[parseInt(r.hari)] = parseFloat(r[key]) || 0;
@@ -78,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
           : 0;
 
       const datasetBars = {
-        label: `${label}`,
+        label: `${label} (Agregat Shift)`,
         data: values,
         backgroundColor: warna[lineId % warna.length] + "88",
         borderColor: warna[lineId % warna.length],
@@ -111,51 +114,45 @@ document.addEventListener("DOMContentLoaded", () => {
             title: {
               display: true,
               text: [
-                `📊 ${label} -  Line ${
+                `📊 ${label} - Line ${
                   lineId === 1 ? "A" : "B"
                 } (${bulan}/${tahun})`,
+                `📋 Data: Agregat dari 3 Shift`,
               ],
               font: { size: 16 },
-              color: "#000000", // warna default teks
+              color: "#000000",
             },
             subtitle: {
               display: true,
               text: `==================🎯 Target: ${targetVal} ==================`,
-              color: "#FF0000", // warna merah
+              color: "#FF0000",
               font: { size: 16 },
               padding: { top: 5 },
             },
-            // TOMBOL LEGEND (FILTER DATA LINE A ATAU TARGET)
             legend: {
               position: "top",
               labels: { boxWidth: 40 },
               font: { size: 14 },
             },
+            tooltip: {
+              callbacks: {
+                afterTitle: function (tooltipItems) {
+                  return "📅 Nilai harian (total 3 shift)";
+                },
+              },
+            },
           },
-          // SCALE AXIS SUMBU X Y
           scales: {
-            y: { beginAtZero: true },
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: `${label} (Total Harian)`,
+              },
+            },
             x: {
               title: { display: true, text: "Hari (1–31)" },
               color: "#000000",
-              // ========================================================
-              // Menambahkan label tambahan untuk menampilkan result
-              // ========================================================
-              // ticks: {
-              //   callback: function (val, index) {
-              //     const day = labels[index];
-              //     color: "#F4F754";
-              //     const resultValue = dataMap[day];
-              //     return [
-              //       day,
-              //       resultValue !== undefined
-              //         ? resultValue.toFixed(1) + ""
-              //         : "",
-              //     ];
-              //   },
-              // },
-              // ========================================================
-              // ========================================================
             },
           },
         },
@@ -277,7 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
         labels: bulanLabels,
         datasets: [
           {
-            label: `${metric.label}`,
+            label: `${metric.label} (Agregat Shift)`,
             data: produksiData,
             backgroundColor: warna + "88",
             borderColor: warna,
@@ -302,41 +299,44 @@ document.addEventListener("DOMContentLoaded", () => {
         plugins: {
           title: {
             display: true,
-            text: `📘 ${lineName} — ${metric.label} (${tahun})`,
+            text: [
+              `📘 ${lineName} — ${metric.label} (${tahun})`,
+              `📋 Data: Rata-rata bulanan dari agregat shift`,
+            ],
             font: { size: 16 },
-            color: "#000000", // warna hitam buat judul utama
+            color: "#000000",
           },
           subtitle: {
             display: true,
             text: `====================== Target: ${targetValue} ======================`,
-            color: "#FF0000", // 🎯 warna merah untuk target
+            color: "#FF0000",
             font: { size: 16 },
             padding: { top: 5 },
           },
-          legend: { position: "top" },
+          legend: {
+            position: "top",
+            labels: {
+              font: { size: 12 },
+            },
+          },
+          tooltip: {
+            callbacks: {
+              afterTitle: function (tooltipItems) {
+                return "📅 Nilai bulanan (rata-rata dari agregat shift)";
+              },
+            },
+          },
         },
-
         scales: {
-          y: { beginAtZero: true },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: `${metric.label} (Agregat)`,
+            },
+          },
           x: {
             title: { display: true, text: `Tahun ${tahun}` },
-
-            // ========================================================
-            // Menambahkan label tambahan untuk menampilkan result
-            // ========================================================
-            // ticks: {
-            //   callback: function (val, index) {
-            //     const monthName = bulanLabels[index];
-            //     const resultValue = produksiData[index];
-            //     return [
-            //       monthName,
-            //       resultValue !== undefined ? resultValue.toFixed(1) + "" : "",
-            //     ];
-            //   },
-            // },
-            // ========================================================
-            // Menambahkan label tambahan untuk menampilkan result END
-            // ========================================================
           },
         },
       },
@@ -428,7 +428,249 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ============================================================================
-// 🧾 Fungsi Export PDF (dipakai semua chart)
+// 🔄 FUNGSI AGREGAT DATA SHIFT (UNTUK CHART YANG SUDAH ADA)
+// ============================================================================
+
+// Fungsi ini memastikan data dari backend sudah di-agregat dengan benar
+function validateAggregatedData(rows, key) {
+  console.log(`🔍 Validating aggregated data for ${key}:`, rows);
+
+  // Cek jika ada data duplikat hari (harusnya sudah di-agregat oleh backend)
+  const dayMap = {};
+  rows.forEach((row) => {
+    const hari = parseInt(row.hari);
+    if (dayMap[hari]) {
+      console.warn(`⚠️ Duplicate data found for day ${hari}`);
+    }
+    dayMap[hari] = true;
+  });
+
+  return rows;
+}
+
+// ============================================================================
+// 📊 CHART BULANAN DENGAN DATA AGREGAT SHIFT (MODIFIKASI RINGAN)
+// ============================================================================
+
+// 🎨 Render chart dengan garis target - MODIFIED FOR SHIFT DATA
+function renderChartWithShiftAggregate(
+  rows,
+  targetData,
+  key,
+  label,
+  labels,
+  ctx,
+  lineId,
+  bulan,
+  tahun
+) {
+  // Validasi data agregat
+  const validatedRows = validateAggregatedData(rows, key);
+
+  const dataMap = {};
+  validatedRows.forEach((r) => {
+    dataMap[parseInt(r.hari)] = parseFloat(r[key]) || 0;
+  });
+
+  const values = labels.map((hari) => dataMap[hari] || 0);
+  const targetKey = `target_${key}`;
+  const targetVal =
+    targetData && targetData[targetKey] !== undefined
+      ? parseFloat(targetData[targetKey])
+      : 0;
+
+  const datasetBars = {
+    label: `${label} (Agregat Shift)`,
+    data: values,
+    backgroundColor: warna[lineId % warna.length] + "88",
+    borderColor: warna[lineId % warna.length],
+    borderWidth: 1.5,
+  };
+
+  const datasetTargetLine = {
+    label: `🎯 Target ${label}`,
+    data: Array(31).fill(targetVal),
+    type: "line",
+    borderColor: "#ff0000",
+    borderWidth: 2,
+    borderDash: [6, 4],
+    pointRadius: 0,
+    fill: false,
+  };
+
+  if (ctx.chartInstance) ctx.chartInstance.destroy();
+
+  ctx.chartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [datasetBars, datasetTargetLine],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: [
+            `📊 ${label} - Line ${
+              lineId === 1 ? "A" : "B"
+            } (${bulan}/${tahun})`,
+            `📋 Data: Agregat dari 3 Shift`,
+          ],
+          font: { size: 16 },
+          color: "#000000",
+        },
+        subtitle: {
+          display: true,
+          text: `==================🎯 Target: ${targetVal} ==================`,
+          color: "#FF0000",
+          font: { size: 16 },
+          padding: { top: 5 },
+        },
+        legend: {
+          position: "top",
+          labels: { boxWidth: 40 },
+          font: { size: 14 },
+        },
+        tooltip: {
+          callbacks: {
+            afterTitle: function (tooltipItems) {
+              return "📅 Nilai harian (total 3 shift)";
+            },
+          },
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: `${label} (Total Harian)`,
+          },
+        },
+        x: {
+          title: { display: true, text: "Hari (1–31)" },
+          color: "#000000",
+        },
+      },
+    },
+  });
+}
+
+// ============================================================================
+// 📅 CHART TAHUNAN DENGAN DATA AGREGAT SHIFT
+// ============================================================================
+
+// 🔧 GENERIC RENDER CHART - MODIFIED FOR SHIFT DATA
+function renderChartWithShiftAggregateAnnual({
+  ctx,
+  data,
+  metric,
+  warna,
+  lineName,
+  tahun,
+}) {
+  const dataBulan = data.bulanData || {};
+  const targetData = data.target || {};
+
+  const produksiData = bulanLabels.map((_, i) => {
+    const bulan = i + 1;
+    const avgKey = `avg_${metric.key}`;
+    return dataBulan[bulan] && dataBulan[bulan][avgKey] !== undefined
+      ? parseFloat(dataBulan[bulan][avgKey])
+      : 0;
+  });
+
+  const targetKey = `target_${metric.key}`;
+  const targetValue =
+    targetData && targetData[targetKey] !== undefined
+      ? parseFloat(targetData[targetKey])
+      : 0;
+
+  // Hapus chart lama
+  if (ctx.chartInstance) ctx.chartInstance.destroy();
+
+  ctx.chartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: bulanLabels,
+      datasets: [
+        {
+          label: `${metric.label} (Agregat Shift)`,
+          data: produksiData,
+          backgroundColor: warna + "88",
+          borderColor: warna,
+          borderWidth: 1.5,
+          borderRadius: 4,
+        },
+        {
+          label: `🎯 Target ${metric.label}`,
+          data: Array(12).fill(targetValue),
+          type: "line",
+          borderColor: "#ff0000",
+          borderWidth: 2,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          fill: false,
+        },
+      ],
+    },
+    responsive: true,
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: [
+            `📘 ${lineName} — ${metric.label} (${tahun})`,
+            `📋 Data: Rata-rata bulanan dari agregat shift`,
+          ],
+          font: { size: 16 },
+          color: "#000000",
+        },
+        subtitle: {
+          display: true,
+          text: `====================== Target: ${targetValue} ======================`,
+          color: "#FF0000",
+          font: { size: 16 },
+          padding: { top: 5 },
+        },
+        legend: {
+          position: "top",
+          labels: {
+            font: { size: 12 },
+          },
+        },
+        tooltip: {
+          callbacks: {
+            afterTitle: function (tooltipItems) {
+              return "📅 Nilai bulanan (rata-rata dari agregat shift)";
+            },
+          },
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: `${metric.label} (Agregat)`,
+          },
+        },
+        x: {
+          title: {
+            display: true,
+            text: `Tahun ${tahun}`,
+          },
+        },
+      },
+    },
+  });
+}
+
+// ============================================================================
+// 🧾 FUNGSI EXPORT PDF (TETAP SAMA)
 // ============================================================================
 // function exportChartPDF(canvasId, title) {
 //   const { jsPDF } = window.jspdf;
@@ -439,3 +681,26 @@ document.addEventListener("DOMContentLoaded", () => {
 //   pdf.addImage(imgData, "PNG", 10, 25, 190, 100);
 //   pdf.save(`${title}.pdf`);
 // }
+
+// ============================================================================
+// 🔍 DEBUG FUNCTION - UNTUK CEK DATA AGREGAT
+// ============================================================================
+function debugAggregatedData(rows, lineName) {
+  console.log(`🔍 Debug data agregat untuk ${lineName}:`, rows);
+
+  const dailyTotals = {};
+  rows.forEach((row) => {
+    const hari = row.hari;
+    if (!dailyTotals[hari]) {
+      dailyTotals[hari] = [];
+    }
+    dailyTotals[hari].push({
+      batch_count: row.batch_count,
+      productivity: row.productivity,
+      production_speed: row.production_speed,
+      feed_raw_material: row.feed_raw_material,
+    });
+  });
+
+  console.log(`📊 Summary ${lineName}:`, dailyTotals);
+}

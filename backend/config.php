@@ -271,3 +271,59 @@ foreach ($fields as $f => $v) {
     }
     $averages[$f] = $count > 0 ? number_format($sum / $count, 2) : '-';
 }
+
+// =============================================
+// FUNGSI UNTUK MENDAPATKAN DATA RATA-RATA HARIAN DARI SHIFT
+// =============================================
+function getDailyAverageFromShifts($pdo, $lineId, $bulan, $tahun)
+{
+    $stmt = $pdo->prepare("
+        SELECT 
+            DAY(tanggal) AS hari,
+            AVG(batch_count) AS avg_batch_count,
+            AVG(productivity) AS avg_productivity,
+            AVG(production_speed) AS avg_production_speed,
+            AVG(batch_weight) AS avg_batch_weight,
+            AVG(operation_factor) AS avg_operation_factor,
+            AVG(cycle_time) AS avg_cycle_time,
+            AVG(grade_change_sequence) AS avg_grade_change_sequence,
+            AVG(grade_change_time) AS avg_grade_change_time,
+            AVG(feed_raw_material) AS avg_feed_raw_material
+        FROM input_harian
+        WHERE line_id = ? AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?
+        GROUP BY hari
+        ORDER BY hari
+    ");
+    $stmt->execute([$lineId, $bulan, $tahun]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// FUNGSI UNTUK MENDAPATKAN DATA PER SHIFT (DETAIL)
+function getShiftData($pdo, $lineId, $bulan, $tahun)
+{
+    $stmt = $pdo->prepare("
+        SELECT 
+            DAY(tanggal) AS hari,
+            shift_id,
+            ms.kode_shift,
+            ms.nama_shift,
+            batch_count,
+            productivity,
+            production_speed,
+            batch_weight,
+            operation_factor,
+            cycle_time,
+            grade_change_sequence,
+            grade_change_time,
+            feed_raw_material
+        FROM input_harian ih
+        LEFT JOIN master_shift ms ON ih.shift_id = ms.id
+        WHERE line_id = ? AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?
+        ORDER BY hari, ms.jam_mulai
+    ");
+    $stmt->execute([$lineId, $bulan, $tahun]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+// =============================================
+// AKHIR FUNGSI UNTUK MENDAPATKAN DATA RATA-RATA HARIAN DARI SHIFT
+// =============================================

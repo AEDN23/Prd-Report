@@ -113,7 +113,12 @@ document.addEventListener("DOMContentLoaded", () => {
             title: {
               display: true,
               // Menggabungkan label dan target ke dalam title
-              text: [`📊 ${label} - Line ${lineId === 1 ? "A" : "B"} (${bulan}/${tahun})`, `Target: ${targetVal}`],
+              text: [
+                `📊 ${label} - Line ${
+                  lineId === 1 ? "A" : "B"
+                } (${bulan}/${tahun})`,
+                `Target: ${targetVal}`,
+              ],
               font: { size: 16 },
             },
             legend: {
@@ -123,16 +128,21 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           scales: {
             y: { beginAtZero: true },
-            x: { 
+            x: {
               title: { display: true, text: "Hari (1–31)" },
               // Menambahkan label tambahan untuk menampilkan result
               ticks: {
-                callback: function(val, index) {
+                callback: function (val, index) {
                   const day = labels[index];
                   const resultValue = dataMap[day];
-                  return [day, resultValue !== undefined ? resultValue.toFixed(1) + '' : ''];
-                }
-              }
+                  return [
+                    day,
+                    resultValue !== undefined
+                      ? resultValue.toFixed(1) + ""
+                      : "",
+                  ];
+                },
+              },
             },
           },
         },
@@ -280,23 +290,29 @@ document.addEventListener("DOMContentLoaded", () => {
           title: {
             display: true,
             // Menggabungkan label dan target ke dalam title
-            text: [`📘 ${lineName} — ${metric.label} (${tahun})`, `Target: ${targetValue}`],
+            text: [
+              `📘 ${lineName} — ${metric.label} (${tahun})`,
+              `Target: ${targetValue}`,
+            ],
             font: { size: 16 },
           },
           legend: { position: "top" },
         },
         scales: {
           y: { beginAtZero: true },
-          x: { 
+          x: {
             title: { display: true, text: "Bulan" },
             // Menambahkan label tambahan untuk menampilkan result
             ticks: {
-                callback: function(val, index) {
-                  const monthName = bulanLabels[index];
-                  const resultValue = produksiData[index];
-                  return [monthName, resultValue !== undefined ? resultValue.toFixed(1) + '' : ''];
-                }
-            }
+              callback: function (val, index) {
+                const monthName = bulanLabels[index];
+                const resultValue = produksiData[index];
+                return [
+                  monthName,
+                  resultValue !== undefined ? resultValue.toFixed(1) + "" : "",
+                ];
+              },
+            },
           },
         },
       },
@@ -399,8 +415,8 @@ function exportChartPDF(canvasId, title) {
   // Dapatkan tanggal saat ini
   const today = new Date();
   const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0'); // Bulan dimulai dari 0
-  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, "0"); // Bulan dimulai dari 0
+  const day = String(today.getDate()).padStart(2, "0");
   const dateString = `${year}-${month}-${day}`; // Format YYYY-MM-DD
 
   pdf.text(title, 15, 15);
@@ -428,12 +444,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-
 // ==============================
 // 📊 SCRIPT UNTUK EXPOR PDF
 // ==============================
 document.addEventListener("DOMContentLoaded", () => {
-  const exportBtn = document.getElementById("exportPDF"); 
+  const exportBtn = document.getElementById("exportPDF");
   const chartCanvas = document.getElementById("myChart");
 
   exportBtn.addEventListener("click", async () => {
@@ -554,4 +569,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-

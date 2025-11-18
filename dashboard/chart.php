@@ -129,7 +129,7 @@ $page_title = "Halaman chart"
                 <br>
 
 
-                <script src="../js/chart.js"></script>
+                <!-- <script src="../js/chart.js"></script> -->
                 <link href="../css/ind.css" rel="stylesheet">
                 <style>
                     /* ===== Sticky Navbar ===== */
@@ -327,12 +327,22 @@ $page_title = "Halaman chart"
             "productivity",
             "production_speed",
             "feed_raw_material",
+            "batch_weight",
+            "operation_factor",
+            "cycle_time",
+            "grade_change_sequence",
+            "grade_change_time",
         ];
         const datasetLabels = [
             "Batch Count",
             "Productivity",
             "Production Speed",
             "Feed Raw Material",
+            "Batch Weight",
+            "Operation Factor",
+            "Cycle Time",
+            "Grade Change Sequence",
+            "Grade Change Time",
         ];
 
         let currentDataset = 0; // 🔁 sinkronisasi global antar line
@@ -509,10 +519,10 @@ $page_title = "Halaman chart"
         // ========================================================================
         // 🔄 AUTO REFRESH SINKRON SETIAP 5 DETIK (ganti dataset otomatis)
         // ========================================================================
-        setInterval(() => {
-            currentDataset = (currentDataset + 1) % datasetKeys.length;
-            refreshAllBulananCharts();
-        }, 5000); // GANTI DATASET SETIAP 5 DETIK
+        // setInterval(() => {
+        //     currentDataset = (currentDataset + 1) % datasetKeys.length;
+        //     refreshAllBulananCharts();
+        // }, 5000); // GANTI DATASET SETIAP 5 DETIK
 
 
         // ============================================================================
@@ -703,10 +713,10 @@ $page_title = "Halaman chart"
         document.getElementById('tahunFilterTahunan')?.addEventListener('change', loadTahunanCharts);
 
         // auto rotate metric tiap 5 detik (tahunan)
-        setInterval(() => {
-            currentMetric = (currentMetric + 1) % metrics.length;
-            loadTahunanCharts();
-        }, 5000);
+        // setInterval(() => {
+        //     currentMetric = (currentMetric + 1) % metrics.length;
+        //     loadTahunanCharts();
+        // }, 5000);
 
         // load pertama kali
         refreshAllBulananCharts();

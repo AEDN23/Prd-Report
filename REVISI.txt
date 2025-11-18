@@ -26,6 +26,10 @@
 - INPUT PER SHIFT ✅
 - CHART LINE PER SHIFT ❌
 
+18 - NOVEMBER - 2025
+- Export EXCEL TABEL NYA (Saat di export hanya muncul nilai terkahir di input)
+- Chart line perbandingan per SHIFT
+
 
 
 
