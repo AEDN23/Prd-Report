@@ -1,6 +1,7 @@
 <?php
 $page_title = "Halaman Utama";
 include '../layout/header.php';
+include '../layout/sidebar.php';
 ?>
 <script src="../js/dash.js"></script>
 

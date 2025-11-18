@@ -1,6 +1,7 @@
 <?php
 $page_title = "Edit Target Produksi";
 include '../layout/header.php';
+include '../layout/sidebar.php';
 
 require_once '../backend/config.php';
 

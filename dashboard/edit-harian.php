@@ -1,6 +1,7 @@
 <?php
 $page_title = "Edit Data Harian";
 include '../layout/header.php';
+include '../layout/sidebar.php';
 
 $id = $_GET['id'] ?? 0;
 

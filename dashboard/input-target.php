@@ -1,7 +1,9 @@
 <?php
 $page_title = "Input Target Produksi";
 include '../layout/header.php';
+include '../layout/sidebar.php';
 ?>
+
 
 <script>
     $(document).ready(function() {

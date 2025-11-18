@@ -1,6 +1,7 @@
 <?php
 $page_title = "INFORMASI";
 include '../layout/header.php';
+include '../layout/sidebar.php';
 ?>
 
 <div class="container-fluid">

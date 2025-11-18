@@ -1,6 +1,7 @@
 <?php
 $page_title = "Data Harian per Shift";
 include '../layout/header.php';
+include '../layout/sidebar.php';
 
 // Get all data with shift information
 $dataHarian = getAllInputHarian($pdo);

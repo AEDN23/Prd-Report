@@ -1,6 +1,7 @@
 <?php
-$page_title = "Input Harian Per Shift";
+$page_title = "Input Harian";
 include '../layout/header.php';
+include '../layout/sidebar.php';
 
 // Get data for dropdowns
 $lines = getLineProduksi($pdo);

@@ -1,6 +1,7 @@
 <?php
 $page_title = "Input Info";
 include '../layout/header.php';
+include '../layout/sidebar.php';
 ?>
 
 <div class="form-container">
