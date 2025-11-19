@@ -19,12 +19,9 @@ $page_title = "Halaman chart"
     <link rel="stylesheet" href="../css/style.css">
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    <script src="../js/script.js"></script>
-    <script src="../js/export.js"></script>
 </head>
 
 <?php
@@ -32,7 +29,6 @@ include '../layout/sidebar.php';
 ?>
 
 
-<!-- <script src="../js/chart.js"></script> -->
 <link href="../css/ind.css" rel="stylesheet">
 
 
@@ -44,11 +40,10 @@ include '../layout/sidebar.php';
             <!-- =========================================================================================================================================-->
 
             <!-- FILTER CHART BULANAN -->
-            <form id="filter-chart-bulanan" class="row g-3 mb-3">
+            <form id="filter-chart-bulanan-pershift" class="row g-3 mb-3">
                 <div class="col-md-2">
                     <label class="form-label">Bulan</label>
-                    <!-- ganti id jadi bulanFilter supaya tidak bentrok -->
-                    <select id="bulanFilter" name="bulan" class="form-select">
+                    <select id="bulanFilterPershift" name="bulan" class="form-select">
                         <?php for ($m = 1; $m <= 12; $m++): ?>
                             <option value="<?= $m ?>" <?= $m == date('n') ? 'selected' : '' ?>>
                                 <?= date('F', mktime(0, 0, 0, $m, 10)) ?>
@@ -58,8 +53,7 @@ include '../layout/sidebar.php';
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Tahun</label>
-                    <!-- ganti id jadi tahunFilterBulanan supaya unik -->
-                    <input id="tahunFilterBulanan" type="number" name="tahun" value="<?= date('Y') ?>" class="form-control">
+                    <input id="tahunFilterBulananPershift" type="number" name="tahun" value="<?= date('Y') ?>" class="form-control">
                 </div>
             </form>
             <!-- FILTER CHART BULANAN -->
@@ -67,7 +61,7 @@ include '../layout/sidebar.php';
 
 
             <!-- ========================== LINE A BULANAN =========================== -->
-            <section id="chart-bar-bulanan-LINEA" style="height: 100vh;" class="mb-5">
+            <section id="chart-bar-bulanan-LINEA-pershift" style="height: 100vh;" class="mb-5">
                 <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE A</h6>
                 <div class="chart-container">
                     <div class="chart-toolbar mb-2">
@@ -81,71 +75,22 @@ include '../layout/sidebar.php';
             </section>
 
             <!-- ========================== LINE B BULANAN =========================== -->
-            <section id="chart-bar-bulanan-LINEB" class="mb-5" style="height: 100vh">
+            <section id="chart-bar-bulanan-LINEB-pershift" class="mb-5" style="height: 100vh">
                 <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE B</h6>
                 <div class="chart-container">
                     <div class="chart-toolbar mb-2">
                         <button id="prevBarB" class="btn btn-sm btn-secondary">◀ Prev</button>
                         <button id="nextBarB" class="btn btn-sm btn-primary">Next ▶</button>
                         <button class="btn btn-sm btn-danger exportChartPDF">Export PDF</button>
-
-
                     </div>
                     <canvas id="BarChartB" style="width:100%; height:85vh;"></canvas>
                 </div>
             </section>
-
-            <!-- =========================================================================================================================================-->
-            <!-- 📅 CHART TAHUNAN PER LINE A  DAN B-->
-            <!-- =========================================================================================================================================-->
-
-            <!-- FILTER CHART TAHUNAN-->
-            <form id="filter-chart-tahunan" class="row g-3 mb-3">
-                <div class="col-md-2">
-                    <label class="form-label">Tahun</label>
-                    <!-- gunakan id tahunFilterTahunan supaya unik -->
-                    <input id="tahunFilterTahunan" type="number" name="tahun" value="<?= date('Y') ?>" class="form-control">
-                </div>
-            </form>
-            <!-- FILTER CHART TAHUNAN -->
-
-            <!-- ========================== LINE A TAHUNAN =========================== -->
-            <section id="chart-tahunan-LINEA" style="height: 100vh;">
-                <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI LINE-A (TAHUNAN)</h6>
-                <div class="chart-container">
-                    <div class="chart-toolbar">
-                        <button id="prevTahunan" class="btn btn-sm btn-secondary">◀ Prev</button>
-                        <button id="nextTahunan" class="btn btn-sm btn-primary">Next ▶</button>
-
-                        <button class="btn btn-sm btn-danger exportChartPDF">Export PDF</button>
-
-                    </div>
-                    <canvas id="BarCharttahunan" style="width:100%; height:85vh;"></canvas>
-                </div>
-            </section>
-
-            <!-- ========================== LINE B TAHUNAN =========================== -->
-            <section id="chart-tahunan-LINEB" style="height: 100vh;">
-                <hr>
-                <h6 class="fw-bold text-primary mb-3">📅 CHART PRODUKSI LINE-B (TAHUNAN)</h6>
-                <div class="chart-container">
-                    <div class="chart-toolbar">
-                        <button id="prevTahunanB" class="btn btn-sm btn-secondary">◀ Prev</button>
-                        <button id="nextTahunanB" class="btn btn-sm btn-primary">Next ▶</button>
-                        <button class="btn btn-sm btn-danger exportChartPDF">Export PDF</button>
-
-                    </div>
-                    <canvas id="BarCharttahunanLINEB" style="width:100%; height:85vh;"></canvas>
-                </div>
-            </section>
-
-
         </div> <!-- end card-body -->
     </div> <!-- end card -->
 </div> <!-- end container -->
 </div>
 <!-- End of Footer -->
-
 </div>
 <!-- End of Content Wrapper -->
 
@@ -162,9 +107,626 @@ include '../layout/sidebar.php';
 <script src="../js/sb-admin-2.min.js"></script>
 
 <!-- Page level plugins -->
-<script src="../vendor/chart.js/Chart.min.js"></script>
-<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
-
 </body>
 
 </html>
+<script>
+    // SCRIPT UNTUK CHART BAR BULANAN PERSHIFT - AUTO REFRESH FIXED
+
+    // ============================================================================
+    // 📊 GLOBAL VARIABLES DAN FUNCTIONS
+    // ============================================================================
+    let currentDatasetA = 0;
+    let currentDatasetB = 0;
+
+    const datasetKeys = [
+        "batch_count", "productivity", "production_speed", "feed_raw_material",
+        "batch_weight", "operation_factor", "cycle_time", "grade_change_sequence", "grade_change_time"
+    ];
+
+    const datasetLabels = [
+        "Batch Count", "Productivity", "Production Speed", "Feed Raw Material",
+        "Batch Weight", "Operation Factor", "Cycle Time", "Grade Change Sequence", "Grade Change Time"
+    ];
+
+    // ============================================================================
+    // 📊 CHART BAR BULANAN PER SHIFT - LINE A
+    // ============================================================================
+    function initializeChartA() {
+        const ctxA = document.getElementById("BarChartA").getContext("2d");
+        const bulanFilter = document.getElementById("bulanFilterPershift");
+        const tahunFilter = document.getElementById("tahunFilterBulananPershift");
+
+        const btnPrevA = document.getElementById("prevBarA");
+        const btnNextA = document.getElementById("nextBarA");
+        const btnExportA = document.querySelector("#chart-bar-bulanan-LINEA-pershift .exportChartPDF");
+
+        let chartInstanceA;
+
+        function loadChartA() {
+            const bulanVal = bulanFilter.value;
+            const tahunVal = tahunFilter.value;
+            const lineId = 1; // LINE A
+
+            console.log("🔄 Loading BAR chart LINE A dengan bulan:", bulanVal, "tahun:", tahunVal);
+
+            // Tampilkan loading state
+            if (chartInstanceA) {
+                chartInstanceA.destroy();
+            }
+            showLoadingStateA();
+
+            fetch(`../backend/chart-shift.php?bulan=${bulanVal}&tahun=${tahunVal}&line_id=${lineId}`)
+                .then((res) => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
+                .then((data) => {
+                    console.log("✅ Data SHIFT LINE A dari backend:", data);
+
+                    if (data && data.shifts && Object.keys(data.shifts).length > 0) {
+                        console.log("📊 Shifts available:", Object.keys(data.shifts));
+                        renderChartA(data.shifts);
+                    } else {
+                        console.warn("⚠️ Data chart kosong atau tidak sesuai format");
+                        renderEmptyChartA("Tidak ada data produksi untuk periode ini");
+                    }
+                })
+                .catch((err) => {
+                    console.error("❌ Gagal load SHIFT chart LINE A:", err);
+                    renderEmptyChartA("Gagal memuat data: " + err.message);
+                });
+        }
+
+        function showLoadingStateA() {
+            chartInstanceA = new Chart(ctxA, {
+                type: "bar",
+                data: {
+                    labels: Array.from({
+                        length: 31
+                    }, (_, i) => i + 1),
+                    datasets: [{
+                        label: "Memuat data...",
+                        data: Array(31).fill(0),
+                        backgroundColor: "#cccccc88",
+                        borderColor: "#cccccc",
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "⏳ Memuat data LINE A..."
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderChartA(shifts) {
+            const key = datasetKeys[currentDatasetA];
+            const label = datasetLabels[currentDatasetA];
+            const labels = Array.from({
+                length: 31
+            }, (_, i) => i + 1);
+
+            const warna = [
+                "#0046FF88", // Shift 1 - Biru
+                "#F9E40088", // Shift 2 - Kuning
+                "#FF90BB88", // Shift 3 - Pink
+            ];
+
+            const datasets = [];
+            let totalDataPoints = 0;
+
+            // Loop melalui semua shift (1, 2, 3)
+            Object.entries(shifts).forEach(([shiftNum, shiftData]) => {
+                console.log(`🔍 Processing Shift ${shiftNum}:`, shiftData);
+
+                if (shiftData && Object.keys(shiftData).length > 0) {
+                    const dataMap = {};
+
+                    // Map data per hari untuk shift ini
+                    Object.entries(shiftData).forEach(([hari, row]) => {
+                        const hariInt = parseInt(hari);
+                        if (!isNaN(hariInt) && row[key] !== null && row[key] !== undefined) {
+                            dataMap[hariInt] = parseFloat(row[key]) || 0;
+                            totalDataPoints++;
+                        }
+                    });
+
+                    console.log(`📊 Shift ${shiftNum} - Data points for ${key}:`, dataMap);
+
+                    const hasData = Object.values(dataMap).some(val => val > 0);
+                    if (hasData) {
+                        datasets.push({
+                            label: `Shift ${shiftNum} - ${label}`,
+                            data: labels.map((hari) => dataMap[hari] || 0),
+                            backgroundColor: warna[(shiftNum - 1) % warna.length],
+                            borderColor: warna[(shiftNum - 1) % warna.length].replace('88', ''),
+                            borderWidth: 1.5,
+                            borderRadius: 4,
+                        });
+                    } else {
+                        console.log(`➖ Shift ${shiftNum} tidak memiliki data untuk ${key}`);
+                    }
+                } else {
+                    console.log(`❌ Shift ${shiftNum} tidak memiliki data sama sekali`);
+                }
+            });
+
+            console.log(`📊 LINE A - Total datasets: ${datasets.length}, Total data points: ${totalDataPoints}`);
+
+            if (datasets.length === 0) {
+                console.log("📭 Tidak ada data yang bisa ditampilkan untuk LINE A");
+                renderEmptyChartA(`Tidak ada data ${label} untuk periode ini`);
+                return;
+            }
+
+            if (chartInstanceA) chartInstanceA.destroy();
+
+            const namaBulan = [
+                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+            ];
+            const bulanNama = namaBulan[parseInt(bulanFilter.value, 10) - 1] || bulanFilter.value;
+
+            chartInstanceA = new Chart(ctxA, {
+                type: "bar",
+                data: {
+                    labels,
+                    datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `📊 LINE A - ${label} - Perbandingan Shift (${bulanNama} ${tahunFilter.value})`,
+                            font: {
+                                size: 16
+                            },
+                        },
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: label
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: "Hari (1–31)"
+                            },
+                            ticks: {
+                                maxTicksLimit: 31
+                            }
+                        },
+                    },
+                    interaction: {
+                        mode: 'index'
+                    }
+                },
+            });
+        }
+
+        function renderEmptyChartA(message) {
+            const labels = Array.from({
+                length: 31
+            }, (_, i) => i + 1);
+            if (chartInstanceA) chartInstanceA.destroy();
+
+            chartInstanceA = new Chart(ctxA, {
+                type: "bar",
+                data: {
+                    labels,
+                    datasets: [{
+                        label: "Tidak ada data",
+                        data: labels.map(() => 0),
+                        backgroundColor: "#cccccc88",
+                        borderColor: "#cccccc",
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: message || "📊 LINE A - Tidak ada data produksi"
+                        }
+                    },
+                    scales: {
+                        y: {
+                            display: false
+                        },
+                        x: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event listeners untuk LINE A
+        btnNextA.addEventListener("click", () => {
+            currentDatasetA = (currentDatasetA + 1) % datasetKeys.length;
+            console.log(`🔄 LINE A Switching to dataset: ${datasetLabels[currentDatasetA]}`);
+            loadChartA();
+        });
+
+        btnPrevA.addEventListener("click", () => {
+            currentDatasetA = (currentDatasetA - 1 + datasetKeys.length) % datasetKeys.length;
+            console.log(`🔄 LINE A Switching to dataset: ${datasetLabels[currentDatasetA]}`);
+            loadChartA();
+        });
+
+        btnExportA.addEventListener("click", () => {
+            const namaBulan = [
+                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+            ];
+            const bulanNama = namaBulan[parseInt(bulanFilter.value, 10) - 1] || bulanFilter.value;
+            const title = `LINE_A_Chart_Bar_${datasetLabels[currentDatasetA]}_${bulanNama}_${tahunFilter.value}`;
+            exportChartPDF("BarChartA", title);
+        });
+
+        // Return loadChartA function agar bisa diakses dari luar
+        return loadChartA;
+    }
+
+    // ============================================================================
+    // 📊 CHART BAR BULANAN PER SHIFT - LINE B
+    // ============================================================================
+    function initializeChartB() {
+        const ctxB = document.getElementById("BarChartB").getContext("2d");
+        const bulanFilter = document.getElementById("bulanFilterPershift");
+        const tahunFilter = document.getElementById("tahunFilterBulananPershift");
+
+        const btnPrevB = document.getElementById("prevBarB");
+        const btnNextB = document.getElementById("nextBarB");
+        const btnExportB = document.querySelector("#chart-bar-bulanan-LINEB-pershift .exportChartPDF");
+
+        let chartInstanceB;
+
+        function loadChartB() {
+            const bulanVal = bulanFilter.value;
+            const tahunVal = tahunFilter.value;
+            const lineId = 2; // LINE B
+
+            console.log("🔄 Loading BAR chart LINE B dengan bulan:", bulanVal, "tahun:", tahunVal);
+
+            // Tampilkan loading state
+            if (chartInstanceB) {
+                chartInstanceB.destroy();
+            }
+            showLoadingStateB();
+
+            fetch(`../backend/chart-shift.php?bulan=${bulanVal}&tahun=${tahunVal}&line_id=${lineId}`)
+                .then((res) => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
+                .then((data) => {
+                    console.log("✅ Data SHIFT LINE B dari backend:", data);
+
+                    if (data && data.shifts && Object.keys(data.shifts).length > 0) {
+                        console.log("📊 Shifts available:", Object.keys(data.shifts));
+                        renderChartB(data.shifts);
+                    } else {
+                        console.warn("⚠️ Data chart kosong atau tidak sesuai format");
+                        renderEmptyChartB("Tidak ada data produksi untuk periode ini");
+                    }
+                })
+                .catch((err) => {
+                    console.error("❌ Gagal load SHIFT chart LINE B:", err);
+                    renderEmptyChartB("Gagal memuat data: " + err.message);
+                });
+        }
+
+        function showLoadingStateB() {
+            chartInstanceB = new Chart(ctxB, {
+                type: "bar",
+                data: {
+                    labels: Array.from({
+                        length: 31
+                    }, (_, i) => i + 1),
+                    datasets: [{
+                        label: "Memuat data...",
+                        data: Array(31).fill(0),
+                        backgroundColor: "#cccccc88",
+                        borderColor: "#cccccc",
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "⏳ Memuat data LINE B..."
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderChartB(shifts) {
+            const key = datasetKeys[currentDatasetB];
+            const label = datasetLabels[currentDatasetB];
+            const labels = Array.from({
+                length: 31
+            }, (_, i) => i + 1);
+
+            const warna = [
+                "#0046FF88", // Shift 1 - Biru
+                "#F9E40088", // Shift 2 - Kuning
+                "#FF90BB88", // Shift 3 - Pink
+            ];
+
+            const datasets = [];
+            let totalDataPoints = 0;
+
+            // Loop melalui semua shift (1, 2, 3)
+            Object.entries(shifts).forEach(([shiftNum, shiftData]) => {
+                console.log(`🔍 Processing Shift ${shiftNum}:`, shiftData);
+
+                if (shiftData && Object.keys(shiftData).length > 0) {
+                    const dataMap = {};
+
+                    // Map data per hari untuk shift ini
+                    Object.entries(shiftData).forEach(([hari, row]) => {
+                        const hariInt = parseInt(hari);
+                        if (!isNaN(hariInt) && row[key] !== null && row[key] !== undefined) {
+                            dataMap[hariInt] = parseFloat(row[key]) || 0;
+                            totalDataPoints++;
+                        }
+                    });
+
+                    console.log(`📊 Shift ${shiftNum} - Data points for ${key}:`, dataMap);
+
+                    const hasData = Object.values(dataMap).some(val => val > 0);
+                    if (hasData) {
+                        datasets.push({
+                            label: `Shift ${shiftNum} - ${label}`,
+                            data: labels.map((hari) => dataMap[hari] || 0),
+                            backgroundColor: warna[(shiftNum - 1) % warna.length],
+                            borderColor: warna[(shiftNum - 1) % warna.length].replace('88', ''),
+                            borderWidth: 1.5,
+                            borderRadius: 4,
+                        });
+                    } else {
+                        console.log(`➖ Shift ${shiftNum} tidak memiliki data untuk ${key}`);
+                    }
+                } else {
+                    console.log(`❌ Shift ${shiftNum} tidak memiliki data sama sekali`);
+                }
+            });
+
+            console.log(`📊 LINE B - Total datasets: ${datasets.length}, Total data points: ${totalDataPoints}`);
+
+            if (datasets.length === 0) {
+                console.log("📭 Tidak ada data yang bisa ditampilkan untuk LINE B");
+                renderEmptyChartB(`Tidak ada data ${label} untuk periode ini`);
+                return;
+            }
+
+            if (chartInstanceB) chartInstanceB.destroy();
+
+            const namaBulan = [
+                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+            ];
+            const bulanNama = namaBulan[parseInt(bulanFilter.value, 10) - 1] || bulanFilter.value;
+
+            chartInstanceB = new Chart(ctxB, {
+                type: "bar",
+                data: {
+                    labels,
+                    datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `📊 LINE B - ${label} - Perbandingan Shift (${bulanNama} ${tahunFilter.value})`,
+                            font: {
+                                size: 16
+                            },
+                        },
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: label
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: "Hari (1–31)"
+                            },
+                            ticks: {
+                                maxTicksLimit: 31
+                            }
+                        },
+                    },
+                    interaction: {
+                        mode: 'index'
+                    }
+                },
+            });
+        }
+
+        function renderEmptyChartB(message) {
+            const labels = Array.from({
+                length: 31
+            }, (_, i) => i + 1);
+            if (chartInstanceB) chartInstanceB.destroy();
+
+            chartInstanceB = new Chart(ctxB, {
+                type: "bar",
+                data: {
+                    labels,
+                    datasets: [{
+                        label: "Tidak ada data",
+                        data: labels.map(() => 0),
+                        backgroundColor: "#cccccc88",
+                        borderColor: "#cccccc",
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: message || "📊 LINE B - Tidak ada data produksi"
+                        }
+                    },
+                    scales: {
+                        y: {
+                            display: false
+                        },
+                        x: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event listeners untuk LINE B
+        btnNextB.addEventListener("click", () => {
+            currentDatasetB = (currentDatasetB + 1) % datasetKeys.length;
+            console.log(`🔄 LINE B Switching to dataset: ${datasetLabels[currentDatasetB]}`);
+            loadChartB();
+        });
+
+        btnPrevB.addEventListener("click", () => {
+            currentDatasetB = (currentDatasetB - 1 + datasetKeys.length) % datasetKeys.length;
+            console.log(`🔄 LINE B Switching to dataset: ${datasetLabels[currentDatasetB]}`);
+            loadChartB();
+        });
+
+        btnExportB.addEventListener("click", () => {
+            const namaBulan = [
+                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+            ];
+            const bulanNama = namaBulan[parseInt(bulanFilter.value, 10) - 1] || bulanFilter.value;
+            const title = `LINE_B_Chart_Bar_${datasetLabels[currentDatasetB]}_${bulanNama}_${tahunFilter.value}`;
+            exportChartPDF("BarChartB", title);
+        });
+
+        // Return loadChartB function agar bisa diakses dari luar
+        return loadChartB;
+    }
+
+    // ============================================================================
+    // 🧾 Fungsi Export PDF
+    // ============================================================================
+    function exportChartPDF(canvasId, title) {
+        const {
+            jsPDF
+        } = window.jspdf;
+        const pdf = new jsPDF("l", "mm", "a4");
+        const canvas = document.getElementById(canvasId);
+
+        if (!canvas) {
+            alert('Canvas tidak ditemukan');
+            return;
+        }
+
+        const imgData = canvas.toDataURL("image/png");
+        const today = new Date();
+        const dateString = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+        pdf.text(title, 15, 15);
+        pdf.addImage(imgData, "PNG", 10, 25, 277 - 20, 150);
+        pdf.save(`${title}_${dateString}.pdf`);
+    }
+
+    // ============================================================================
+    // 🔄 MAIN INITIALIZATION - AUTO REFRESH FIXED
+    // ============================================================================
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log("🚀 Initializing Chart Shift System...");
+
+        // Initialize charts dan dapatkan reference ke load functions
+        const loadChartA = initializeChartA();
+        const loadChartB = initializeChartB();
+
+        // Get filter elements
+        const bulanFilter = document.getElementById('bulanFilterPershift');
+        const tahunFilter = document.getElementById('tahunFilterBulananPershift');
+
+        // Event listener untuk perubahan filter - AUTO REFRESH
+        if (bulanFilter) {
+            bulanFilter.addEventListener('change', function() {
+                console.log('🔄 Bulan changed to:', this.value);
+                // Auto refresh kedua chart
+                if (typeof loadChartA === 'function') loadChartA();
+                if (typeof loadChartB === 'function') loadChartB();
+            });
+        }
+
+        if (tahunFilter) {
+            tahunFilter.addEventListener('change', function() {
+                console.log('🔄 Tahun changed to:', this.value);
+                // Auto refresh kedua chart
+                if (typeof loadChartA === 'function') loadChartA();
+                if (typeof loadChartB === 'function') loadChartB();
+            });
+
+            // Juga trigger pada input (untuk kasus manual typing)
+            tahunFilter.addEventListener('input', function() {
+                console.log('⌨️ Tahun input:', this.value);
+                // Debounce untuk menghindari terlalu banyak request
+                clearTimeout(window.tahunInputTimeout);
+                window.tahunInputTimeout = setTimeout(() => {
+                    if (typeof loadChartA === 'function') loadChartA();
+                    if (typeof loadChartB === 'function') loadChartB();
+                }, 800);
+            });
+        }
+
+        // Load charts pertama kali
+        if (typeof loadChartA === 'function') loadChartA();
+        if (typeof loadChartB === 'function') loadChartB();
+
+        console.log("✅ Chart Shift System Initialized Successfully");
+    });
+</script>

@@ -1,3 +1,5 @@
+// FUNCTION 
+
 // ============================================================================
 // 📈 LINE CHART BULANAN
 // ============================================================================
@@ -7,10 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 🎨 Warna dan dataset
   const warna = [
-    "#1B1E23",
-    "#FF90BB",
-    "#FF0000",
     "#6f42c1",
+    "#0046FF",
+    "#F9E400",
+    "#FF90BB",
     "#450693",
     "#E9FF97",
     "#fd7e14",
@@ -216,7 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 🎨 Warna berbeda untuk tiap line
   const warnaA = "#007bff"; // biru
-  const warnaB = "#28a745"; // hijau
+  const warnaB = "#F9E400"; // hijau
 
   const metrics = [
     { key: "productivity", label: "Productivity (Ton/Shift)" },

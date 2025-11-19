@@ -32,7 +32,6 @@ include '../layout/sidebar.php';
 ?>
 
 
-<!-- <script src="../js/chart.js"></script> -->
 <link href="../css/ind.css" rel="stylesheet">
 
 <div class="container-fluid">
@@ -161,8 +160,6 @@ include '../layout/sidebar.php';
 <script src="../js/sb-admin-2.min.js"></script>
 
 <!-- Page level plugins -->
-<script src="../vendor/chart.js/Chart.min.js"></script>
-<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
 
 </body>
 
@@ -172,7 +169,6 @@ include '../layout/sidebar.php';
     // ============================================================================
     // 📈 LINE CHART BULANAN
     // ============================================================================
-    // Catatan: semua komentar aslinya tetap dipertahankan di bawah ini
     document.addEventListener("DOMContentLoaded", () => {
         // default values diambil dari input filter (jika ada) agar sinkron
         function getBulananFilters() {
@@ -196,7 +192,8 @@ include '../layout/sidebar.php';
 
         // 🎨 Warna dan dataset
         const warna = [
-            "#1B1E23",
+            "#0046FF",
+            "#F9E400",
             "#FF90BB",
             "#FF0000",
             "#6f42c1",
@@ -416,7 +413,7 @@ include '../layout/sidebar.php';
         // ============================================================================
         // kita buat fungsi terpusat agar bisa dipanggil ulang saat filter tahun tahunan berubah
         const warnaA = "#007bff"; // biru
-        const warnaB = "#28a745"; // hijau
+        const warnaB = "#F9E400"; // hijau
 
         const metrics = [{
                 key: "productivity",
@@ -445,7 +442,7 @@ include '../layout/sidebar.php';
             "Juli", "Agustus", "September", "Oktober", "November", "Desember",
         ];
 
-        let currentMetric = 0; // 🔁 sinkron antar line
+        let currentMetric = 0;
 
         function renderTahunanChart({
             ctx,

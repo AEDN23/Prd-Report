@@ -64,29 +64,6 @@ include '../layout/sidebar.php';
                 </div>
             </section>
             <!-- ============================== -->
-            <!-- ⿢ PARAMETER LINE -->
-            <!-- ============================== -->
-            <!-- <section id="parameter-section" class="mb-4">
-                <hr>
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 id="judulParameter" class="fw-bold text-primary mb-0">
-                        📈 PARAMETER <?= htmlspecialchars($selectedLineName ?? '') ?> - <?= $selectedYear ?>
-                    </h6>
-
-                    <div class="btn-group">
-                        <a id="btnPDFParameter" href="../export/export-pdf-parameter.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
-                            class="btn btn-danger btn-sm" style="margin-right: 10px;">
-                            <i class="fas fa-file-pdf"></i> Export PDF</a>
-                        <a id="btnExcelParameter" href="../export/export-excel-parameter.php?line=<?= $selectedLine ?>&tahun=<?= $selectedYear ?>"
-                            class="btn btn-success btn-sm"><i class="fas fa-file-excel"></i> Export Excel</a>
-                    </div>
-                </div>
-
-                <div id="parameterB" class=" border rounded p-3 text-center text-muted">
-                    Memuat data...
-                </div>
-            </section> -->
-            <!-- ============================== -->
             <!-- ⿣ DATA TARGET PRODUKSI (TAHUNAN) -->
             <!-- ============================== -->
             <section id="rangkuman-section">

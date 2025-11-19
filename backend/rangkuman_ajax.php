@@ -203,11 +203,3 @@ $namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oc
         <?php endforeach; ?>
     </tbody>
 </table>
-
-<!-- INFO DEBUG -->
-<div class="mt-3 p-2 bg-light rounded small">
-    <strong>Info Perhitungan:</strong><br>
-    - Total Hari Produksi: <?= $totalTahunan['total_hari'] ?> hari<br>
-    - Rata-rata Tahunan: Total semua hari / <?= $totalTahunan['total_hari'] ?> hari<br>
-    - Rata-rata Bulanan: Total hari dalam bulan / jumlah hari produksi bulan tersebut
-</div>

@@ -274,12 +274,12 @@ $page_title = "Halaman chart"
                             backgroundColor: warna[colorIndex % warna.length] + "33", // 🔥 ADD BACKGROUND COLOR
                             pointBackgroundColor: warna[colorIndex % warna.length], // 🔥 ADD POINT FILL COLOR
                             pointBorderColor: "#ffffff", // 🔥 ADD POINT BORDER
-                            pointBorderWidth: 2, // 🔥 ADD POINT BORDER WIDTH
+                            pointBorderWidth: 1, // 🔥 ADD POINT BORDER WIDTH
                             fill: true, // 🔥 ENABLE AREA FILL
                             tension: 0.3,
                             pointRadius: 6, // 🔥 INCREASE POINT SIZE
                             pointHoverRadius: 8, // 🔥 HOVER EFFECT
-                            borderWidth: 3, // 🔥 THICKER LINE
+                            borderWidth: 1, // 🔥 THICKER LINE
                         });
                         colorIndex++;
                     } else {
