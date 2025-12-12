@@ -3,7 +3,7 @@ session_start();
 $host = 'localhost';
 $dbname = 'db_produksi_report';
 $username = 'root';
-$password = '';
+$password = '!Emix#2025';
 
 // FUNGSI UNTUK MENDAPATKAN DATA SHIFT
 function getMasterShift($pdo)

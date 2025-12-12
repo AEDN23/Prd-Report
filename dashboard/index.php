@@ -3,7 +3,6 @@ $page_title = "Halaman Utama";
 include '../layout/header.php';
 include '../layout/sidebar.php';
 ?>
-<script src="../js/dash.js"></script>
 
 <div class="container-fluid">
     <div class="card shadow mb-4">
@@ -42,17 +41,17 @@ include '../layout/sidebar.php';
                                 class="form-control form-control-sm" style="width: 100px; margin-right: 10px;">
                         </form>
 
+
                         <div class="btn-group">
                             <a id="btnPDFHarian" hidden
                                 href="../export/export-pdf-harian.php?line=<?= $selectedLine ?>&bulan=<?= $selectedMonth ?>&tahun=<?= $selectedYear ?>"
                                 class="btn btn-danger btn-sm" style="margin-right: 10px;">
                                 <i class="fas fa-file-pdf"></i> Export PDF
                             </a>
-
                             <a id="btnExcelHarian"
                                 href="../export/export-excel-harian.php?line=<?= $selectedLine ?>&bulan=<?= $selectedMonth ?>&tahun=<?= $selectedYear ?>"
                                 class="btn btn-success btn-sm">
-                                <i class="fas fa-file-excel"></i> Export Excel
+                                <i class="fas fa-file-excel"></i> Export Excellllllllllll
                             </a>
 
                         </div>
@@ -184,7 +183,7 @@ include '../layout/sidebar.php';
                         <i class="fas fa-filter"></i> Filter aktif
                     </small>
                 </div>
-                
+
             </section>
 
 

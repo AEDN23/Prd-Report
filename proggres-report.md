@@ -22,3 +22,6 @@
 28 - OKTOBER - 2025
 - Monitoring pemasangan fiber optik
 - Fiksasi autoscroll dan scroll chart
+
+12 - DESEMBER - 2025
+- Memperbaiki export excel harian dan bulanan | dijumlahkan semua shift dan data per shift

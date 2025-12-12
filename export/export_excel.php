@@ -1,5 +1,3 @@
-<!-- FUNCTION EXPORT EXCEL DI TABEL REPORT PRODUKSI TAHUNAN  (EXPORT_EXCEL.PHP) -->
-
 <?php
 ob_clean();
 ob_start();
@@ -26,21 +24,25 @@ $stmt = $pdo->prepare("SELECT * FROM target WHERE line_id=? AND tahun_target=?")
 $stmt->execute([$selectedLine, $selectedYear]);
 $target = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// PERBAIKAN QUERY: Hitung total per bulan (SUM semua shift)
 $stmt = $pdo->prepare("
     SELECT 
         MONTH(tanggal) AS bulan,
-        AVG(batch_count) AS avg_batch_count,
+        -- SUM untuk metrics kumulatif
+        SUM(batch_count) AS total_batch_count,
+        SUM(batch_weight) AS total_batch_weight,
+        SUM(feed_raw_material) AS total_feed_raw_material,
+        -- AVG untuk metrics rata-rata
         AVG(productivity) AS avg_productivity,
         AVG(production_speed) AS avg_production_speed,
-        AVG(batch_weight) AS avg_batch_weight,
         AVG(operation_factor) AS avg_operation_factor,
         AVG(cycle_time) AS avg_cycle_time,
         AVG(grade_change_sequence) AS avg_grade_change_sequence,
-        AVG(grade_change_time) AS avg_grade_change_time,
-        AVG(feed_raw_material) AS avg_feed_raw_material
+        AVG(grade_change_time) AS avg_grade_change_time
     FROM input_harian
     WHERE line_id = ? AND YEAR(tanggal) = ?
-    GROUP BY bulan ORDER BY bulan
+    GROUP BY bulan 
+    ORDER BY bulan
 ");
 $stmt->execute([$selectedLine, $selectedYear]);
 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -105,9 +107,19 @@ foreach ($fields as $key => $label) {
     $sum = 0;
     $count = 0;
     foreach ($data as $d) {
-        if ($d['avg_' . $key] !== null) {
-            $sum += $d['avg_' . $key];
-            $count++;
+        // Gunakan total_ untuk metrics kumulatif, avg_ untuk metrics rata-rata
+        if ($key === 'batch_count' || $key === 'batch_weight' || $key === 'feed_raw_material') {
+            // Metrics kumulatif: gunakan total
+            if ($d['total_' . $key] !== null) {
+                $sum += $d['total_' . $key];
+                $count++;
+            }
+        } else {
+            // Metrics rata-rata: gunakan avg
+            if ($d['avg_' . $key] !== null) {
+                $sum += $d['avg_' . $key];
+                $count++;
+            }
         }
     }
     $avg = $count ? round($sum / $count, 2) : '-';
@@ -117,7 +129,18 @@ foreach ($fields as $key => $label) {
     for ($m = 1; $m <= 12; $m++) {
         $bulanRow = array_filter($data, fn($r) => $r['bulan'] == $m);
         $bulanRow = reset($bulanRow);
-        $val = $bulanRow ? round($bulanRow['avg_' . $key], 2) : '-';
+
+        if ($bulanRow) {
+            // Pilih kolom yang tepat berdasarkan tipe metric
+            if ($key === 'batch_count' || $key === 'batch_weight' || $key === 'feed_raw_material') {
+                $val = round($bulanRow['total_' . $key], 2);
+            } else {
+                $val = round($bulanRow['avg_' . $key], 2);
+            }
+        } else {
+            $val = '-';
+        }
+
         $col = chr(68 + $m - 1);
         $sheet->setCellValue("{$col}{$row}", $val);
     }
@@ -144,5 +167,3 @@ $writer = new Xlsx($spreadsheet);
 ob_end_clean(); // tambahkan ini
 $writer->save('php://output');
 exit;
-
-
