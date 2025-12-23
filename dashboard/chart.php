@@ -1,6 +1,6 @@
 <?php
 require_once '../backend/config.php';
-$page_title = "Halaman chart"
+$page_title = "chart"
 ?>
 
 <!DOCTYPE html>

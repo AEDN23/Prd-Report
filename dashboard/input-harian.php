@@ -80,16 +80,21 @@ $today = date('Y-m-d');
                             </label>
                             <select id="shift_id" name="shift_id" required>
                                 <option value="">-- Pilih Shift --</option>
-                                <?php foreach ($shifts as $shift): ?>
+                                <?php
+                                $selectedShift = 4;
+
+                                foreach ($shifts as $shift):
+                                    $selected = ($shift['id'] == $selectedShift) ? 'selected' : '';
+                                ?>
                                     <option value="<?= $shift['id'] ?>"
                                         data-start="<?= $shift['jam_mulai'] ?>"
-                                        data-end="<?= $shift['jam_selesai'] ?>">
+                                        data-end="<?= $shift['jam_selesai'] ?>"
+                                        <?= $selected ?>>
                                         <?= htmlspecialchars($shift['kode_shift']) ?> - <?= htmlspecialchars($shift['nama_shift']) ?>
                                         (<?= substr($shift['jam_mulai'], 0, 5) ?> - <?= substr($shift['jam_selesai'], 0, 5) ?>)
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <small class="form-help" id="shift-time-display"></small>
                         </div>
                     </div>
                 </div>

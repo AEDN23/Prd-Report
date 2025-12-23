@@ -5,11 +5,26 @@ $line = $_GET['line'] ?? 1;
 $bulan = $_GET['bulan'] ?? date('n');
 $tahun = $_GET['tahun'] ?? date('Y');
 
+// Array mapping shift_id ke nama shift
+$shiftMapping = [
+    1 => 'Shift 1',
+    2 => 'Shift 2',
+    3 => 'Shift 3',
+    4 => 'Semua Shift'
+];
+
+// Fungsi helper untuk mendapatkan nama shift
+function getShiftName($shiftId, $shiftMapping)
+{
+    return $shiftMapping[$shiftId] ?? 'Shift ' . $shiftId;
+}
+
 // ambil target
 $stmt = $pdo->prepare("SELECT * FROM target WHERE line_id=? AND tahun_target=?");
 $stmt->execute([$line, $tahun]);
 $target = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// Query untuk data summary per hari
 $stmt = $pdo->prepare("
     SELECT 
         DAY(tanggal) AS hari,
@@ -33,18 +48,29 @@ $stmt->execute([$line, $bulan, $tahun]);
 $data = [];
 $dataFullTanggal = [];
 
-// Untuk edit, kita perlu ambil semua ID per tanggal (semua shift)
-$stmtIds = $pdo->prepare("
-    SELECT DAY(tanggal) AS hari, GROUP_CONCAT(id) as ids
+// QUERY UNTUK DATA EDIT PER SHIFT - MENDAPATKAN ID DAN SHIFT_ID
+$stmtEdit = $pdo->prepare("
+    SELECT 
+        DAY(tanggal) AS hari,
+        id,
+        shift_id
     FROM input_harian
     WHERE line_id = ? AND MONTH(tanggal) = ? AND YEAR(tanggal) = ?
-    GROUP BY tanggal
-    ORDER BY tanggal ASC
+    ORDER BY tanggal, shift_id
 ");
-$stmtIds->execute([$line, $bulan, $tahun]);
-$dataIds = [];
-while ($r = $stmtIds->fetch(PDO::FETCH_ASSOC)) {
-    $dataIds[$r['hari']] = $r['ids'];
+$stmtEdit->execute([$line, $bulan, $tahun]);
+
+// Simpan data untuk edit per shift
+$dataEdit = [];
+while ($row = $stmtEdit->fetch(PDO::FETCH_ASSOC)) {
+    $hari = $row['hari'];
+    if (!isset($dataEdit[$hari])) {
+        $dataEdit[$hari] = [];
+    }
+    $dataEdit[$hari][] = [
+        'id' => $row['id'],
+        'shift_id' => $row['shift_id']
+    ];
 }
 
 while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -150,22 +176,22 @@ foreach ($fields as $key => $v) {
             <td colspan="5"><strong> Edit Data per Shift</strong></td>
             <?php for ($d = 1; $d <= 31; $d++): ?>
                 <td>
-                    <?php if (isset($dataIds[$d])): ?>
-                        <?php
-                        $ids = explode(',', $dataIds[$d]);
-                        if (count($ids) > 0):
-                        ?>
-                            <div class="btn-group-vertical btn-group-sm">
-                                <?php foreach ($ids as $index => $id): ?>
-                                    <a href="../dashboard/edit-harian.php?id=<?= $id ?>"
-                                        class="btn btn-outline-primary btn-sm mb-1"
-                                        title="Edit data shift"
-                                        style="padding: 0.1rem 0.4rem; font-size: 0.7rem;">
-                                        <i class="fas fa-edit"></i> Shift <?= $index + 1 ?>
-                                    </a>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
+                    <?php if (isset($dataEdit[$d]) && count($dataEdit[$d]) > 0): ?>
+                        <div class="btn-group-vertical btn-group-sm">
+                            <?php
+                            // Data sudah diurutkan berdasarkan shift_id dari query
+                            foreach ($dataEdit[$d] as $shiftData):
+                                $shiftName = getShiftName($shiftData['shift_id'], $shiftMapping);
+                                $btnClass = ($shiftData['shift_id'] == 4) ? 'btn-outline-info' : 'btn-outline-primary';
+                            ?>
+                                <a href="../dashboard/edit-harian.php?id=<?= $shiftData['id'] ?>"
+                                    class="btn <?= $btnClass ?> btn-sm mb-1"
+                                    title="Edit data <?= $shiftName ?>"
+                                    style="padding: 0.1rem 0.4rem; font-size: 0.7rem;">
+                                    <i class="fas fa-edit"></i> <?= $shiftName ?>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
                     <?php else: ?>
                         <span class="text-muted">-</span>
                     <?php endif; ?>

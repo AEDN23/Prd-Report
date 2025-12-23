@@ -25,3 +25,7 @@
 
 12 - DESEMBER - 2025
 - Memperbaiki export excel harian dan bulanan | dijumlahkan semua shift dan data per shift
+
+16 - DESEMBER - 2025
+- Menambahkan data master shift (Semua shift)
+- Memperbaiki export excel jadi data hari ini, shift 1, 2, 3 dan semua shift

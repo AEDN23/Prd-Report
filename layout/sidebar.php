@@ -39,19 +39,17 @@
                 <span>Informasi</span></a>
         </li>
 
-        <?php
-        $is_chart_active = ($page_title === "Chart Shift" || $page_title === "Chart Perbandingan" || $page_title === "Chart Index");
-        ?>
         <li class="nav-item <?php if ($is_chart_active) echo 'active'; ?>">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseChart"
                 aria-expanded="<?php echo $is_chart_active ? 'true' : 'false'; ?>" aria-controls="collapseChart">
                 <i class="bi bi-bar-chart-fill"></i>
                 <span>Chart</span>
             </a>
-            <div id="collapseChart" class="collapse <?php if ($is_chart_active) echo 'show'; ?>" aria-labelledby="headingChart" data-parent="#accordionSidebar">
+            <div id="collapseChart" class="collapse <?php if ($is_chart_active) echo 'show'; ?>"
+                data-parent="#accordionSidebar"> <!-- Tambahkan data-parent di sini -->
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Pilihan Chart:</h6>
-                    <a class="collapse-item <?php if ($page_title === "Chart Index") echo 'active'; ?>" href="chart">Chart</a>
+                    <a class="collapse-item <?php if ($page_title === "chart") echo 'active'; ?>" href="chart">Chart</a>
                     <a class="collapse-item <?php if ($page_title === "Chart Perbandingan") echo 'active'; ?>" href="chart-line-ab">Chart Perbandingan</a>
                     <a class="collapse-item <?php if ($page_title === "Chart Shift") echo 'active'; ?>" href="chart-shift">Chart Per Shift</a>
                 </div>

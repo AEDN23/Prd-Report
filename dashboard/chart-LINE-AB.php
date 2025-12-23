@@ -2,8 +2,292 @@
 
 <?php
 require_once '../backend/config.php';
-$page_title = "Halaman chart"
+$page_title = "Chart Perbandingan"
 ?>
+
+
+<!-- sciprt export pdf -->
+<script>
+    // ============================================================================
+    // 📅 BAR CHART TAHUNAN (SEMUA LINE DIGABUNG) - DENGAN EXPORT
+    // ============================================================================
+    document.addEventListener("DOMContentLoaded", () => {
+        const ctx = document.getElementById("BarCharttahunan").getContext("2d");
+        const tahunInput = document.getElementById("tahunInput");
+        const btnPrev = document.getElementById("prevTahunan");
+        const btnNext = document.getElementById("nextTahunan");
+        const btnExport = document.getElementById("exportPDFbarcharttahunan"); // Pastikan ID ini benar
+
+        let currentMetric = 0;
+        let chart;
+
+        const metrics = [{
+                key: "productivity",
+                label: "Productivity (Ton/Shift)"
+            },
+            {
+                key: "batch_count",
+                label: "Batch Count (Per Day)"
+            },
+            {
+                key: "production_speed",
+                label: "Production Speed (Kg/Min)"
+            },
+            {
+                key: "feed_raw_material",
+                label: "Feed Raw Material (Kg/Day)"
+            },
+            {
+                key: "operation_factor",
+                label: "Operation Factor (%)"
+            },
+            {
+                key: "batch_weight",
+                label: "Batch Weight (Kg/Batch)"
+            },
+            {
+                key: "cycle_time",
+                label: "Cycle Time (Min/Batch)"
+            },
+            {
+                key: "grade_change_sequence",
+                label: "Grade Change Sequence"
+            },
+            {
+                key: "grade_change_time",
+                label: "Grade Change Time (Min/Grade)"
+            }
+        ];
+
+        const bulanLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const warna = ["#0046FF88", "#F9E40088", "#FF90BB88", "#45069388"];
+
+        // Fungsi untuk mendapatkan label metric saat ini
+        function getCurrentMetricLabel() {
+            return metrics[currentMetric].label;
+        }
+
+        function loadChartyears() {
+            const tahunVal = tahunInput.value;
+
+            console.log("🔄 Loading TAHUNAN chart dengan tahun:", tahunVal);
+
+            // Tampilkan loading state
+            if (chart) {
+                chart.destroy();
+            }
+            showLoadingState();
+
+            // Ambil data untuk semua line
+            Promise.all([
+                    fetch(`../backend/get_chart_tahunan.php?line=1&tahun=${tahunVal}`).then(res => res.json()),
+                    fetch(`../backend/get_chart_tahunan.php?line=2&tahun=${tahunVal}`).then(res => res.json()),
+                    fetch(`../backend/get_chart_tahunan.php?line=3&tahun=${tahunVal}`).then(res => res.json())
+                ])
+                .then(([dataLineA, dataLineB, dataLineC]) => {
+                    console.log("✅ Data TAHUNAN dari backend:", {
+                        dataLineA,
+                        dataLineB,
+                        dataLineC
+                    });
+
+                    const allData = {
+                        'LINE A': dataLineA,
+                        'LINE B': dataLineB,
+                        'LINE C': dataLineC
+                    };
+                    renderChart(allData);
+                })
+                .catch((err) => {
+                    console.error("❌ Gagal load TAHUNAN chart:", err);
+                    renderEmptyChart("Gagal memuat data: " + err.message);
+                });
+        }
+
+        function showLoadingState() {
+            chart = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: bulanLabels,
+                    datasets: [{
+                        label: "Memuat data...",
+                        data: Array(12).fill(0),
+                        backgroundColor: "#cccccc88",
+                        borderColor: "#cccccc",
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "⏳ Memuat data chart tahunan..."
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderChart(allData) {
+            const metric = metrics[currentMetric];
+            const tahun = tahunInput.value;
+
+            console.log(`📊 Rendering chart tahunan untuk metric: ${metric.label}, tahun: ${tahun}`);
+
+            const datasets = [];
+            let colorIndex = 0;
+
+            Object.entries(allData).forEach(([lineName, data]) => {
+                console.log(`🔍 Processing ${lineName}:`, data);
+
+                const dataBulan = data.bulanData || {};
+
+                const produksiData = bulanLabels.map((_, i) => {
+                    const bulan = i + 1;
+                    const avgKey = `avg_${metric.key}`;
+                    return dataBulan[bulan] && dataBulan[bulan][avgKey] !== undefined ?
+                        parseFloat(dataBulan[bulan][avgKey]) : null;
+                });
+
+                // Hanya tambahkan jika ada data
+                const hasData = produksiData.some(val => val !== null && val > 0);
+                if (hasData) {
+                    datasets.push({
+                        label: `${lineName} - ${metric.label}`,
+                        data: produksiData,
+                        backgroundColor: warna[colorIndex % warna.length],
+                        borderColor: warna[colorIndex % warna.length].replace('88', ''),
+                        borderWidth: 1.5,
+                        borderRadius: 4,
+                    });
+                    colorIndex++;
+                    console.log(`✅ Added dataset for ${lineName} with ${produksiData.filter(v => v !== null).length} data points`);
+                } else {
+                    console.log(`➖ ${lineName} tidak memiliki data untuk ${metric.label}`);
+                }
+            });
+
+            console.log(`📊 Total datasets: ${datasets.length}`);
+
+            if (datasets.length === 0) {
+                console.log("📭 Tidak ada data yang bisa ditampilkan");
+                renderEmptyChart(`Tidak ada data ${metric.label} untuk tahun ${tahun}`);
+                return;
+            }
+
+            if (chart) chart.destroy();
+
+            chart = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: bulanLabels,
+                    datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `📘 ${metric.label} - Perbandingan Line Produksi (${tahun})`,
+                            font: {
+                                size: 16
+                            },
+                        },
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: metric.label
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: "Bulan"
+                            }
+                        },
+                    },
+                },
+            });
+        }
+
+        function renderEmptyChart(message) {
+            if (chart) chart.destroy();
+
+            chart = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: bulanLabels,
+                    datasets: [{
+                        label: "Tidak ada data",
+                        data: Array(12).fill(0),
+                        backgroundColor: "#cccccc88",
+                        borderColor: "#cccccc",
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: message || "📊 Tidak ada data produksi tahunan"
+                        }
+                    },
+                    scales: {
+                        y: {
+                            display: false
+                        },
+                        x: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event Listeners
+        btnNext.addEventListener("click", () => {
+            currentMetric = (currentMetric + 1) % metrics.length;
+            console.log(`🔄 TAHUNAN Switching to metric: ${metrics[currentMetric].label}`);
+            loadChartyears();
+        });
+
+        btnPrev.addEventListener("click", () => {
+            currentMetric = (currentMetric - 1 + metrics.length) % metrics.length;
+            console.log(`🔄 TAHUNAN Switching to metric: ${metrics[currentMetric].label}`);
+            loadChartyears();
+        });
+
+        // Export PDF untuk chart tahunan
+        btnExport.addEventListener("click", function() {
+            console.log("📤 Exporting TAHUNAN chart to PDF");
+
+            const tahun = tahunInput.value;
+            const metricLabel = metrics[currentMetric].label;
+            const title = `Chart_Tahunan_${metricLabel.replace(/\s+/g, '_')}_${tahun}`;
+
+            // Gunakan fungsi exportChartPDF yang sudah ada
+            exportChartPDF("BarCharttahunan", title);
+        });
+
+        tahunInput.addEventListener("change", loadChartyears);
+
+        // Load pertama kali
+        console.log("🚀 Initializing TAHUNAN chart...");
+        loadChartyears();
+    });
+</script>
+<!-- sciprt export pdf -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -22,9 +306,9 @@ $page_title = "Halaman chart"
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    <script src="../js/script.js"></script>
-    <script src="../js/export.js"></script>
-    <script src="../js/chartdashboard.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 </head>
 
@@ -110,7 +394,7 @@ $page_title = "Halaman chart"
                         <div class="chart-toolbar">
                             <button id="prevTahunan" class="btn btn-sm btn-secondary">◀ Prev</button>
                             <button id="nextTahunan" class="btn btn-sm btn-primary">Next ▶</button>
-                            <!-- <button id="exportPDFbarcharttahunan" class="btn btn-sm btn-danger">Export PDF</button> -->
+                            <button id="exportPDFbarcharttahunan" class="btn btn-sm btn-danger">Export PDF</button>
                         </div>
                         <canvas id="BarCharttahunan" style="width:100%; height:400px;"></canvas>
                     </div>
@@ -869,4 +1153,75 @@ $page_title = "Halaman chart"
         pdf.addImage(imgData, "PNG", 10, 25, 277 - 20, 150);
         pdf.save(`${title}_${dateString}.pdf`);
     }
+
+
+    // script untuk export pdf
+    function exportAllChartsPDF() {
+        const {
+            jsPDF
+        } = window.jspdf;
+        const pdf = new jsPDF('landscape', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        const charts = ['myChart', 'BarChart', 'BarCharttahunan'];
+        const chartTitles = ['Chart Line Produksi', 'Chart Bar Produksi', 'Chart Tahunan Produksi'];
+        let currentPage = 1;
+
+        // Fungsi untuk capture chart
+        function captureChart(chartId, title, index) {
+            return new Promise((resolve) => {
+                const canvas = document.getElementById(chartId);
+                if (!canvas) {
+                    resolve();
+                    return;
+                }
+
+                html2canvas(canvas, {
+                    scale: 1.5,
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                }).then(canvasImg => {
+                    if (index > 0) {
+                        pdf.addPage();
+                        currentPage++;
+                    }
+
+                    // Tambahkan judul
+                    pdf.setFontSize(16);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.text(title, pdfWidth / 2, 15, {
+                        align: 'center'
+                    });
+
+                    // Tambahkan chart
+                    const imgData = canvasImg.toDataURL('image/png');
+                    const imgProps = pdf.getImageProperties(imgData);
+                    const imgWidth = pdfWidth - 40;
+                    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+
+                    pdf.addImage(imgData, 'PNG', 20, 25, imgWidth, imgHeight);
+
+                    // Tambahkan nomor halaman
+                    pdf.setFontSize(10);
+                    pdf.text(`Halaman ${currentPage}`, pdfWidth - 20, pdfHeight - 10);
+
+                    resolve();
+                });
+            });
+        }
+
+        // Capture semua chart
+        Promise.all(charts.map((chartId, index) =>
+            captureChart(chartId, chartTitles[index], index)
+        )).then(() => {
+            const today = new Date();
+            const fileName = `Laporan_Produksi_${today.getFullYear()}${(today.getMonth()+1).toString().padStart(2,'0')}${today.getDate().toString().padStart(2,'0')}.pdf`;
+            pdf.save(fileName);
+        });
+    }
+
+    // Tambahkan tombol untuk export semua
+    // <button id="exportAllPDF" class="btn btn-sm btn-success">Export Semua Chart</button>
+    // script untuk export pdf end
 </script>
