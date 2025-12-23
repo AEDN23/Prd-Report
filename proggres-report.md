@@ -29,3 +29,7 @@
 16 - DESEMBER - 2025
 - Menambahkan data master shift (Semua shift)
 - Memperbaiki export excel jadi data hari ini, shift 1, 2, 3 dan semua shift
+
+23 - DESEMBER - 2025
+- Membuat auto swipe halaman
+- Membuat auto scroll informasi

@@ -171,6 +171,8 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
     <!-- STYLES -->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <link href="css/ind.css" rel="stylesheet">
+    <script src="js/info-scroll.js"></script>
+
 
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/bundele/bootstrap.bundle.min.js"></script>
@@ -227,12 +229,9 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
 
     <!-- SCRIPTS -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script> -->
-    <script src="js/autoscroll.js"></script>
 
     <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
     <script src="js/bundele/chart.js"></script>
-
-
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
     <!--SCRIPT UNTUK IMPORT PDF-->
     <script src="js/bundele/jspdf.umd.min.js"></script>
@@ -245,29 +244,49 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
 <div class="swipe-layer"></div>
 
 <body id="page-top">
+
+    <!-- =========================================================================================================================================-->
+    <!-- 🌐 HEADER BAR / NAVBAR -->
+    <!-- =========================================================================================================================================-->
+    <!-- =========================================================================================================================================-->
+    <!-- 📊 ISI HALAMAN -->
+    <!-- =========================================================================================================================================-->
     <div class="container-fluid">
         <div class="card shadow mb-4">
             <div class="card-body">
-                <section id="chart-bar-bulanan-LINEA" style="height: 100vh;" class="mb-5">
-                    <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE A</h6>
-                    <div class="chart-container">
-                        <div class="chart-toolbar mb-2">
-                            <button id="prevBarA" class="btn btn-sm btn-secondary">◀ Prev</button>
-                            <button id="nextBarA" class="btn btn-sm btn-primary">Next ▶</button>
-                        </div>
-                        <canvas id="BarChartA" style="width:100%; height: 85vh"></canvas>
-                    </div>
-                </section>
+                <!-- =========================================================================================================================================-->
+                <!-- 📅 INFORMASI -->
+                <!-- =========================================================================================================================================-->
+                <h2 id="DAFTAR-INFORMASI">Daftar Informasi</h2>
+                <section id="informasi">
+                    <hr>
+                    <div class="card-body">
 
-                <!-- ========================== LINE B BULANAN =========================== -->
-                <section id="chart-bar-bulanan-LINEB" class="mb-5" style="height: 100vh">
-                    <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE B</h6>
-                    <div class="chart-container">
-                        <div class="chart-toolbar mb-2">
-                            <button id="prevBarB" class="btn btn-sm btn-secondary">◀ Prev</button>
-                            <button id="nextBarB" class="btn btn-sm btn-primary">Next ▶</button>
-                        </div>
-                        <canvas id="BarChartB" style="width:100%; height:85vh;"></canvas>
+                        <?php
+
+                        try {
+                            $stmt = $pdo->query("SELECT * FROM info ORDER BY created_at DESC");
+                            $infos = $stmt->fetchAll();
+
+                            if ($infos) {
+                                foreach ($infos as $info) {
+                                    echo "<h1 class='text-center' style='word-break:break-word; white-space:normal;'>" . htmlspecialchars($info['judul']) . "</h1><div>" . htmlspecialchars(date('d-m-Y', strtotime($info['created_at']))) . "</div>";
+                                    echo "<div class='text-center'>" . '|  ' . htmlspecialchars($info['deskripsi']) . ' |</div>  <br>';
+                                    echo "<p class='text-justify' style='word-break:break-word; white-space:normal;'>" . nl2br(htmlspecialchars($info['isi'])) . "</p>";
+                                    if (!empty($info['file'])) {
+                                        echo "<a href='../uploads/info/" . htmlspecialchars($info['file']) . "' target='_blank'>Lihat File</a><br>";
+                                    }
+                                    echo "<hr>";
+                                }
+                            } else {
+                                echo "<p><a href='input-info.php'>Tidak ada informasi tersedia. klik untuk tambah informasi<a></p>";
+                            }
+                        } catch (Exception $e) {
+                            echo "<p>Error: " . htmlspecialchars($e->getMessage()) . "</p>";
+                        }
+                        ?>
+                        <b>
+                        </b>
                     </div>
                 </section>
             </div> <!-- end card-body -->
@@ -319,5 +338,6 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
         updateTabelUtama();
     });
 </script>
+
 
 <script src="js/autoswipe.js"></script>

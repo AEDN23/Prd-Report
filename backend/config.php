@@ -1,7 +1,7 @@
 <?php
 session_start();
 $host = 'localhost';
-$dbname = 'db_produksi_report';
+$dbname = 'db_produksi_pershift';
 $username = 'root';
 $password = '!Emix#2025';
 

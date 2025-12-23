@@ -176,25 +176,25 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
     <script src="js/bundele/bootstrap.bundle.min.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
     <style>
-        body {
-            overflow: hidden;
-        }
+  body {
+    overflow: hidden;
+  }
 
-        .swipe-layer {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #2563eb, #1e40af);
-            z-index: 9999;
-            transition: left 1s ease-in-out;
-        }
+  .swipe-layer {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #2563eb, #1e40af);
+    z-index: 9999;
+    transition: left 1s ease-in-out;
+  }
 
-        .swipe-layer.active {
-            left: 0;
-        }
-    </style>
+  .swipe-layer.active {
+    left: 0;
+  }
+</style>
 
     <style>
         /* semua teks dalam section informasi jadi merah */
@@ -227,7 +227,6 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
 
     <!-- SCRIPTS -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script> -->
-    <script src="js/autoscroll.js"></script>
 
     <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
     <script src="js/bundele/chart.js"></script>
@@ -243,11 +242,39 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
 </head>
 
 <div class="swipe-layer"></div>
-
 <body id="page-top">
+
+    <!-- =========================================================================================================================================-->
+    <!-- 🌐 HEADER BAR / NAVBAR -->
+    <!-- =========================================================================================================================================-->
+    <!-- =========================================================================================================================================-->
+    <!-- 📊 ISI HALAMAN -->
+    <!-- =========================================================================================================================================-->
     <div class="container-fluid">
         <div class="card shadow mb-4">
             <div class="card-body">
+                <!-- =========================================================================================================================================-->
+                <!-- 📈 CHART PRODUKSI (BULANAN)    BUKA KOMEN JIKA INGIN MENAMPIKAN LINE CHART-->
+                <!-- =========================================================================================================================================-->
+
+                <!-- ========================== LINE B BULANAN =========================== -->
+                <section id="chart-bar-bulanan-LINEB" style="height: 100vh;">
+                    <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE B</h6>
+                    <div class="chart-container">
+                        <div class="chart-toolbar mb-2">
+                            <button id="prevBarB" class="btn btn-sm btn-secondary">◀ Prev</button>
+                            <button id="nextBarB" class="btn btn-sm btn-primary">Next ▶</button>
+                        </div>
+                        <canvas id="BarChartB" style="width:100%; height:85vh;"></canvas>
+                    </div>
+                </section>
+
+
+
+                <!-- =========================================================================================================================================-->
+                <!-- 📊 CHART BAR (BULANAN) -->
+                <!-- =========================================================================================================================================-->
+                <!-- ========================== LINE A BULANAN =========================== -->
                 <section id="chart-bar-bulanan-LINEA" style="height: 100vh;" class="mb-5">
                     <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE A</h6>
                     <div class="chart-container">
@@ -259,17 +286,10 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
                     </div>
                 </section>
 
-                <!-- ========================== LINE B BULANAN =========================== -->
-                <section id="chart-bar-bulanan-LINEB" class="mb-5" style="height: 100vh">
-                    <h6 class="fw-bold text-primary mb-3">📊 GRAFIK BAR PRODUKSI LINE B</h6>
-                    <div class="chart-container">
-                        <div class="chart-toolbar mb-2">
-                            <button id="prevBarB" class="btn btn-sm btn-secondary">◀ Prev</button>
-                            <button id="nextBarB" class="btn btn-sm btn-primary">Next ▶</button>
-                        </div>
-                        <canvas id="BarChartB" style="width:100%; height:85vh;"></canvas>
-                    </div>
-                </section>
+
+
+
+
             </div> <!-- end card-body -->
         </div> <!-- end card -->
     </div> <!-- end container -->
@@ -319,5 +339,4 @@ function getDailyData($pdo, $lineId, $bulan, $tahun, $fields)
         updateTabelUtama();
     });
 </script>
-
 <script src="js/autoswipe.js"></script>
