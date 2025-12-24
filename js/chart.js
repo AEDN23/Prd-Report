@@ -10,8 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🎨 Warna dan dataset
   const warna = [
     "#6f42c1",
-    "#0046FF",
-    "#F9E400",
+    "#106900ff",
+    "#766609ff",
     "#FF90BB",
     "#450693",
     "#E9FF97",
@@ -217,8 +217,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const tahun = new Date().getFullYear();
 
   // 🎨 Warna berbeda untuk tiap line
-  const warnaA = "#007bff"; // biru
-  const warnaB = "#F9E400"; // hijau
+  const warnaA = "#106900ff";  
+  const warnaB = "#766609ff";  
 
   const metrics = [
     { key: "productivity", label: "Productivity (Ton/Shift)" },
