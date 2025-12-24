@@ -219,6 +219,7 @@ include '../layout/sidebar.php';
                 "#0046FF88", // Shift 1 - Biru
                 "#F9E40088", // Shift 2 - Kuning
                 "#FF90BB88", // Shift 3 - Pink
+                "#f1055f88", // semua shift - Pink
             ];
 
             const datasets = [];
@@ -482,6 +483,7 @@ include '../layout/sidebar.php';
                 "#0046FF88", // Shift 1 - Biru
                 "#F9E40088", // Shift 2 - Kuning
                 "#FF90BB88", // Shift 3 - Pink
+                "#f5025f88", // S4- SEMUA SHIFT
             ];
 
             const datasets = [];
